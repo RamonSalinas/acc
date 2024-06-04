@@ -39,6 +39,7 @@ class UserResource extends Resource
     {
         return __('resources.user');
     }
+
     public static function getPluralLabel(): ?string
     {
         return __('resources.user.plural');
@@ -110,27 +111,27 @@ class UserResource extends Resource
                             ->relationship('roles', 'name', function (Role $role) {
                                 return $role::where('id', '!=', 1);
                             })
-                            ->preload()//Retirar de aqui a permisão..
+                            ->preload()
                             ->visible(Auth::user()->hasPermissionTo('role.update')),
                         Forms\Components\Select::make('id_curso')
                             ->label('Curso')
-                            ->options(AdCursos::all()->pluck('nome_curso', 'id'))
+                            ->options(
+                                AdCursos::all()->mapWithKeys(fn ($curso) => [
+                                    $curso->id => "{$curso->nome_curso} (PPC {$curso->ppc})"
+                                ])->toArray()
+                            )
                             ->searchable()
                             ->preload(),
-
-                            Forms\Components\Select::make('periodo')
-                    ->label('Período')
-                    ->options([
-                        '2016.1' => '2016.1',
-                        '2023.1' => '2023.1',
-                    ])
-                    ->required(),
                         Forms\Components\Select::make('id_professor')
                             ->label('Professor')
-                            ->options(Professor::all()->pluck('nome', 'id'))
+                            ->options(function () {
+                                return User::whereColumn('id', 'id_professor')
+                                           ->get()
+                                           ->pluck('name', 'id');
+                            })
                             ->searchable()
                             ->preload(),
-                    ])->columns(1)
+                    ])->columns(3)
             ]);
     }
 
@@ -155,10 +156,6 @@ class UserResource extends Resource
                     ->state(function (User $record) {
                         return $record->getRoleNames();
                     }),
-
-                Tables\Columns\TextColumn::make('periodo')
-                    ->sortable()
-                    ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

@@ -1,8 +1,23 @@
 <?php
 
+use App\Models\NgAtividades;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PdfController;
 
+
+Route::get('/test-professor', function () {
+    // Criar um novo professor
+    $ngatividades = NgAtividades::create([
+        'grupo_atividade' => 'Nome do Professor',
+        'nome_atividade' => 'professor@example.com',
+        'valor_unitario' => 'Nome do Professor',
+        'percentual_maximo' => 'professor@example.com',
+    ]);
+
+    // Exibir os dados do professor criado
+    dd($ngatividades);
+});
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -13,6 +28,13 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+
+// routes/web.php
+
+
+Route::get('/ng-certificados/pdf', [PdfController::class, 'generatePdf'])->name('ng-certificados.pdf');
+Route::get('/reports/pdf', [PdfController::class, 'generatePdf1'])->name('reports.pdf');
+
 
 Route::get('/', function () {
     return view('welcome');

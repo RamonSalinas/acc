@@ -32,6 +32,12 @@ class RoleSeeder extends Seeder
         ]);
         $admin->givePermissionTo(['role.view.all','user.view.all','user.view','user.update']);
 
+        $especialista =Role::create([
+            'guard_name' => $this->guard,
+            'name' => $this->ESPECIALISTA
+        ]);
+        $especialista->givePermissionTo(['role.view.all','user.view.all','user.view','user.update']);
+
         Role::create([
             'guard_name' => $this->guard,
             'name' => $this->USER

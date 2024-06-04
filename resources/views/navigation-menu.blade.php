@@ -103,7 +103,7 @@
                         <x-slot name="content">
                             <!-- Account Management -->
                             <div class="block px-4 py-2 text-xs text-gray-400">
-                                {{ __('Manage Account') }}
+                                {{ __('Manage Account1') }}
                             </div>
 
                             <x-dropdown-link href="{{ route('profile.show') }}">
@@ -116,12 +116,13 @@
                                 </x-dropdown-link>
                             @endif
 
-                            @if (Auth::user()->isAdmin())
-                                <x-dropdown-link href="{{ route('filament.admin.pages.dashboard') }}">
-                                    {{ __('Admin Panel') }}
-                                </x-dropdown-link>
+                            @if (Auth::check() && (Auth::user()->isAdmin() || Auth::user()->isEspecialista()))
+                            <x-dropdown-link href="{{ route('filament.admin.pages.dashboard') }}">
+                                {{ __('Admin Panel') }}
+                            </x-dropdown-link>
                             @endif
-
+                           
+                           
                             <div class="border-t border-gray-200 dark:border-gray-600"></div>
 
                             <!-- Authentication -->

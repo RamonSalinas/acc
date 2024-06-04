@@ -2,45 +2,33 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use App\Http\Traits\UserTrait;
-use Filament\Models\Contracts\FilamentUser;
-use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Fortify\TwoFactorAuthenticatable;
-use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
+use Filament\Models\Contracts\FilamentUser;
+use App\Http\Traits\UserTrait;
+use Filament\Panel;
+use Laravel\Jetstream\HasProfilePhoto;
+use Laravel\Fortify\TwoFactorAuthenticatable;
 
 class User extends Authenticatable implements FilamentUser
 {
-    use HasApiTokens;
-    use HasFactory;
-    use HasProfilePhoto;
-    use Notifiable;
-    use TwoFactorAuthenticatable;
-    use HasRoles;
-    use UserTrait;
+    use HasApiTokens, HasFactory, HasProfilePhoto, Notifiable, TwoFactorAuthenticatable, HasRoles, UserTrait;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
         'name',
+        'cpf',
         'email',
         'password',
         'is_active',
+        'id_curso',
+        'id_professor',
+        'periodo', 
+
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
@@ -48,20 +36,10 @@ class User extends Authenticatable implements FilamentUser
         'two_factor_secret',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
 
-    /**
-     * The accessors to append to the model's array form.
-     *
-     * @var array<int, string>
-     */
     protected $appends = [
         'profile_photo_url',
     ];
@@ -75,9 +53,47 @@ class User extends Authenticatable implements FilamentUser
     {
         return $this->hasRole($this->ADMIN);
     }
+    
+
+    public function isUser(): bool
+    {
+        return $this->hasRole($this->USER);
+    }
+
+    public function isEspecialista(): bool
+    {
+        return $this->hasRole($this->ESPECIALISTA);
+    }
 
     public function canAccessPanel(Panel $panel): bool
     {
-        return $this->hasRole([$this->SUPER_ADMIN,$this->ADMIN]) && $this->is_active;
+        return $this->hasRole([$this->SUPER_ADMIN, $this->ADMIN, $this->USER, $this->ESPECIALISTA]) && $this->is_active;
     }
+
+    public function ng_certificado()
+    {
+        return $this->belongsToMany(NgCertificados::class);
+    }
+
+    public function ng_cursos()
+    {
+        return $this->hasMany(AdCursos::class);
+    }
+
+    public function professores()
+    {
+        return $this->belongsToMany(Professor::class, 'professor_user', 'user_id', 'professor_id');
+    }
+
+    public function ngCertificados()
+    {
+        return $this->belongsToMany(NgCertificados::class, 'ng_certificado_user', 'user_id', 'ng_certificados_id');
+    }
+
+    public function curso()
+    {
+        return $this->belongsTo(AdCursos::class, 'id_curso');
+    }
+    
+
 }

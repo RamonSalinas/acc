@@ -1,0 +1,48 @@
+https://github.com/Innovix-Matrix-Systems/ims-laravel-admin-starter
+Opção 1.  Aprender a usar os roles do projeto e delimitar funciones dos três perfis
+Procurar projetos com tailwindcss filement e php laravel
+Crear um novo banco de dados e novos permissos
+
+testar este projeto. https://github.com/Innovix-Matrix-Systems/ims-laravel-api-starter
+fazer analises financeiro
+
+Opção 2.  Fazer um novo Panel e configurar roles e permissões para ter acesso no dosi novos panel
+
+
+Mailgun
+
+
+1  Primeiro segui o tutorail em resumo, baixar codigo do Git hub básico,  usar composer install, migrar banco de dados com artemisa  migrete,  
+
+
+Como criar um novo recurso No laravel Filamente 
+
+primeiro criar a migração.
+Depois criar o modelo para a conexão com o banco de dados.
+Depois criar o Recurse do filament php artisan make:filament-resource ng_pesquisa
+    Precisa depois configurar cada um dos recursos. com os valores que deseja solicitar no formulario e nas tabelas 
+
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('ng_certificado_user', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('ng_certificados_id')->constrained('ng_certificados')->onDelete('cascade');
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('ng_certificado_user');
+    }
+};

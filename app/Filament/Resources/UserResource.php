@@ -4,8 +4,9 @@ namespace App\Filament\Resources;
 
 use App\Exports\BulkExport;
 use App\Filament\Resources\UserResource\Pages;
-use App\Filament\Resources\UserResource\Pages\CreateUser;
 use App\Models\User;
+use App\Models\Professor;
+use App\Models\AdCursos;
 use Filament\Forms;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Form;
@@ -14,10 +15,7 @@ use Filament\Infolists\Infolist;
 use Filament\Pages\Page;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
-use Filament\Tables\Filters\Filter;
-use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
@@ -27,7 +25,7 @@ use Spatie\Permission\Models\Role;
 class UserResource extends Resource
 {
     protected static ?string $model = User::class;
-
+    protected static ?string $navigationLabel = 'Usuarios';
     protected static ?string $navigationIcon = 'heroicon-o-user-group';
     protected static ?string $navigationGroup = 'Settings';
     protected static ?int $navigationSort = 2;
@@ -50,7 +48,7 @@ class UserResource extends Resource
     {
         return $infolist
             ->schema([
-                Infolists\Components\TextEntry::make('name'),
+                Infolists\Components\TextEntry::make('nome'),
                 Infolists\Components\TextEntry::make('email'),
                 Infolists\Components\TextEntry::make('email_verified_at'),
                 Infolists\Components\IconEntry::make('is_active')->boolean(),
@@ -77,6 +75,8 @@ class UserResource extends Resource
                         Forms\Components\TextInput::make('name')
                             ->required()
                             ->maxLength(255),
+                        Forms\Components\TextInput::make('cpf')
+                            ->maxLength(255),
                         Forms\Components\TextInput::make('email')
                             ->email()
                             ->required()
@@ -86,7 +86,7 @@ class UserResource extends Resource
                             ->visibleOn('edit'),
                         Forms\Components\TextInput::make('password')
                             ->password()
-                            ->required(fn (Page $livewire) => ($livewire instanceof CreateUser))
+                            ->required(fn (Page $livewire) => ($livewire instanceof Pages\CreateUser))
                             ->maxLength(255)
                             ->dehydrateStateUsing(fn (string $state): string => Hash::make($state))
                             ->dehydrated(fn (?string $state): bool => filled($state))
@@ -110,8 +110,26 @@ class UserResource extends Resource
                             ->relationship('roles', 'name', function (Role $role) {
                                 return $role::where('id', '!=', 1);
                             })
-                            ->preload()
+                            ->preload()//Retirar de aqui a permisão..
                             ->visible(Auth::user()->hasPermissionTo('role.update')),
+                        Forms\Components\Select::make('id_curso')
+                            ->label('Curso')
+                            ->options(AdCursos::all()->pluck('nome_curso', 'id'))
+                            ->searchable()
+                            ->preload(),
+
+                            Forms\Components\Select::make('periodo')
+                    ->label('Período')
+                    ->options([
+                        '2016.1' => '2016.1',
+                        '2023.1' => '2023.1',
+                    ])
+                    ->required(),
+                        Forms\Components\Select::make('id_professor')
+                            ->label('Professor')
+                            ->options(Professor::all()->pluck('nome', 'id'))
+                            ->searchable()
+                            ->preload(),
                     ])->columns(1)
             ]);
     }
@@ -124,24 +142,23 @@ class UserResource extends Resource
                     ->searchable(isIndividual: true),
                 Tables\Columns\TextColumn::make('email')
                     ->searchable(),
+                Tables\Columns\TextColumn::make('cpf')
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('email_verified_at')
                     ->since()
                     ->sortable(),
-                // ->visible(false),
                 Tables\Columns\IconColumn::make('is_active')
                     ->label("Active")
                     ->boolean(),
-                // Tables\Columns\ToggleColumn::make('is_active')
-                //     ->disabled(fn (User $record) => !Auth::user()->hasPermissionTo('user.update')),
                 Tables\Columns\TextColumn::make('roles')
                     ->badge()
                     ->state(function (User $record) {
                         return $record->getRoleNames();
                     }),
-                // ->color(fn (string $state): string => match ($state) {
-                //     'Super-Admin' => 'success',
-                //     'Admin' => 'info',
-                // }),
+
+                Tables\Columns\TextColumn::make('periodo')
+                    ->sortable()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -153,29 +170,13 @@ class UserResource extends Resource
             ])
             ->filters([
                 Tables\Filters\TernaryFilter::make('is_active'),
-                Filter::make('View Only Active Users')
+                Tables\Filters\Filter::make('View Only Active Users')
                     ->query(fn (Builder $query) => $query->where('is_active', true)),
-                // SelectFilter::make('is_active')
-                //     ->options([
-                //         '1' => 'Active',
-                //         '0' => 'Deactive',
-                //     ]),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
-                //Tables\Actions\DeleteAction::make()->visible(fn (User $record) => !$record->isSuperAdmin()),
-                // Action::make('delete')
-                //     ->requiresConfirmation()
-                //     ->icon('heroicon-o-trash')
-                //     ->color('danger')
-                //     ->action(fn (User $record) => $record->delete())
-                //     ->visible(fn (User $record) => !$record->isSuperAdmin() && Auth::user()->hasPermissionTo('user.delete'))
-                //     ->modalHeading('Delete User')
-                //     ->modalDescription('Are you sure you\'d like to delete this User? This cannot be undone.')
-                //     ->modalSubmitActionLabel('Yes, delete the User'),
-
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -187,21 +188,13 @@ class UserResource extends Resource
                         ->deselectRecordsAfterCompletion()
                 ])
             ])
-            // ->checkIfRecordIsSelectableUsing(
-            //     fn (User $record): bool => !$record->isSuperAdmin() && Auth::user()->hasPermissionTo('user.delete'),
-            // ); //performance issue
-            // ->defaultPaginationPageOption(25)
-            //->reorderable('sort')
-            //->selectCurrentPageOnly()
             ->queryStringIdentifier('users')
             ->deferLoading();
     }
 
     public static function getRelations(): array
     {
-        return [
-            //
-        ];
+        return [];
     }
 
     public static function getPages(): array

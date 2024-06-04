@@ -16,11 +16,6 @@ class UserJoinChart extends ChartWidget
         return __('widgets.chart.user.join_this_year');
     }
 
-    public static function canView(): bool
-    {
-        return Auth::user()->isSuperAdmin();
-    }
-
     protected function getData(): array
     {
         $users = User::all('id', 'name', 'created_at');

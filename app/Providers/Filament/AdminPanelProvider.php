@@ -9,7 +9,6 @@ use App\Filament\Resources\UserResource;
 use App\Http\Middleware\AdminAuthenticate;
 use App\Http\Middleware\Authenticate;
 use App\Http\Middleware\LanguageMiddleware;
-//use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Navigation\MenuItem;
@@ -27,6 +26,7 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use App\Filament\Widgets\CertificadosWidgetStats;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -39,10 +39,6 @@ class AdminPanelProvider extends PanelProvider
             ->favicon(asset('favicon.ico'))
             ->id('admin')
             ->path('admin')
-            //->login()
-            //->registration()
-            //->profile()
-            //->passwordReset()
             ->colors([
                 'danger' => Color::Red,
                 'gray' => Color::Zinc,
@@ -52,16 +48,13 @@ class AdminPanelProvider extends PanelProvider
                 'warning' => Color::Amber,
             ])
             ->viteTheme('resources/css/filament/admin/theme.css')
-            //->maxContentWidth('full')
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
-            ->pages([
-                //Pages\Dashboard::class,
-            ])
+            ->pages([])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
                 Widgets\AccountWidget::class,
-                //Widgets\FilamentInfoWidget::class,
+                CertificadosWidgetStats::class, // Registrar o widget personalizado
             ])
             ->databaseNotifications()
             ->userMenuItems([
@@ -71,17 +64,6 @@ class AdminPanelProvider extends PanelProvider
                     ->icon('heroicon-o-cog-6-tooth'),
             ])
             ->sidebarCollapsibleOnDesktop()
-            // ->navigation(function (NavigationBuilder $builder): NavigationBuilder {
-            //     return $builder->items([
-            //         NavigationItem::make('Dashboard')
-            //             ->icon('heroicon-o-home')
-            //             ->isActiveWhen(fn (): bool => request()->routeIs('filament.admin.pages.dashboard'))
-            //             ->url(fn (): string => Dashboard::getUrl()),
-            //             ...RoleResource::getNavigationItems(),
-            //             ...UserResource::getNavigationItems(),
-
-            //     ]);
-            // })
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,

@@ -37,7 +37,7 @@ class UserSeeder extends Seeder
     public function __construct()
     {
         $this->faker = $this->withFaker();
-    }
+    } 
     /**
      * Run the database seeds.
      */

@@ -9,4 +9,5 @@ trait UserTrait
     private $SUPER_ADMIN = 'Super-Admin';
     private $ADMIN = 'Admin';
     private $USER = 'User';
+    private $ESPECIALISTA = 'Especialista';
 }

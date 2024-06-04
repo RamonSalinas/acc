@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ## About this project
 
 `ims-laravel-admin-starter` is a streamlined Admin panel & API starter application built using the powerful [Laravel 10](https://laravel.com/) framework and [Filment 3](https://filamentphp.com/).
@@ -251,3 +252,7 @@ Leverage these Artisan commands to streamline your development process and maint
 This project is brought to you by Innovix Matrix System and is released as open-source software under the [MIT license](https://opensource.org/licenses/MIT).
 
 Feel free to use, modify, and distribute this starter project in accordance with the MIT license terms. We encourage collaboration and welcome contributions from the community to make this project even better.
+=======
+# acc
+Sistema para Calcular ACC dos alunos da UFOB Cursos da UFOB.   Usando um sistema de banco de dados relacional e boas práticas de programação. 
+>>>>>>> 30f95fe8ff603d1c7bf29634c89afee288262e6d

@@ -28,7 +28,7 @@ class RoleResource extends Resource
     }
     public static function getPluralLabel(): ?string
     {
-        return __('resources.role.plural');
+        return __('Roles');
     }
 
     public static function getNavigationBadge(): ?string

@@ -76,8 +76,14 @@ class UserResource extends Resource
                         Forms\Components\TextInput::make('name')
                             ->required()
                             ->maxLength(255),
-                        Forms\Components\TextInput::make('cpf')
-                            ->maxLength(255),
+                            Forms\Components\TextInput::make('cpf')
+                            ->required()
+                            ->maxLength(11)
+                            ->minLength(11)
+                            ->unique(User::class, 'cpf', ignoreRecord: true)
+                            ->numeric()
+                            ->label('CPF')
+                            ->helperText('O CPF deve conter apenas números e ter exatamente 11 dígitos.'),
                         Forms\Components\TextInput::make('email')
                             ->email()
                             ->required()

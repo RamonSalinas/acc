@@ -28,6 +28,7 @@ class DatabaseSeeder extends Seeder
 
         //creating Admins
         $this->call(UserSeeder::class);
+        $this->call(AdGrupoSeeder::class);
 
         Model::reguard(); // Enable mass assignment
     }

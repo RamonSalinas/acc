@@ -22,4 +22,9 @@ class NgAtividades extends Model
     {
         return $this->hasMany(NgCertificados::class, 'id_tipo_Atividade');
     }
+
+    public function grupo()
+    {
+        return $this->belongsTo(AdGrupo::class, 'grupo_atividades', 'id');
+    }
 }

@@ -34,7 +34,7 @@ class AdminPanelProvider extends PanelProvider
     {
         return $panel
             ->default()
-            ->brandName('IMS Admin')
+            ->brandName('ACC Admin')
             ->brandLogo(asset('assets/logo.svg'))
             ->favicon(asset('favicon.ico'))
             ->id('admin')

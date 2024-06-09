@@ -25,7 +25,7 @@ class PermissionResource extends Resource
     }
     public static function getPluralLabel(): ?string
     {
-        return __('resources.permission.plural');
+        return __('Permissões');
     }
 
     public static function form(Form $form): Form

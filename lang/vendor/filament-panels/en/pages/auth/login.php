@@ -30,7 +30,7 @@ return [
         ],
 
         'remember' => [
-            'label' => 'Remember me',
+            'label' => 'Lembre-se de mim',
         ],
 
         'actions' => [

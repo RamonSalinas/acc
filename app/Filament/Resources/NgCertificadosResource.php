@@ -6,6 +6,7 @@ use App\Filament\Resources\NgCertificadosResource\Pages;
 use App\Models\NgCertificados;  
 use App\Models\NgAtividades;
 use App\Models\AdCursos;
+use App\Models\AdGrupo;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Filament\Forms;
@@ -31,17 +32,20 @@ class NgCertificadosResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Select::make('grupo_atividades')
-                    ->options([
-                        '1' => '1',
-                        '2' => '2',
-                        '3' => '3',
-                        '4' => '4',
-                        '5' => '5',
-                        '8' => '8',
-                    ])
+                ->label('Grupo de Atividades')
+                ->options(function () {
+                    // Carregue os dados diretamente do banco de dados
+                    return AdGrupo::pluck('nome_grupo', 'id')->toArray();
+                })
                     ->required()
                     ->reactive()
-                    ->default('1')
+                    ->searchable()
+                    ->label('Grupo de Atividades')
+                    ->getSearchResultsUsing(function (string $search): array {
+                        $results = AdGrupo::where('nome_grupo', 'like', "%{$search}%")->limit(50)->get();
+                        return $results->pluck('nome_grupo', 'id')->toArray();
+                    })
+                    ->getOptionLabelUsing(fn ($value): ?string => AdGrupo::find($value)?->nome_grupo)
                     ->afterStateUpdated(function (callable $set) {
                         $set('id_tipo_Atividade', null);
                         $set('valor_unitario', null);
@@ -49,210 +53,237 @@ class NgCertificadosResource extends Resource
                         $set('horas_ACC', null);
                     }),
 
-                Forms\Components\Select::make('id_tipo_Atividade')
-                    ->label('Nome da Atividade')
-                    ->required()
-                    ->reactive()
-                    ->options(function (callable $get) {
-                        $grupoAtividades = $get('grupo_atividades');
-                        if ($grupoAtividades) {
-                            return NgAtividades::where('grupo_atividades', $grupoAtividades)
-                                ->pluck('nome_atividade', 'id')
-                                ->toArray();
+            Forms\Components\Select::make('id_tipo_atividade')
+            ->label('Nome da Atividade')
+            ->required()
+            ->reactive()
+            ->options(function (callable $get) {
+                $grupoAtividades = $get('grupo_atividades');
+                if ($grupoAtividades) {
+                    return NgAtividades::where('grupo_atividades', $grupoAtividades)
+                        ->pluck('nome_atividade', 'id')
+                        ->toArray();
+                }
+                return [];
+            })
+            ->default(function ($record) {
+                return $record ? $record->id_tipo_atividade : null;
+            })
+            ->afterStateUpdated(function (callable $set, callable $get, $state) {
+                $set('horas_ACC', null);
+
+                if ($state) {
+                    $atividade = NgAtividades::find($state);
+                    if ($atividade) {
+                        $set('valor_unitario', $atividade->valor_unitario);
+                        $set('percentual_maximo', $atividade->percentual_maximo);
+
+                        if (in_array($state, [7, 9, 15])) {
+                            Notification::make()
+                                ->title('Atividade Especial Selecionada')
+                                ->body('Você selecionou uma atividade especial. Agregue o número de atividades realizadas.')
+                                ->success()
+                                ->send();
                         }
-                        return [];
-                    })
-                    ->afterStateUpdated(function (callable $set, callable $get, $state) {
-                        $set('horas_ACC', null);  // Reset horas_ACC to null
-
-                        if ($state) {
-                            $atividade = NgAtividades::find($state);
-                            if ($atividade) {
-                                $set('valor_unitario', $atividade->valor_unitario);
-                                $set('percentual_maximo', $atividade->percentual_maximo);
-
-                                if (in_array($state, [7, 9, 15])) {
-                                    Notification::make()
-                                        ->title('Atividade Especial Selecionada')
-                                        ->body('Você selecionou uma atividade especial. Agregue o número de atividades realizadas.')
-                                        ->success()
-                                        ->send();
-                                }
-                            }
-                        }
-                    }),
-
+                    }
+                }
+            }),
+    
                 Forms\Components\TextInput::make('valor_unitario')
                     ->label('Valor Unitário')
                     ->disabled()
                     ->reactive()
-                    ->dehydrated(false),
-
+                    ->dehydrated(false)
+                    ->hidden(),
+    
                 Forms\Components\TextInput::make('percentual_maximo')
                     ->label('Percentual Máximo')
                     ->disabled()
-                    ->dehydrated(false),
-
+                    ->dehydrated(false)
+                    ->hidden(),
+                
+    
                 Forms\Components\TextInput::make('nome_certificado')
                     ->required()
                     ->default('NOME TESTE')
                     ->maxLength(255),
-
+    
                 Forms\Components\TextInput::make('carga_horaria')
                     ->label(fn (callable $get) => $get('carga_horaria_label', 'Horario'))
                     ->required()
                     ->reactive()
-                    ->afterStateUpdated(function (callable $set, callable $get) {
-                        $idTipoAtividade = $get('id_tipo_Atividade');
-                        $valorUnitario = $get('valor_unitario');
-                        $cargaHoraria = $get('carga_horaria');
-                        $percentualMaximo = $get('percentual_maximo');
-                        
-                        $user = Auth::user();
-                        $curso = AdCursos::find($user->id_curso);
+                    ->numeric() // Ensure only numeric values
+                    ->rule('min:1') // Ensure the value is   maior que 0
+    ->afterStateUpdated(function (callable $set, callable $get) {
+    $idTipoAtividade = $get('id_tipo_atividade');
+    $valorUnitario = $get('valor_unitario');
+    $cargaHoraria = $get('carga_horaria');
+    $percentualMaximo = $get('percentual_maximo');
 
-                        if (!$curso) {
+   
+                    $user = Auth::user();
+                    $curso = AdCursos::find($user->id_curso);
+    
+                    if (!$curso) {
+                        Notification::make()
+                            ->title('Erro')
+                            ->body('Curso não encontrado.')
+                            ->danger()
+                            ->send();
+                        return;
+                    }
+    
+                    if (!$percentualMaximo) {
+                        Notification::make()
+                            ->title('Erro')
+                            ->body('Percentual máximo não encontrado.')
+                            ->danger()
+                            ->send();
+                        return;
+                    }
+    
+                    if (!$valorUnitario) {
+                        Notification::make()
+                            ->title('Erro')
+                            ->body('Valor unitário não encontrado.')
+                            ->danger()
+                            ->send();
+                        return;
+                    }
+    
+                    if (!$cargaHoraria) {
+                        Notification::make()
+                            ->title('Erro')
+                            ->body('Carga horária não encontrada.')
+                            ->danger()
+                            ->send();
+                        return;
+                    }
+    
+                    $maxHorasPermitidas = ($curso->carga_horaria_ACC * $percentualMaximo) / 100;
+                    if ($idTipoAtividade && in_array($idTipoAtividade, [7, 9, 15])) {
+                        $horasACC = $valorUnitario * $cargaHoraria;
+    
+                        if ($horasACC > $maxHorasPermitidas) {
                             Notification::make()
-                                ->title('Erro')
-                                ->body('Curso não encontrado.')
-                                ->danger()
+                                ->title('Excedeu o limite permitido')
+                                ->body('Só será contemplado o máximo porcentagem do barema do CCET.')
+                                ->warning()
                                 ->send();
-                            return;
                         }
-
-                        $maxHorasPermitidas = ($curso->carga_horaria_ACC * $percentualMaximo) / 100;
-                        if ($idTipoAtividade && in_array($idTipoAtividade, [7, 9, 15])) {
-                            $horasACC = $valorUnitario * $cargaHoraria;
-
-                            if ($horasACC > $maxHorasPermitidas) {
-                                Notification::make()
-                                    ->title('Excedeu o limite permitido')
-                                    ->body('Só será contemplado o máximo porcentagem do barema do CCET.')
-                                    ->warning()
-                                    ->send();
-                            }
-                            $set('horas_ACC', $horasACC);
-                        } else {
-                            $horasACC = $cargaHoraria / $valorUnitario;
-
-                            if ($horasACC > $maxHorasPermitidas) {
-                                Notification::make()
-                                    ->title('Excedeu o limite permitido')
-                                    ->body('Só será contemplado o máximo porcentagem do barema do CCET.')
-                                    ->warning()
-                                    ->send();
-                            }
-                            $set('horas_ACC', $horasACC);
+                        $set('horas_ACC', $horasACC);
+                    } else {
+                        $horasACC = $cargaHoraria / $valorUnitario;
+    
+                        if ($horasACC > $maxHorasPermitidas) {
+                            Notification::make()
+                                ->title('Excedeu o limite permitido')
+                                ->body('Só será contemplado o máximo porcentagem do barema do CCET.')
+                                ->warning()
+                                ->send();
                         }
-                    }),
-
-                    
-
-                Forms\Components\Textarea::make('descricao')
-                    ->default('TESTE DESCRIÇÃO'),
-
-                Forms\Components\TextInput::make('local')
-                    ->required()
-                    ->default('TESTE BARREIRA')
-                    ->maxLength(255),
-
-                Forms\Components\DatePicker::make('data_inicio')
-                    ->default(Carbon::now())
-                    ->required(),
-
-                Forms\Components\DatePicker::make('data_final')
-                    ->default(Carbon::now())
-                    ->required(),
-
-                Forms\Components\Hidden::make('id_usuario')
-                    ->default(fn () => Auth::id()),
-
-                Forms\Components\TextInput::make('horas_ACC')//Teve que criar um hidden  do mesmo valor já que quando coloco disable, o valor não é enviado e da erro no banco de dados. 
+                        $set('horas_ACC', $horasACC);
+                    }
+                }),
+    
+            Forms\Components\Textarea::make('descricao')
+                ->default('TESTE DESCRIÇÃO'),
+    
+            Forms\Components\TextInput::make('local')
+                ->required()
+                ->default('TESTE BARREIRA')
+                ->maxLength(255),
+    
+            Forms\Components\DatePicker::make('data_inicio')
+                ->default(Carbon::now())
+                ->required(),
+    
+            Forms\Components\DatePicker::make('data_final')
+                ->default(Carbon::now())
+                ->required(),
+    
+            Forms\Components\Hidden::make('id_usuario')
+                ->default(fn () => Auth::id()),
+    
+            Forms\Components\TextInput::make('horas_ACC') // This hidden field ensures the value is sent to the database
                 ->label('Horas ACC Equivalentes')
                 ->default(0)
                 ->disabled()
                 ->extraAttributes(['hidden' => 'hidden']),
-                Forms\Components\Hidden::make('horas_ACC')
+            Forms\Components\Hidden::make('horas_ACC')
                 ->default(0),
-                    
-
-                Forms\Components\TextInput::make('type')
-                    ->default('pendente')
-                    ->disabled()
-                    ->required(),
-
-
-             
-                    
-            ]);
+    
+            Forms\Components\TextInput::make('type')
+                ->default('pendente')
+                ->disabled()
+                ->required(),
+        ]);
     }
 
     public static function table(Table $table): Table
-{
-    $currentUser = Auth::user();
+    {
+        $currentUser = Auth::user();
 
-    $query = static::getModel()::query();
+        $query = static::getModel()::query();
 
-    // Verifica se o usuário é um Super Admin
-    if (!$currentUser->isSuperAdmin()) {
-        // Verifica se o usuário é um Admin
-        if ($currentUser->isAdmin()) {
-            // Se for, filtra os registros pelo id_professor igual ao ID do Admin
-            $query->whereHas('user', function ($query) use ($currentUser) {
-                $query->where('id_professor', $currentUser->id);
-            });
-        } else {
-            // Se não for um Super Admin ou Admin, filtra os registros pelo ID do usuário atual
-            $query->where('id_usuario', $currentUser->id);
+        if (!$currentUser->isSuperAdmin()) {
+            if ($currentUser->isAdmin()) {
+                $query->whereHas('user', function ($query) use ($currentUser) {
+                    $query->where('id_professor', $currentUser->id);
+                });
+            } else {
+                $query->where('id_usuario', $currentUser->id);
+            }
         }
+
+        return $table
+            ->query($query)
+            ->columns([
+                Tables\Columns\TextColumn::make('nome_certificado')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('carga_horaria')
+                 ->badge(),
+   
+                 Tables\Columns\TextColumn::make('type')
+                ->badge()
+                ->color(fn ($state) => match($state) {
+                    '
+                    Aprovada' => 'success',
+                    'Pendente' => 'warning',
+                    'Rejeitada' => 'danger',
+                    default => null,  // Ou você pode escolher uma cor padrão como 'secondary'
+                }),
+
+               
+                Tables\Columns\TextColumn::make('horas_ACC')->sortable()->searchable(),
+           
+              Tables\Columns\TextColumn::make('ngAtividade.nome_atividade')->label('Atividade')->sortable()->searchable(),
+                       ])
+            ->filters([
+                // Defina os filtros, se necessário
+            ])
+            ->actions([
+                !$currentUser->isAdmin()
+                    ? Tables\Actions\EditAction::make()
+                    : Tables\Actions\Action::make('view')
+                        ->label('Ver')
+                        ->url(fn ($record) => route('filament.admin.resources.ng-certificados.view', $record))
+                        ->icon('heroicon-o-eye'),
+            ]);
     }
-
-    return $table
-        ->query($query)
-        ->columns([
-            Tables\Columns\TextColumn::make('nome_certificado')->sortable()->searchable(),
-            Tables\Columns\TextColumn::make('carga_horaria')->sortable()->searchable(),
-            Tables\Columns\TextColumn::make('type')
-                ->badge()->colors([
-                    'pendente' => 'gray',
-                    'aprovado' => 'green',
-                    'reprovado' => 'red',
-                ])->searchable(),
-            Tables\Columns\TextColumn::make('descricao')->sortable()->searchable(),
-            Tables\Columns\TextColumn::make('local')->sortable()->searchable(),
-            Tables\Columns\TextColumn::make('data_inicio')->date()->sortable()->searchable(),
-            Tables\Columns\TextColumn::make('data_final')->date()->sortable()->searchable(),
-            Tables\Columns\TextColumn::make('ngAtividade.nome_atividade')->label('Atividade')->sortable()->searchable(),
-            Tables\Columns\TextColumn::make('user.name')->label('Usuário')->sortable()->searchable(),
-            Tables\Columns\TextColumn::make('horas_ACC')->sortable()->searchable(),
-        ])
-        ->filters([
-            // Defina os filtros, se necessário
-        ])
-        ->actions([
-            Tables\Actions\EditAction::make(),
-        ])
-        ->bulkActions([
-            Tables\Actions\DeleteBulkAction::make(),
-        ]);
-}
-
 
     public static function getRelations(): array
     {
         return [
-            // 
+            //
         ];
     }
-
     public static function getPages(): array
     {
         return [
             'index' => Pages\ListNgCertificados::route('/'),
             'create' => Pages\CreateNgCertificados::route('/create'),
             'edit' => Pages\EditNgCertificados::route('/{record}/edit'),
+            'view' => Pages\ViewNgCertificados::route('/{record}'),
         ];
     }
-
-    
 }

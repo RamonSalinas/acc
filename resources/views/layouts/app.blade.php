@@ -14,6 +14,7 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
 
+
         <!-- Styles -->
         @livewireStyles
     </head>
@@ -22,6 +23,7 @@
 
         <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
             @livewire('navigation-menu')
+            @livewire('database-notifications')
 
             <!-- Page Heading -->
             @if (isset($header))

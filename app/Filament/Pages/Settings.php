@@ -30,7 +30,7 @@ class Settings extends Page implements HasForms
 
     public static function getNavigationLabel(): string
     {
-        return __('pages.profile.settings');
+        return __('Configurações');
     }
 
     protected function getHeaderWidgets(): array
@@ -58,53 +58,47 @@ class Settings extends Page implements HasForms
     public $language;
 
     public function mount(): void
-{
-    $user = Auth::user();
+    {
+        $user = Auth::user();
 
-    if ($user) {
-        //$roles = optional($user->roles)->pluck('id')->toArray();
+        if ($user) {
+            //$roles = optional($user->roles)->pluck('id')->toArray();
 
-   
+            $this->updateProfileFrom->fill([
+                'name' => $user->name,
+                'email' => $user->email,
+                'cpf' => $user->cpf,
+                'id_curso' => $user->id_curso,
+                'id_professor' => $user->id_professor,
+                //   'roles' => $roles,
+            ]);
 
-        $this->updateProfileFrom->fill([
-            'name' => $user->name,
-            'email' => $user->email,
-            'cpf' => $user->cpf,
-            'id_curso' => $user->id_curso,
-            'id_professor' => $user->id_professor,
-        //   'roles' => $roles,
-        ]);
+            $this->userId = $user->id;
+        }
 
-        $this->userId = $user->id;
+        $this->language = session('locale', config('app.locale'));
     }
-
-    $this->language = session('locale', config('app.locale'));
-}
-
-
-
-
 
     public function saveProfileAction()
     {
-        return Action::make('save profile information')
-            ->label(__('pages.profile.action.label'))
+        return Action::make('salvar informações do perfil')
+            ->label(__('Salvar informações do perfil'))
             ->action('saveProfile')
             ->color('primary');
     }
 
     public function savePasswordAction()
     {
-        return Action::make('update password')
-            ->label(__('pages.profile.action.password.label'))
+        return Action::make('atualizar senha')
+            ->label(__('Atualizar senha'))
             ->action('updatePassword')
             ->color('primary');
     }
 
     public function saveSettingsAction()
     {
-        return Action::make('update system settings')
-            ->label(__('pages.system.action.label'))
+        return Action::make('atualizar configurações do sistema')
+            ->label(__('Atualizar configurações do sistema'))
             ->action('updateSettings')
             ->color('primary');
     }
@@ -117,8 +111,8 @@ class Settings extends Page implements HasForms
             'cpf' => 'max:255',
             'id_curso' => 'required|exists:ad_cursos,id',
             'id_professor' => 'required|exists:users,id',
-//'roles' => 'required|array',
-      //      'roles.*' => 'exists:roles,id',
+            //'roles' => 'required|array',
+            // 'roles.*' => 'exists:roles,id',
         ]);
 
         try {
@@ -132,12 +126,12 @@ class Settings extends Page implements HasForms
             $user->save();
 
             Notification::make()
-                ->title(__('notifications.save.success'))
+                ->title(__('Salvo com sucesso'))
                 ->success()
                 ->send();
         } catch (\Throwable $th) {
             Notification::make()
-                ->title(__('notifications.profile.save.failed'))
+                ->title(__('Falha ao salvar o perfil'))
                 ->danger()
                 ->send();
         }
@@ -156,13 +150,13 @@ class Settings extends Page implements HasForms
             $user->save();
 
             Notification::make()
-                ->title(__('notifications.profile.password.save.success'))
+                ->title(__('Senha atualizada com sucesso'))
                 ->success()
                 ->send()
                 ->sendToDatabase(Auth::user());
         } catch (\Throwable $th) {
             Notification::make()
-                ->title(__('notifications.profile.save.failed'))
+                ->title(__('Falha ao atualizar a senha'))
                 ->danger()
                 ->send();
         }
@@ -180,7 +174,7 @@ class Settings extends Page implements HasForms
             Carbon::setLocale($this->language);
 
             Notification::make()
-                ->title(__('notifications.save.success'))
+                ->title(__('Configurações salvas com sucesso'))
                 ->success()
                 ->send()
                 ->sendToDatabase(Auth::user());
@@ -188,7 +182,7 @@ class Settings extends Page implements HasForms
             return redirect('/admin');
         } catch (\Throwable $th) {
             Notification::make()
-                ->title(__('notifications.profile.save.failed'))
+                ->title(__('Falha ao salvar as configurações'))
                 ->danger()
                 ->send();
         }
@@ -198,15 +192,15 @@ class Settings extends Page implements HasForms
     {
         return $form
             ->schema([
-                Section::make(__('pages.profile.password'))
-                    ->description(__('pages.profile.update_password'))
+                Section::make(__('Senha'))
+                    ->description(__('Atualize sua senha'))
                     ->schema([
                         TextInput::make('password')
-                            ->label(__('pages.profile.form.label.password'))
+                            ->label(__('Senha'))
                             ->password()
                             ->autocomplete(false),
                         TextInput::make('password_confirmation')
-                            ->label(__('pages.profile.form.label.password_confirmed'))
+                            ->label(__('Confirme a senha'))
                             ->password(),
                     ])->columns(2),
             ]);
@@ -216,26 +210,26 @@ class Settings extends Page implements HasForms
     {
         return $form
             ->schema([
-                Section::make(__('pages.profile.account_information'))
-                    ->description(__('pages.profile.account_settings'))
+                Section::make(__('Informações da conta'))
+                    ->description(__('Configurações da conta'))
                     ->schema([
                         TextInput::make('name')
-                            ->label(__('pages.profile.form.label.name'))
+                            ->label(__('Nome'))
                             ->required()
                             ->maxLength(255),
                         TextInput::make('cpf')
                             ->label(__('CPF'))
                             ->maxLength(255),
                         TextInput::make('email')
-                            ->label(__('pages.profile.form.label.email'))
+                            ->label(__('Email'))
                             ->email()
                             ->required()
                             ->maxLength(255)
                             ->unique(ignoreRecord: true),
                         DateTimePicker::make('email_verified_at')
-                            ->label(__('Email Verified At'))
+                            ->label(__('Data de verificação do email'))
                             ->visibleOn('edit'),
-                      /*  Select::make('roles')
+                        /*  Select::make('roles')
                             ->label(__('Roles'))
                             ->multiple()
                             ->searchable()
@@ -264,16 +258,16 @@ class Settings extends Page implements HasForms
     {
         return $form
             ->schema([
-                Section::make(__('pages.system.settings'))
-                    ->description(__('pages.system.settings.desc'))
+                Section::make(__('Configurações do Sistema'))
+                    ->description(__('Configurações do sistema'))
                     ->schema([
                         Select::make('language')
-                            ->label(__('pages.system.settings.language'))
+                            ->label(__('Idioma'))
                             ->options($this->getLanguageOptions())
                             ->native(false)
                             ->reactive()
                             ->required()
-                            ->default('en'),
+                            ->default('pt_BR'),
                     ])->columns(1),
             ]);
     }
@@ -281,9 +275,9 @@ class Settings extends Page implements HasForms
     private function getLanguageOptions(): array
     {
         return [
-            'en' => 'English',
-            'pt' => 'Português',
-            'es' => 'Español',
+            'en' => 'Inglês',
+            'pt_BR' => 'Português',
+            'es' => 'Espanhol',
         ];
     }
 }

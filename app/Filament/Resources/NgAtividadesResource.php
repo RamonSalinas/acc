@@ -26,7 +26,7 @@
             ->schema([
                 Forms\Components\TextInput::make('grupo_atividades')
                     ->required()
-                    ->maxLength(255),
+                    ->numeric(),
 
                 Forms\Components\TextInput::make('nome_atividade')
                     ->required()

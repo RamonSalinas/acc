@@ -3,7 +3,7 @@
 use App\Models\User;
 use Laravel\Jetstream\Features;
 
-test('confirm password screen can be rendered', function () {
+test('a tela de confirmação de senha pode ser renderizada', function () {
     $user = Features::hasTeamFeatures()
                     ? User::factory()->withPersonalTeam()->create()
                     : User::factory()->create();
@@ -13,7 +13,7 @@ test('confirm password screen can be rendered', function () {
     $response->assertStatus(200);
 });
 
-test('password can be confirmed', function () {
+test('a senha pode ser confirmada', function () {
     $user = User::factory()->create();
 
     $response = $this->actingAs($user)->post('/user/confirm-password', [
@@ -28,7 +28,7 @@ test('password is not confirmed with invalid password', function () {
     $user = User::factory()->create();
 
     $response = $this->actingAs($user)->post('/user/confirm-password', [
-        'password' => 'wrong-password',
+        'password' => 'errou-password',
     ]);
 
     $response->assertSessionHasErrors();

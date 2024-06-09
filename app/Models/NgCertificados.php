@@ -4,10 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Pages\ListNgCertificados;
-use Filament\Notifications\Notification;
-use App\Models\AdCursos;
-use App\Filament\Resources\NgCertificadosResource\Pages;
 
 class NgCertificados extends Model
 {
@@ -20,10 +16,11 @@ class NgCertificados extends Model
         'local',
         'data_inicio',
         'data_final',
-        'id_tipo_Atividade',
+        'id_tipo_atividade',
         'id_usuario',
         'horas_ACC',
         'type',
+        'grupo_atividades', // Certifique-se de que o campo grupo_atividades está presente
     ];
 
     public function user()
@@ -33,8 +30,12 @@ class NgCertificados extends Model
 
     public function ngAtividade()
     {
-        return $this->belongsTo(NgAtividades::class, 'id_tipo_Atividade');
+        return $this->belongsTo(NgAtividades::class, 'id_tipo_atividade');
     }
 
-  
+    public function grupoAtividades()
+    {
+        return $this->belongsTo(AdGrupo::class, 'id');
+
+    }
 }

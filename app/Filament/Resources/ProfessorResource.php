@@ -77,7 +77,27 @@ class ProfessorResource extends Resource
 
     public static function table(Table $table): Table
     {
+        
+        // Verifica se o usuário é um Super Admin
+        $currentUser = Auth::user();
+        $query = User::query();
+
+        // Verifica se o usuário é um Super Admin
+        if ($currentUser->isSuperAdmin()) {
+            // Se for, mostra unicamente os usuários com o papel de Admin
+            $query->whereHas('roles', function ($query) {
+                $query->where('name', 'Admin');
+            });
+        } 
+        // Verifica se o usuário é um Admin
+        elseif ($currentUser->isAdmin()) {
+            // Se for, mostra unicamente seu próprio usuário
+            $query->where('id', $currentUser->id);
+        } 
+        // Verifica se o usuário é um Especialista
+        
         return $table
+            ->query($query)
             ->columns([
                 Tables\Columns\TextColumn::make('name')->label('Nome'), // Modificado para 'name'
                 Tables\Columns\TextColumn::make('email'),
@@ -98,7 +118,20 @@ class ProfessorResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return auth()->user()->isAdmin();
+        // Verifica se o usuário atual é um Super Admin
+        if (auth()->user()->isSuperAdmin()) {
+            // Se for um Super Admin, retorna true para permitir ver todos os registros
+            return true;
+        }
+
+        // Verifica se o usuário atual é um Admin
+        if (auth()->user()->isAdmin()) {
+            // Se for um Admin, retorna false para não permitir ver todos os registros
+            return false;
+        }
+
+        // Se não for nenhum dos casos acima, retorna false por padrão
+        return false;
     }
 
     public static function createRecord($data)

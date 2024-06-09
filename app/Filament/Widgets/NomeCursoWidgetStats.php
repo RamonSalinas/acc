@@ -6,31 +6,38 @@ use App\Models\User;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use App\Models\AdCursos;
-use Illuminate\Contracts\View\View; // Importar a classe View
+use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Auth;
 
 class NomeCursoWidgetStats extends BaseWidget
 {
     protected static ?string $pollingInterval = null;
-    
+
     protected function getStats(): array
     {
-        // Fetch users and their roles
-        $users = User::with('roles')->get(['id', 'id_curso', 'is_active']);
-        
-        // Get the list of course IDs
-        $idCursos = $users->pluck('id_curso')->toArray();
-        
-        // Take the first course ID for demonstration
-        $firstIdCurso = $idCursos[0] ?? null;
+        // Fetch the first user with their roles
+        $user = Auth::user();
 
-        // Fetch the course details from AdCursos using the firstIdCurso
-        $cursoDetails = AdCursos::where('id', $firstIdCurso)->first();
+        // Initialize variables to store course details or default message
+        $nomeCurso = 'Curso ainda não registrado, registre o curso antes de iniciar.';
+        $cargaHorariaCurso = 'N/A';
+        $cargaHorariaACC = 'N/A';
+        $cargaHorariaExtensao = 'N/A';
 
-        // Initialize variables to store course details
-        $nomeCurso = $cursoDetails->nome_curso ?? 'N/A';
-        $cargaHorariaCurso = $cursoDetails->carga_horaria_curso ?? 'N/A';
-        $cargaHorariaACC = $cursoDetails->carga_horaria_ACC ?? 'N/A';
-        $cargaHorariaExtensao = $cursoDetails->carga_horaria_Extensao ?? 'N/A';
+        // Check if the user's id_curso is filled
+        if ($user && !is_null($user->id_curso)) {
+            // Fetch the course details from AdCursos using the user's id_curso
+            $cursoDetails = AdCursos::where('id', $user->id_curso)->first();
+        
+
+            // If course details are found, update the variables
+            if ($cursoDetails) {
+                $nomeCurso = $cursoDetails->nome_curso;
+                $cargaHorariaCurso = $cursoDetails->carga_horaria_curso;
+                $cargaHorariaACC = $cursoDetails->carga_horaria_ACC;
+                $cargaHorariaExtensao = $cursoDetails->carga_horaria_Extensao;
+            }
+        }
 
         // Return the stats array
         return [

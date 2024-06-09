@@ -268,7 +268,9 @@ class NgCertificadosResource extends Resource
                         ->label('Ver')
                         ->url(fn ($record) => route('filament.admin.resources.ng-certificados.view', $record))
                         ->icon('heroicon-o-eye'),
+                Tables\Actions\DeleteAction::make(),
             ]);
+            
     }
 
     public static function getRelations(): array

@@ -1,7 +1,5 @@
 <?php
 
-
-
 namespace App\Filament\Resources\ReportResource\Pages;
 
 use App\Filament\Resources\ReportResource;
@@ -16,11 +14,22 @@ class ListReports extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            // Actions\CreateAction::make(),
             Actions\Action::make('downloadPdf')
                 ->label('Download PDF')
                 ->url(route('reports.pdf'))
-                ->color('secondary')
+                ->color('warning')
+                ->icon('academicon-openedition'),
+        ];
+    }
+
+    protected function getFooterActions(): array
+    {
+        return [
+            Actions\Action::make('downloadPdfFooter')
+                ->label('Download PDF')
+                ->url(route('reports.pdf'))
+                ->color('warning')
                 ->icon('academicon-openedition'),
         ];
     }

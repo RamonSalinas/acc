@@ -4,63 +4,40 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ReportResource\Pages;
 use App\Filament\Resources\ReportResource\RelationManagers;
-use App\Models\Report;
 use App\Models\Professor;
-use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Log;
 
 class ReportResource extends Resource
 {
     protected static ?string $model = Professor::class;
 
     protected static ?string $navigationIcon = 'academicon-open-data';
-    protected static ?string $label = 'Reportes';
     protected static ?string $navigationLabel = 'Reportes';
     protected static ?string $pluralLabel = 'Reportes';
 
-
-    public static function form(Form $form): Form
+    public static function boot()
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('nome')
-                    ->required()
-                    ->maxLength(255),
-                    Forms\Components\Textarea::make('email')
-                    ->required(),
-            ]);
+        parent::boot();
+
+        // Tente obter o caminho da imagem
+        $imagePath = asset('images/image.png');
+
+        // Verifique se há erro ao obter o caminho da imagem
+        if ($imagePath === false) {
+            // Se houver erro, registre uma mensagem de log
+            Log::error('Erro ao obter o caminho da imagem');
+        } else {
+            // Se não houver erro, defina o label com a imagem
+            static::label('<img src="' . $imagePath . '" alt="Ícone de Relatórios"> Relatórios do Curso');
+        }
     }
 
-    public static function table(Table $table): Table
-    {
-        return $table
-            ->columns([
-                Tables\Columns\TextColumn::make('nome')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('created_at')->date()->sortable(),
-            ])
-            ->filters([
-                // 
-            ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
-            ]);
-    }
-    
     public static function getRelations(): array
     {
-        return [
-            //
-        ];
+        return [];
     }
-    
+
     public static function getPages(): array
     {
         return [
@@ -68,5 +45,5 @@ class ReportResource extends Resource
             'create' => Pages\CreateReport::route('/create'),
             'edit' => Pages\EditReport::route('/{record}/edit'),
         ];
-    }    
+    }
 }

@@ -8,23 +8,66 @@ use Illuminate\Http\Request;
 use App\Models\NgAtividades;
 use App\Models\AdCursos;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Redirect;
 
 class PdfController extends Controller
 {
     public function generatePdf()
-    {
-        $certificados = NgCertificados::with(['ngAtividade', 'user'])->get();
+{
+    $user = Auth::user();
+    $curso = AdCursos::find($user->id_curso);
 
-        $pdf = Pdf::loadView('pdf.certificados', compact('certificados'))
-                  ->setPaper('a4', 'landscape');  // Set the orientation to landscape
-
-        return $pdf->download('certificados.pdf');
+    // Verificar se o usuário tem o curso registrado
+    if (!$curso) {
+        return Redirect::route('error');
     }
+
+    // Verificar se o usuário é super administrador
+    if ($user->isSuperAdmin()) {
+        // Se o usuário for super administrador, pode ver todos os certificados
+        $certificados = NgCertificados::with(['ngAtividade', 'user'])->get();
+    } else {
+        // Se o usuário for administrador
+        if ($user->isAdmin()) {
+            // Mostrar certificados cujo id_usuario seja igual ao seu ID
+            $certificados = NgCertificados::with(['ngAtividade', 'user'])
+                ->where(function ($query) use ($user) {
+                    $query->where('id_usuario', $user->id)
+                        ->orWhereHas('user', function ($query) use ($user) {
+                            $query->where('id_professor', $user->id);
+                        });
+                })
+                ->get();
+
+
+        } else {
+            // Se o usuário não for administrador, mostrar apenas seus próprios certificados
+            $certificados = NgCertificados::with(['ngAtividade', 'user'])
+                                          ->where('id_usuario', $user->id)
+                                          ->get();
+        }
+    }
+
+    $pdf = Pdf::loadView('pdf.certificados', compact('certificados', 'user', 'curso'))
+              ->setPaper('a4', 'landscape');  // Set the orientation to landscape
+
+    return $pdf->download('certificados.pdf');
+}
+
+    
 
     public function generatePdf1()
     {
         $user = Auth::user();
         $curso = AdCursos::find($user->id_curso);
+        
+        if (!$curso) {
+            return Redirect::route('error');
+        }
+    
+        
+        
         $horaExtensão = $curso->carga_horaria_Extensao;
 
         $query = NgCertificados::with(['ngAtividade', 'user']);

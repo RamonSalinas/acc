@@ -35,6 +35,7 @@ Route::get('/test-professor', function () {
 Route::get('/ng-certificados/pdf', [PdfController::class, 'generatePdf'])->name('ng-certificados.pdf');
 Route::get('/reports/pdf', [PdfController::class, 'generatePdf1'])->name('reports.pdf');
 
+Route::view('/error', 'error')->name('error');
 
 Route::get('/', function () {
     return view('welcome');

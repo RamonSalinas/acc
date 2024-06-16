@@ -209,4 +209,9 @@ class UserResource extends Resource
             'view' => Pages\ViewUser::route('/{record}'),
         ];
     }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return Auth::check() && Auth::user()->isSuperAdmin();
+    }
 }

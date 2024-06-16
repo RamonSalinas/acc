@@ -21,6 +21,8 @@ class NgCertificados extends Model
         'horas_ACC',
         'type',
         'grupo_atividades', // Certifique-se de que o campo grupo_atividades está presente
+        'arquivo', // Novo campo adicionado
+
     ];
 
     public function user()

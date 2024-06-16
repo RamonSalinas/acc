@@ -1,9 +1,11 @@
 <?php
 
 namespace App\Observers;
+
 use Filament\Notifications\Notification;
 use Filament\Notifications\Actions\Action; // Certifique-se de que o namespace está correto
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 class UserObserver
 {
@@ -11,20 +13,25 @@ class UserObserver
      * Handle the User "created" event.
      */
     public function created(User $user): void
-{
-    $notification = Notification::make()
-        ->success()
-        ->title('Bem-vindo ao sistema de registro de ACC da UFOB')
-        ->body('Não se esqueça de atualizar seu curso e semestre para poder registrar suas atividades complementares.')
-        ->actions([
-            Action::make('Atualizar dados')
-                ->button()
-                ->url(route('filament.admin.pages.settings')), // Gerando a URL corretamente
-        ]);
+    {
+        $notificationTitle = 'Bem-vindo ao sistema de registro de ACC da UFOB, ' . $user->name;
+        $notificationBody = 'Não se esqueça de atualizar seu curso e semestre para poder registrar suas atividades.';
 
-    $user->notify($notification->toDatabase()); // Notificando o usuário
-}
+        // Verifica se o usuário é um administrador e adiciona o título "docente"
+    
 
+        $notification = Notification::make()
+            ->success()
+            ->title($notificationTitle)
+            ->body($notificationBody)
+            ->actions([
+                Action::make('Atualizar dados')
+                    ->button()
+                    ->url(route('filament.admin.pages.settings')), // Gerando a URL corretamente
+            ]);
+
+        $user->notify($notification->toDatabase()); // Notificando o usuário
+    }
 
     /**
      * Handle the User "updated" event.
@@ -35,10 +42,11 @@ class UserObserver
         $notification = Notification::make()
             ->success()
             ->title('User updated Observer')
-            ->body('The user has been updated successfully. >)');
+            ->body('The user has been updated successfully.');
 
         $user->notify($notification->toDatabase());
     }
+
     /**
      * Handle the User "deleted" event.
      */

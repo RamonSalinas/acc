@@ -94,6 +94,10 @@ class User extends Authenticatable implements FilamentUser
     {
         return $this->belongsTo(AdCursos::class, 'id_curso');
     }
+    public function certificados()
+    {
+        return $this->hasMany(NgCertificados::class, 'id_usuario');
+    }
     
 
 }

@@ -40,7 +40,7 @@ class ViewNgCertificados extends ViewRecord
             Action::make('Rejeitar')
                 ->label('Rejeitar')
                 ->action(function () {
-                    $this->record->update(['type' => 'rejeitada']);
+                    $this->record->update(['type' => 'Rejeitada']);
                     
                     Log::info('Ação Rejeitar iniciada', ['record_id' => $this->record->id, 'user_id' => $this->record->id_usuario]);
                     $this->notifyAluno($this->record->id_usuario, 'Certificado Rejeitado', 'O certificado foi rejeitado pelo seu orientador.');
@@ -55,6 +55,16 @@ class ViewNgCertificados extends ViewRecord
                 })
                 ->color('danger')
                 ->icon('phosphor-certificate-duotone'),
+            
+            Action::make('Baixar')
+                ->label('Baixar Arquivo')
+                ->url(fn() => $this->record->arquivo ? asset('storage/' . $this->record->arquivo) : null)
+                ->icon('phosphor-certificate-duotone')
+                ->openUrlInNewTab()
+                ->visible(fn() => $this->record->arquivo !== null),
+
+
+                
         ];
     }
 
@@ -64,7 +74,6 @@ class ViewNgCertificados extends ViewRecord
         
         $aluno = User::find($alunoId);
         if ($aluno) {
-
             Log::info('Aluno encontrado', ['id_aluno' => $alunoId, 'aluno' => $aluno->toArray()]);
             
             $notification = Notification::make()

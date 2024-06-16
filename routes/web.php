@@ -34,6 +34,8 @@ Route::get('/test-professor', function () {
 
 Route::get('/ng-certificados/pdf', [PdfController::class, 'generatePdf'])->name('ng-certificados.pdf');
 Route::get('/reports/pdf', [PdfController::class, 'generatePdf1'])->name('reports.pdf');
+Route::get('/generatePdfuser/{id}', [PdfController::class, 'generatePdfuser'])->name('pdf_generatePdfuser');
+//Route::get('/generatePdfuser/pdf', [PdfController::class, 'generatePdfuser'])->name('pdf.generatePdfuser');
 
 Route::view('/error', 'error')->name('error');
 

@@ -5,7 +5,8 @@ namespace App\Filament\Resources\ReportResource\Pages;
 use App\Filament\Resources\ReportResource;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Actions;
-use App\Http\Controllers\ReportPdfController;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 class ListReports extends ListRecords
 {
@@ -14,7 +15,6 @@ class ListReports extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            // Actions\CreateAction::make(),
             Actions\Action::make('downloadPdf')
                 ->label('Download PDF')
                 ->url(route('reports.pdf'))

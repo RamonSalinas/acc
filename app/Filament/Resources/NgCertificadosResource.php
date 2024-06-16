@@ -51,6 +51,7 @@ class NgCertificadosResource extends Resource
                         $set('valor_unitario', null);
                         $set('percentual_maximo', null);
                         $set('horas_ACC', null);
+                        $set('carga_horaria', null);
                     }),
 
             Forms\Components\Select::make('id_tipo_atividade')
@@ -71,6 +72,8 @@ class NgCertificadosResource extends Resource
             })
             ->afterStateUpdated(function (callable $set, callable $get, $state) {
                 $set('horas_ACC', null);
+                $set('carga_horaria', null);
+                
 
                 if ($state) {
                     $atividade = NgAtividades::find($state);
@@ -201,6 +204,13 @@ class NgCertificadosResource extends Resource
             Forms\Components\DatePicker::make('data_final')
                 ->default(Carbon::now())
                 ->required(),
+
+                Forms\Components\FileUpload::make('arquivo')
+                    ->label('Arquivo')
+                    ->disk('public')
+                    ->directory('certificados')
+                    ->acceptedFileTypes(['image/*', 'application/pdf'])
+                    ->maxSize(10240), // Limite de tamanho de 10 MB
     
             Forms\Components\Hidden::make('id_usuario')
                 ->default(fn () => Auth::id()),
@@ -255,8 +265,26 @@ class NgCertificadosResource extends Resource
 
                
                 Tables\Columns\TextColumn::make('horas_ACC')->sortable()->searchable(),
+
+                Tables\Columns\TextColumn::make('user.name')
+                    ->label('Nome do Usuário')
+                    ->sortable()
+                    ->searchable(),
            
-              Tables\Columns\TextColumn::make('ngAtividade.nome_atividade')->label('Atividade')->sortable()->searchable(),
+                    Tables\Columns\TextColumn::make('ngAtividade.nome_atividade')
+                    ->label('Atividade')
+                    ->sortable()
+                    ->searchable()
+                    ->wrap()
+                    ->tooltip(fn ($record) => $record->ngAtividade->nome_atividade)
+                    ->formatStateUsing(fn ($state) => \Illuminate\Support\Str::limit($state, 20)),            //   Tables\Columns\TextColumn::make('arquivo')
+            //   ->label('Arquivo')
+            //   ->url(fn ($record) => asset('storage/certificados/' . $record->arquivo))
+            //   ->icon('academicon-dryad-square') // Ícone de download
+            //   ->openUrlInNewTab()
+            //   ->tooltip('Baixar arquivo'),
+
+
                        ])
             ->filters([
                 // Defina os filtros, se necessário
@@ -269,6 +297,15 @@ class NgCertificadosResource extends Resource
                         ->url(fn ($record) => route('filament.admin.resources.ng-certificados.view', $record))
                         ->icon('heroicon-o-eye'),
                 Tables\Actions\DeleteAction::make(),
+                Tables\Actions\Action::make('download')
+                ->label('Baixar')
+                ->url(function ($record) {
+                    return $record->arquivo ? asset('storage/' . $record->arquivo) : null;
+                })
+                ->icon('academicon-dryad-square') // Ícone de download
+                ->openUrlInNewTab()
+                ->tooltip('Baixar arquivo')
+                ->visible(fn ($record) => $record->arquivo !== null) // A ação só é visível se houver um arquivo
             ]);
             
     }

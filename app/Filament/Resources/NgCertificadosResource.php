@@ -236,13 +236,15 @@ class NgCertificadosResource extends Resource
 
         $query = static::getModel()::query();
 
-        if (!$currentUser->isSuperAdmin()) {
-            if ($currentUser->isAdmin()) {
-                $query->whereHas('user', function ($query) use ($currentUser) {
-                    $query->where('id_professor', $currentUser->id);
-                });
-            } else {
-                $query->where('id_usuario', $currentUser->id);
+       if ($currentUser instanceof User) {
+            if (!$currentUser->isSuperAdmin()) {
+                if ($currentUser->isAdmin()) {
+                    $query->whereHas('user', function ($query) use ($currentUser) {
+                        $query->where('id_professor', $currentUser->id);
+                    });
+                } else {
+                    $query->where('id_usuario', $currentUser->id);
+                }
             }
         }
 

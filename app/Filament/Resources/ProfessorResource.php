@@ -81,8 +81,9 @@ class ProfessorResource extends Resource
         // Verifica se o usuário é um Super Admin
         $currentUser = Auth::user();
         $query = User::query();
-
+    if ($currentUser instanceof User) {
         // Verifica se o usuário é um Super Admin
+        
         if ($currentUser->isSuperAdmin()) {
             // Se for, mostra unicamente os usuários com o papel de Admin
             $query->whereHas('roles', function ($query) {
@@ -95,7 +96,7 @@ class ProfessorResource extends Resource
             $query->where('id', $currentUser->id);
         } 
         // Verifica se o usuário é um Especialista
-        
+    } 
         return $table
             ->query($query)
             ->columns([

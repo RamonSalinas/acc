@@ -3,3 +3,46 @@
 
 php artisan csfixer:run
 ./vendor/bin/pest
+
+
+
+npm run dev
+
+
+
+
+Passos para subir no servidor:
+copiar os arquivos para a pasta /opt/lampp/htdocs
+
+ssh root@181.215.135.250
+zHC8@9uW35F48Ww
+
+Verificar a versão do php
+php -v
+Verificar a versão do NOde  
+node -v  tem que ser 16.13.0 se não for rodar o comando nvm use 16.13.0 para mudar a versão do node  da seguinte maneira
+
+Também verifique nmp -v tem que ser 8.1.0 se não for rodar o comando npm install -g npm@8.1.0
+
+
+
+
+ir ate a pasta /opt/lampp/htdocs/acc
+verificar se o arquivo .env esta configurado corretamente  mudar a senha do banco de dados
+rodar o comando composer install
+rodar  php artisan key:generate
+rodar o comando php artisan migrate
+rodar o comando php artisan db:seed  / Importante tenho que criar novas sementes do banco de dados de atividades, professores, cursos
+rodar o php artisan storage:link  permite que a pasta storage seja acessada pelo navegador para baixar documentos em pdf
+
+Para executar
+
+rodar o comando php artisan serve --host=0.0.0.0 Para rodar o servidor 
+rodar npm run dev  Para rodar o webpack e visualização
+rodar php artisan queue:work Para rodar as filas de email e notificações
+
+
+Para rodar o servidor em produção
+rodar o comando php artisan serve --host=
+rodar o comando npm run prod
+rodar o comando php artisan queue:work

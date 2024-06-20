@@ -44,6 +44,9 @@ class User extends Authenticatable implements FilamentUser
         'profile_photo_url',
     ];
 
+
+    
+
     public function isSuperAdmin(): bool
     {
         return $this->id == 1 && $this->hasRole($this->SUPER_ADMIN);
@@ -52,6 +55,7 @@ class User extends Authenticatable implements FilamentUser
     public function isAdmin(): bool
     {
         return $this->hasRole($this->ADMIN);
+        
     }
     
 

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BotManController;
 use App\Models\NgAtividades;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -36,6 +37,10 @@ Route::get('/ng-certificados/pdf', [PdfController::class, 'generatePdf'])->name(
 Route::get('/reports/pdf', [PdfController::class, 'generatePdf1'])->name('reports.pdf');
 Route::get('/generatePdfuser/{id}', [PdfController::class, 'generatePdfuser'])->name('pdf_generatePdfuser');
 //Route::get('/generatePdfuser/pdf', [PdfController::class, 'generatePdfuser'])->name('pdf.generatePdfuser');
+Route::match(['get', 'post'], '/botman', [BotManController::class, 'handle']);
+Route::get('/chat', function () {
+    return view('chat');
+});
 
 Route::view('/error', 'error')->name('error');
 

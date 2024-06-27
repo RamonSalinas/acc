@@ -10,10 +10,13 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
 use Filament\Facades\Filament;
+use Filament\Forms;
 
 class ViewNgCertificados extends ViewRecord
 {
     protected static string $resource = NgCertificadosResource::class;
+
+    public $observacao; // Adiciona a propriedade observacao
 
     protected function getActions(): array
     {
@@ -21,7 +24,9 @@ class ViewNgCertificados extends ViewRecord
             Action::make('Aprovar')
                 ->label('Aprovar')
                 ->action(function () {
-                    $this->record->update(['type' => 'Aprovada']);
+                    $this->record->update([
+                        'type' => 'Aprovada',
+                    ]);
                     
                     Log::info('Ação Aprovar iniciada', ['record_id' => $this->record->id, 'user_id' => $this->record->id_usuario]);
                     $this->notifyAluno($this->record->id_usuario, 'Certificado Aprovado', 'O certificado foi aprovado pelo seu orientador.');
@@ -39,10 +44,19 @@ class ViewNgCertificados extends ViewRecord
 
             Action::make('Rejeitar')
                 ->label('Rejeitar')
-                ->action(function () {
-                    $this->record->update(['type' => 'Rejeitada']);
+                ->form([
+                    Forms\Components\Textarea::make('observacao')
+                        ->label('Observação')
+                        ->maxLength(500)
+                        ->required(), // Torna o campo obrigatório
+                ])
+                ->action(function (array $data) {
+                    $this->record->update([
+                        'type' => 'Rejeitada',
+                        'observacao' => $data['observacao'], // Salva a observação no modelo
+                    ]);
                     
-                    Log::info('Ação Rejeitar iniciada', ['record_id' => $this->record->id, 'user_id' => $this->record->id_usuario]);
+                    Log::info('Ação Rejeitar iniciada', ['record_id' => $this->record->id, 'user_id' => $this->record->id_usuario, 'observacao' => $data['observacao']]);
                     $this->notifyAluno($this->record->id_usuario, 'Certificado Rejeitado', 'O certificado foi rejeitado pelo seu orientador.');
                     
                     Notification::make()
@@ -62,9 +76,6 @@ class ViewNgCertificados extends ViewRecord
                 ->icon('phosphor-certificate-duotone')
                 ->openUrlInNewTab()
                 ->visible(fn() => $this->record->arquivo !== null),
-
-
-                
         ];
     }
 

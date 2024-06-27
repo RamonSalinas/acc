@@ -7,13 +7,13 @@ php artisan csfixer:run
 
 
 npm run dev
-
+php artisan queue:work
 
 
 
 Passos para subir no servidor:
 copiar os arquivos para a pasta /opt/lampp/htdocs
-
+npm run de
 ssh root@181.215.135.250
 zHC8@9uW35F48Ww
 

@@ -224,9 +224,16 @@ class NgCertificadosResource extends Resource
                 ->default(0),
     
             Forms\Components\TextInput::make('type')
+            ->label('Status da avaliação')
                 ->default('pendente')
                 ->disabled()
                 ->required(),
+
+            // Dentro da função form()
+            Forms\Components\Textarea::make('observacao')
+            ->label('Observação Orientador')
+            ->readOnly()
+            ->maxLength(500), // Limite de caracteres para a observação    
         ]);
     }
 
@@ -256,15 +263,14 @@ class NgCertificadosResource extends Resource
                  ->badge(),
    
                  Tables\Columns\TextColumn::make('type')
-                ->badge()
-                ->color(fn ($state) => match($state) {
-                    '
-                    Aprovada' => 'success',
-                    'Pendente' => 'warning',
-                    'Rejeitada' => 'danger',
-                    default => null,  // Ou você pode escolher uma cor padrão como 'secondary'
-                }),
-
+                 ->badge()
+                 ->color(fn ($state) => match($state) {
+                     'Aprovada' => 'success',
+                     'Pendente' => 'warning',
+                     'Rejeitada' => 'danger',
+                     default => null,  // Ou você pode escolher uma cor padrão como 'secondary'
+                 })
+                 ->tooltip(fn ($state) => $state === 'Rejeitada' ? 'Veja a observação do orientador e Envie de novo o certificado, atendendo o solicitado em caso de ser necesário' : null),
                
                 Tables\Columns\TextColumn::make('horas_ACC')->sortable()->searchable(),
 

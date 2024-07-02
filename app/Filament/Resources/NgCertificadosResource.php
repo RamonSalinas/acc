@@ -81,7 +81,8 @@ class NgCertificadosResource extends Resource
                         $set('valor_unitario', $atividade->valor_unitario);
                         $set('percentual_maximo', $atividade->percentual_maximo);
 
-                        if (in_array($state, [7, 9, 15])) {
+                        if (in_array($state, [7, 9, 15,80,82,83,13,14,15,16,17,18,19,20,21,23,25,26,27,28,29,32,33,34,35,36,37,39,40,41,43,44,45,50,53,54,55,56,57,58,59,60,61,62,65,66,67,68,69,70,71,72,73,74])) {
+
                             Notification::make()
                                 ->title('Atividade Especial Selecionada')
                                 ->body('Você selecionou uma atividade especial. Agregue o número de atividades realizadas.')
@@ -162,11 +163,16 @@ class NgCertificadosResource extends Resource
                             ->send();
                         return;
                     }
-    
+//LOGICA PARA CALCULAR AS HORAS ACC DE MANEIRA CERTO NO CASO QUE O USUARIO SELECIONE UMA ATIVIDADE ESPECIAL MULTIPLE BEM A CARGA REGISTRADA
                     $maxHorasPermitidas = ($curso->carga_horaria_ACC * $percentualMaximo) / 100;
-                    if ($idTipoAtividade && in_array($idTipoAtividade, [7, 9, 15])) {
+                   
+                    $grupoA = [7, 9, 15, 80, 82, 83, 13, 14, 15, 16, 17, 18, 19, 20, 21, 23, 25, 26, 27, 28, 29, 32, 33, 34, 35, 36, 37, 39, 40, 41, 43, 44, 45, 50, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74];//Grupo de atividades com bastante horas de carga 
+                    $grupoB = [5, 6, 52, 64, 48, 8, 51, 12, 22, 30, 76, 78, 81]; // Valores de atividades especiais com carga horária  menores
+                   
+                    if ($idTipoAtividade && (in_array($idTipoAtividade, $grupoA) || in_array($idTipoAtividade, $grupoB))) {
+                        // Cálculo das horas para os grupos A e B
                         $horasACC = $valorUnitario * $cargaHoraria;
-    
+                        
                         if ($horasACC > $maxHorasPermitidas) {
                             Notification::make()
                                 ->title('Excedeu o limite permitido')
@@ -176,8 +182,9 @@ class NgCertificadosResource extends Resource
                         }
                         $set('horas_ACC', $horasACC);
                     } else {
+                        // Cálculo das horas para outros casos
                         $horasACC = $cargaHoraria / $valorUnitario;
-    
+                    
                         if ($horasACC > $maxHorasPermitidas) {
                             Notification::make()
                                 ->title('Excedeu o limite permitido')

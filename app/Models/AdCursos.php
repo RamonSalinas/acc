@@ -15,6 +15,8 @@ class AdCursos extends Model
         'carga_horaria_ACC',
         'carga_horaria_Extensao',
         'ppc',
+        'email', // Adicione o campo email aqui
+
     ];
 
     public function users()

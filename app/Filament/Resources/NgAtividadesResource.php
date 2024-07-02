@@ -11,6 +11,8 @@
     use Filament\Tables\Table;
     use Illuminate\Database\Eloquent\Builder;
     use Spatie\Permission\Traits\HasRoles;
+    use App\Http\Livewire\DataTableComponent;
+    use Filament\Tables\Columns\TextColumn;
 
     class NgAtividadesResource extends Resource
     {
@@ -39,6 +41,8 @@
                 Forms\Components\TextInput::make('percentual_maximo')
                     ->required()
                     ->numeric(),
+
+
             ]);
     }
     
@@ -50,9 +54,13 @@
                         ->sortable()
                         ->searchable(),
     
-                    Tables\Columns\TextColumn::make('nome_atividade')
+                        TextColumn::make('nome_atividade')
                         ->sortable()
-                        ->searchable(),
+                        ->searchable()
+                        ->width('80px') // Defina a largura desejada
+                        ->extraAttributes(['style' => 'width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;'])
+                        ->tooltip(fn($record) => $record->nome_atividade), // Mostra o texto completo ao passar o mouse
+                    
     
                     Tables\Columns\TextColumn::make('valor_unitario')
                         ->sortable()
@@ -62,13 +70,11 @@
                         ->sortable()
                         ->searchable(),
     
-                    Tables\Columns\TextColumn::make('created_at')
-                        ->dateTime()
+                        Tables\Columns\TextColumn::make('email') // Adicione o campo email aqui
+                        ->searchable()
                         ->sortable(),
-    
-                    Tables\Columns\TextColumn::make('updated_at')
-                        ->dateTime()
-                        ->sortable(),
+
+                      
                 ])
                 ->filters([
                     // Defina os filtros conforme necessário

@@ -42,6 +42,10 @@ class AdCursosResource extends Resource
                     '2016.1' => '2016.1',
                     '2023.1' => '2023.1',
                 ])->required(),
+                Forms\Components\TextInput::make('email') // Adicione o campo email aqui
+                ->required()
+                ->email()
+                ->maxLength(255),
                 
             ]);
     }
@@ -71,6 +75,11 @@ class AdCursosResource extends Resource
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+
+                    Tables\Columns\TextColumn::make('email') // Adicione o campo email aqui
+                    ->searchable()
+                    ->sortable(),
+
             ])
             ->filters([
                 //

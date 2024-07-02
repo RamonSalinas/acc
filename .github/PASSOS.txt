@@ -1,3 +1,4 @@
+<?php
 https://github.com/Innovix-Matrix-Systems/ims-laravel-admin-starter
 Opção 1.  Aprender a usar os roles do projeto e delimitar funciones dos três perfis
 Procurar projetos com tailwindcss filement e php laravel
@@ -46,3 +47,117 @@ return new class extends Migration
         Schema::dropIfExists('ng_certificado_user');
     }
 };
+
+
+
+
+
+
+
+npm run dev
+php artisan queue:work
+
+
+28,20
+
+
+Passos para subir no servidor:
+copiar os arquivos para a pasta /opt/lampp/htdocs
+npm run de
+ssh root@181.215.135.250
+zHC8@9uW35F48Ww
+define( 'DB_USER', 'root' );
+
+/** Database password */
+define( 'DB_PASSWORD', 'S3v1d0r$s25' );
+
+Verificar a versão do php
+php -v
+Verificar a versão do NOde  
+node -v  tem que ser 16.13.0 se não for rodar o comando nvm use 16.13.0 para mudar a versão do node  da seguinte maneira
+
+Também verifique nmp -v tem que ser 8.1.0 se não for rodar o comando npm install -g npm@8.1.0
+
+
+
+
+ir ate a pasta /opt/lampp/htdocs/acc
+verificar se o arquivo .env esta configurado corretamente  mudar a senha do banco de dados
+rodar o comando composer install
+rodar  php artisan key:generate
+rodar o comando php artisan migrate
+rodar o comando php artisan db:seed  / Importante tenho que criar novas sementes do banco de dados de atividades, professores, cursos
+rodar o php artisan storage:link  permite que a pasta storage seja acessada pelo navegador para baixar documentos em pdf
+
+Para executar
+
+rodar o comando php artisan serve --host=0.0.0.0 Para rodar o servidor  
+
+uso screen -S minha_sessao  com o php artisan serve --host=181.215.135.250  para manter o server funcionando.
+
+
+Para desconectar da sessão do screen sem finalizar o processo:
+
+Pressione Ctrl + A, depois D.
+Para reconectar à sessão do screen:
+
+sh
+Copiar código
+screen -r minha_sessao
+
+rodar npm run dev  Para rodar o webpack e visualização
+rodar php artisan queue:work Para rodar as filas de email e notificações
+
+Problemas:
+Quando actualizar os arquivos no servidor e não aparecer as alterações rodar o comando php artisan config:cache
+Verifique as permissões das pastas do log e storage
+sudo chown -R www-data:www-data /opt/lampp/htdocs/acc/storage
+sudo chmod -R 775 /opt/lampp/htdocs/acc/storage
+
+
+
+sudo /opt/lampp/lampp restart
+php artisan serve --host=181.215.135.250
+
+
+
+
+
+Para rodar o servidor em produção
+rodar o comando php artisan serve --host=
+rodar o comando npm run prod
+rodar o comando php artisan queue:work
+
+
+
+sudo systemctl stop mysql
+sudo systemctl stop apache2
+
+
+
+Imagen de perfil borrosa	
+1 trabajan en 
+Imagen de perfil borrosa	
+1 trabajan en Unimed Limeira
+Imagen de perfil borrosa	
+1 trabajan en 
+Imagen de perfil borrosa	
+1 trabajan en 
+Imagen de perfil borrosa	
+2 te ha encontrado a través de Página de inicio
+Ver todas las visualizaciones
+Descargar la nueva aplicación de LinkedIn para ordenador
+Descargar desde Microsoft
+También disponible en versión móvil
+Descargar en la App Store Descargar en Google Play
+Este email está dirigido a Ramon Adrian Salinas Franco (Professor Adjunto C1 / Pesquisador)
+Consulta por qué informamos sobre esto.
+Recibes emails sobre notificaciones de LinkedIn.
+Darse de baja   ·   Ayuda
+LinkedIn
+© 2024 LinkedIn Ireland Unlimited Company, Wilton Plaza, Wilton Place, Dublín 2. LinkedIn es un nombre comercial registrado de LinkedIn Ireland Unlimited Company. LinkedIn y el logotipo de LinkedIn son marcas registradas de LinkedIn.
+
+
+
+<div id="even3-widget-ticket"></div>
+<script src="https://www.even3.com.br/widget/js?e=iii-feira-de-inovacao-e-ciencias-do-oeste-da-bahia-469888&t=ticket&lang=pt"></script>

@@ -109,7 +109,7 @@ class NgCertificadosResource extends Resource
     
                 Forms\Components\TextInput::make('nome_certificado')
                     ->required()
-                    ->default('NOME TESTE')
+                   // ->default('NOME TESTE')
                     ->maxLength(255),
     
                 Forms\Components\TextInput::make('carga_horaria')
@@ -196,20 +196,20 @@ class NgCertificadosResource extends Resource
                     }
                 }),
     
-            Forms\Components\Textarea::make('descricao')
-                ->default('TESTE DESCRIÇÃO'),
+            Forms\Components\Textarea::make('descricao'),
+                //->default('TESTE DESCRIÇÃO'),
     
             Forms\Components\TextInput::make('local')
                 ->required()
-                ->default('TESTE BARREIRA')
+               // ->default('TESTE BARREIRA')
                 ->maxLength(255),
     
             Forms\Components\DatePicker::make('data_inicio')
-                ->default(Carbon::now())
+               // ->default(Carbon::now())
                 ->required(),
     
             Forms\Components\DatePicker::make('data_final')
-                ->default(Carbon::now())
+               // ->default(Carbon::now())
                 ->required(),
 
                 Forms\Components\FileUpload::make('arquivo')
@@ -217,7 +217,8 @@ class NgCertificadosResource extends Resource
                     ->disk('public')
                     ->directory('certificados')
                     ->acceptedFileTypes(['image/*', 'application/pdf'])
-                    ->maxSize(10240), // Limite de tamanho de 10 MB
+                    ->maxSize(10240) // Limite de tamanho de 10 MB
+                    ->required(),
     
             Forms\Components\Hidden::make('id_usuario')
                 ->default(fn () => Auth::id()),

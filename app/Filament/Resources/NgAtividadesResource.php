@@ -70,10 +70,7 @@
                         ->sortable()
                         ->searchable(),
     
-                        Tables\Columns\TextColumn::make('email') // Adicione o campo email aqui
-                        ->searchable()
-                        ->sortable(),
-
+                
                       
                 ])
                 ->filters([

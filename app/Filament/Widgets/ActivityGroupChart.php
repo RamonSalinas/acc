@@ -55,20 +55,19 @@ class ActivityGroupChart extends ChartWidget
                 case 2:
                     return 'Pesquisa';
                 case 3:
-                    return 'Atividades';
+                    return 'Esporte';
                 case 4:
-                    return 'Representação';
+                    return 'Prêmios';
                 case 5:
-                    return 'Iniciação';
+                    return 'PI';
                 case 6:
-                    return 'Participação';
+                    return 'Administrativo';
                 case 7:
-                    return 'Cultural';
+                    return 'Cursos';
                 case 8:
                     return 'Extensão';
                 default:
                     return 'Desconhecido';
-                
             }
         }, $labels);
 

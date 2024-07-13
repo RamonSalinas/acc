@@ -11,4 +11,4 @@ A<button aria-label="Menu do usuário" type="button" class="shrink-0">
             <img class="fi-avatar object-cover object-center fi-circular rounded-full h-8 w-8 fi-user-avatar" src="https://ui-avatars.com/api/?name=I+M&amp;color=FFFFFF&amp;background=09090b" alt="Avatar of Issac Mayer2">
         fdfa
 
-        
+        Conectando com a nova versão para ajustesr

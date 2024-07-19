@@ -124,7 +124,8 @@ public function generatePdf1()
                 'atividade' => $atividade,
             ];
         })
-        ->sortDesc();
+        //->sortDesc(); Ordem de grupos de atividades por ordem crescente
+        ->sortBy('created_at');
 
         // Calcular a soma total das horas ACC e das horas de extensão
         $totalHorasACC = $certificados->where('id_tipo_atividade', '!=', 10)->sum('horas_ACC');

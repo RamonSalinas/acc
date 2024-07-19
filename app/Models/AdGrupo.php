@@ -18,5 +18,8 @@ class AdGrupo extends Model
     {
         return $this->hasMany(NgCertificados::class, 'grupo_atividades', 'id');
     }
+
+
+    
 }
 

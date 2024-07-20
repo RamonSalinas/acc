@@ -40,7 +40,9 @@ class ViewNgCertificados extends ViewRecord
                     return redirect()->route('filament.admin.resources.ng-certificados.index');
                 })
                 ->color('success')
-                ->icon('phosphor-certificate-duotone'),
+                ->icon('phosphor-certificate-duotone')
+                ->visible(fn() => Auth::user()->isAdmin()), // Visível apenas para administradores
+
 
             Action::make('Rejeitar')
                 ->label('Rejeitar')
@@ -49,6 +51,7 @@ class ViewNgCertificados extends ViewRecord
                         ->label('Observação')
                         ->maxLength(500)
                         ->required(), // Torna o campo obrigatório
+                        
                 ])
                 ->action(function (array $data) {
                     $this->record->update([
@@ -68,7 +71,9 @@ class ViewNgCertificados extends ViewRecord
                     return redirect()->route('filament.admin.resources.ng-certificados.index');
                 })
                 ->color('danger')
-                ->icon('phosphor-certificate-duotone'),
+                ->icon('phosphor-certificate-duotone')
+                ->visible(fn() => Auth::user()->isAdmin()), // Visível apenas para administradores
+
             
             Action::make('Baixar')
                 ->label('Baixar Arquivo')

@@ -113,7 +113,8 @@ class NgCertificadosResource extends Resource
                     ->maxLength(255),
     
                 Forms\Components\TextInput::make('carga_horaria')
-                    ->label(fn (callable $get) => $get('carga_horaria_label', 'Horario'))
+                ->label('Carga Horária ou Número de Atividades')
+                //->label(fn (callable $get) => $get('carga_horaria_label', 'Horario'))
                     ->required()
                     ->reactive()
                     ->numeric() // Ensure only numeric values
@@ -306,12 +307,13 @@ class NgCertificadosResource extends Resource
                 // Defina os filtros, se necessário
             ])
             ->actions([
-                !$currentUser->isAdmin()
-                    ? Tables\Actions\EditAction::make()
-                    : Tables\Actions\Action::make('view')
-                        ->label('Ver')
-                        ->url(fn ($record) => route('filament.admin.resources.ng-certificados.view', $record))
-                        ->icon('heroicon-o-eye'),
+                Tables\Actions\EditAction::make()
+                    ->visible(fn ($record) => !$currentUser->isAdmin() && $record->type == 'Pendente'),
+                Tables\Actions\Action::make('view')
+                    ->label('Ver')
+                    ->url(fn ($record) => route('filament.admin.resources.ng-certificados.view', $record))
+                    ->icon('heroicon-o-eye')
+                    ->visible(fn ($record) => $currentUser->isAdmin() || $record->type != 'Pendente'),
                 Tables\Actions\DeleteAction::make(),
                 Tables\Actions\Action::make('download')
                 ->label('Baixar')

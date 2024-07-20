@@ -135,112 +135,90 @@
       <th>Grupo</th>
       <th>Atividade</th>
       <th>Horas Registradas</th>
-                      <!-- 
-      <th>Horas Máxima por Grupo</th>
-      <th>Percentual Máximo por Atividade</th>
-      <th>Horas Permitidas</th>-->
       <th>Horas Aceitas</th>
-      <th>Analises</th>
+      <th>Horas Extrapoladas</th>
+      <th>Análises</th>
     </tr>
   </thead>
   <tbody>
-
 
 @php
 $totalHorasRegistradas = 0;
 $totalHorasPermitidas = 0;
 $totalHorasAceitas = 0;
+$totalHorasExtrapoladas = 0;
 $extrapolou = 0;
 $horasPorAtividade = [];
 $somaHorasACC = 0;
-$excedeuMax = false;
 $grupoAtual = '';
-
 @endphp
 
 @foreach($certificados->sortBy('created_at') as $certificado)
   @php
-  $idAtividade = $certificado->ngAtividade->id;
   $percentualMaximo = $certificado->ngAtividade->percentual_maximo;
   $horasRegistradas = $certificado->horas_ACC;
-  $horasAceitas = $horasRegistradas; // Inicialmente, assumimos que todas as horas são aceitas
-
+  $horasAceitas = $horasRegistradas;
   $grupoAtividade = $certificado->ngAtividade->grupo_atividades;
+
+  $idAtividade = $certificado->ngAtividade->id;
+  $maxHorasPermitidas = ($curso->carga_horaria_ACC * $percentualMaximo) / 100;
 
   if ($grupoAtual != $grupoAtividade) {
     $grupoAtual = $grupoAtividade;
     $horasPorAtividade = [];
   }
 
-  $maxHorasPermitidas = ($curso->carga_horaria_ACC * $percentualMaximo) / 100;
-
   if (!isset($horasPorAtividade[$idAtividade])) {
-    $horasPorAtividade[$idAtividade] = 0;
+    $horasPorAtividade[$idAtividade] = ['registradas' => 0, 'extrapoladas' => 0];
   }
-  $horasPorAtividade[$idAtividade] += $certificado->horas_ACC;
 
-  $somaHorasACC += $certificado->horas_ACC;
-  $horasExcedidas = $somaHorasACC - $curso->carga_horaria_ACC;
+  $horasPorAtividade[$idAtividade]['registradas'] += $horasRegistradas;
+  $somaHorasACC += $horasRegistradas;
 
   $analise = '';
   $horasRestantes = 0;
-  $horasNaoPermitidas = 0;
+  $horasExtrapoladas = 0;
 
-  if($idAtividade == 10) {
-    $analise = 'Atividade de extensão registrada adequadamente';
+  if ($horasPorAtividade[$idAtividade]['registradas'] > $maxHorasPermitidas) {
+    $horasExtrapoladas = $horasPorAtividade[$idAtividade]['registradas'] - $maxHorasPermitidas;
+    $horasAceitas = max(0, $maxHorasPermitidas - ($horasPorAtividade[$idAtividade]['registradas'] - $horasRegistradas));
+    $horasPorAtividade[$idAtividade]['extrapoladas'] = $horasExtrapoladas;
+    $analise = 'Extrapolou ' . $horasExtrapoladas . ' horas nesta atividade';
   } else {
-  if ($somaHorasACC <= $curso->carga_horaria_ACC) {
-    if ($horasPorAtividade[$idAtividade] <= $maxHorasPermitidas) {
-      $horasRestantes = $maxHorasPermitidas - $horasPorAtividade[$idAtividade];
-      $analise = 'Ainda pode registrar ' . $horasRestantes . ' horas nesta atividade';
-
-    } else{
-      $horasExtrapoladas = $horasPorAtividade[$idAtividade] - $maxHorasPermitidas;
-      $horasNaoPermitidas = $horasPorAtividade[$idAtividade] - $maxHorasPermitidas;
-      $extrapolou += $horasExtrapoladas;
-      $analise = 'Ultrapassou  '.$horasNaoPermitidas.' horas  nesta atividade ';
-      }
-
-  }elseif ($horasPorAtividade[$idAtividade] <= $maxHorasPermitidas) {
-
-    $horasRestantes = $maxHorasPermitidas - $horasPorAtividade[$idAtividade]; //Horas Permitidas 
-
-    $analise = 'ACC Alcançadas, ainda pode registrar mais  '.$horasRestantes.' horas nesta atividade';
-
+    $horasAceitas = $horasRegistradas;
+    $horasRestantes = $maxHorasPermitidas - $horasPorAtividade[$idAtividade]['registradas'];
+    $analise = 'Ainda pode registrar ' . $horasRestantes . ' horas nesta atividade';
   }
-  else {
-    $analise = 'ACC Cumpridas e Ultrapassou as horas permitidas nesta atividade ';
-    $horasExtrapoladas = $somaHorasACC - $curso->carga_horaria_ACC;
-    $horasNaoPermitidas = $somaHorasACC - $curso->carga_horaria_ACC;
-    $extrapolou += $horasExtrapoladas;
-    $horasAceitas = $maxHorasPermitidas - ($horasPorAtividade[$idAtividade] - $horasRegistradas); // Ajusta as horas aceitas para não incluir as horas extrapoladas
 
+  if ($somaHorasACC > $curso->carga_horaria_ACC) {
+   
+    $analise = 'Horas ACC superadas';
   }
-}
-  // Atualiza os totais
-  $totalHorasRegistradas += $certificado->horas_ACC;
+
+  $totalHorasRegistradas += $horasRegistradas;
   $totalHorasPermitidas += $maxHorasPermitidas;
-  $totalHorasAceitas += min($certificado->horas_ACC, $maxHorasPermitidas);
+  $totalHorasAceitas += $horasAceitas;
+  $totalHorasExtrapoladas += $horasPorAtividade[$idAtividade]['extrapoladas'];
   @endphp
   <tr>
     <td>{{ $certificado->id ?? 'N/A' }}</td>
     <td>{{ $certificado->nome_certificado ?? 'N/A' }}</td>
     <td>{{ $grupoAtividade }}</td>
-    <td>{{ $certificado->ngAtividade->nome_atividade ?? 'N/A' }}</td>    
-    <td>{{ $certificado->horas_ACC }}</td>
-    <td>{{ $horasAceitas < 0 ? 0 : $horasAceitas }}</td>
-    <td>{{ $analise}}</td>
+    <td>{{ $certificado->ngAtividade->nome_atividade ?? 'N/A' }}</td>
+    <td>{{ $horasRegistradas }}</td>
+    <td>{{ $horasAceitas }}</td>
+    <td>{{ $horasPorAtividade[$idAtividade]['extrapoladas'] }}</td>
+    <td>{{ $analise }}</td>
   </tr>
-@endforeach  
+@endforeach
 <tr>
-    <td colspan="2">Total</td>
-    <td>{{ $totalHorasRegistradas }}</td>
-    <td></td>
-    <td></td>
-    <td>{{ $totalHorasAceitas }}</td>
-    <td></td>
-  </tr>
-  </tbody>
+  <td colspan="4">Total</td>
+  <td>{{ $totalHorasRegistradas }}</td>
+  <td>{{ $totalHorasAceitas }}</td>
+  <td>{{ $totalHorasExtrapoladas }}</td>
+  <td></td>
+</tr>
+</tbody>
 </table>
 <br>
 

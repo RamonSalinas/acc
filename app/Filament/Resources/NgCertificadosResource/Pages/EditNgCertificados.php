@@ -12,6 +12,8 @@ class EditNgCertificados extends EditRecord
 {
     protected static string $resource = NgCertificadosResource::class;
 
+    
+
     protected function getRedirectUrl(): string
     {
         return static::getResource()::getUrl('index');

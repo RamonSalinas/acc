@@ -12,3 +12,17 @@ A<button aria-label="Menu do usuário" type="button" class="shrink-0">
         fdfa
 
         Conectando com a nova versão para ajustesr
+
+
+         local.INFO: .........loop das atividaas e sumas Horas........ 
+         {"excedentes":[{"id_atividade":179,"horas_excedidas":2.0}],"somaHoras":2.0,"Columnas":{"App\\Models\\NgCertificados":{"id":179,"nome_certificado":"Curso Impi5","carga_horaria":30,"descricao":"Importante Verificar","local":"Salvador","data_inicio":"2024-07-11","data_final":"2024-07-19","id_tipo_atividade":1,"id_usuario":39,"horas_ACC":"30.00","type":"Pendente","created_at":"2024-07-13T22:04:10.000000Z","updated_at":"2024-07-13T22:04:10.000000Z","grupo_atividades":1,"arquivo":"certificados/01J2Q1ZZ894JHQF34DS93BPQ7E.pdf","observacao":null,"ng_atividade":{"id":1,"grupo_atividades":"1","nome_atividade":"a) disciplina cursada com aprovação e não contabilizada para a integralização da carga horária do curso, realizada na UFOB ou em curso de graduação, autorizado pelo MEC, de outra instituição de educação superior;","valor_unitario":"1.000","percentual_maximo":"50.000","created_at":"2024-05-25T12:29:44.000000Z","updated_at":"2024-05-28T00:27:02.000000Z","grupo_atividades_id":null},"user":{"id":39,"name":"Alison Guerrero Franco","email":"al@a.com","email_verified_at":null,"two_factor_confirmed_at":null,"is_active":1,"current_team_id":null,"profile_photo_path":null,"created_at":"2024-07-13T21:59:04.000000Z","updated_at":"2024-07-13T22:00:52.000000Z","id_curso":1,"id_professor":11,"cpf":null,"periodo":null,"profile_photo_url":"https://ui-avatars.com/api/?name=A+G+F&color=7F9CF5&background=EBF4FF"}}}} 
+
+
+
+
+
+
+em caso positivo deve mostrar em quantas horas de diferença supera as horas em um campo chamado Horas Não Consideradas,  
+depois de for detectado que as horas de ACCMAX foram superadas,  todas as seguintes certificados, devera mostrar em uma 
+nova columna chamado detalhes,    "ultrapassou as horas permitidads do curos"  e na columna Horas Não consideras Mostrar 
+o mesmo valor das horas_ACC.  Este é o view  <!DOCTYPE html>

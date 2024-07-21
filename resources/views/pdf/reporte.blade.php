@@ -33,7 +33,7 @@
     th {
       background-color: #4F6D7A;
     }.resumo-container {
-    margin-top: 20px;
+    margin-top: 10px;
     margin-left: auto;
     margin-right: auto;
     max-width: 80%; /* Ajuste conforme necessário */
@@ -41,9 +41,21 @@
     padding: 20px;
     border-radius: 10px; /* Bordas arredondadas */
 }
+.resumo-column p {
+    margin-top: 1px; /* Reduz o espaço acima de cada parágrafo */
+    margin-bottom: 1px; /* Reduz o espaço abaixo de cada parágrafo */
+  }
+
+  .resumo-column h3, .resumo-column p {
+    margin-top: 5px; /* Reduz o espaço acima de cada elemento */
+    margin-bottom: 5px; /* Reduz o espaço abaixo de cada elemento */
+    font-size: 14px; /* Diminui o tamanho da fonte */
+  }
 
 .resumo-column {
     width: 45%;
+    padding: 10px; /* Reduz o preenchimento dentro de cada coluna */
+
 }
 
 @media (max-width: 768px) {
@@ -51,9 +63,25 @@
         width: 100%;
     }
     .resumo-container {
+      margin-top: 2px; /* Reduz o espaço acima de cada parágrafo */
+      margin-bottom: 3px; /* Reduz o espaço abaixo de cada parágrafo */
+
         flex-direction: column;
         align-items: center;
     }
+
+    .aprovado {
+      font-size: 12px; /* Diminui o tamanho da fonte */
+
+  background-color: green;
+  color: white;
+}
+
+.rejeitado {
+  font-size: 12px; /* Diminui o tamanho da fonte */
+  background-color: red;
+  color: white;
+}
 }
     
   </style>
@@ -105,6 +133,7 @@
                   <th style="border: 1px solid #ccc; padding: 8px;">Atividade</th>
                   <th style="border: 1px solid #ccc; padding: 8px;">Horas Registradas</th>
                   <th style="border: 1px solid #ccc; padding: 8px;">Horas Aceitas</th>
+                  <th style="border: 1px solid #ccc; padding: 8px;">Horas Extrapoladas</th>
                   <th style="border: 1px solid #ccc; padding: 8px;">Análises</th>
               </tr>
           </thead>
@@ -114,22 +143,33 @@
       </table>
       <p style="text-align: center; margin-top: 20px;">A tabela acima descreve as seguintes colunas:</p>
       <ul style="text-align: center; list-style-type: none; padding: 0;">
-          <li><strong>ID:</strong> Identificação única do certificado.</li>
           <li><strong>Nome:</strong> Nome do certificado registrado.</li>
           <li><strong>Grupo:</strong> Grupo no qual foi registrado o certificado.</li>
           <li><strong>Atividade:</strong> Atividade na qual foi registrado o certificado.</li>
           <li><strong>Horas Registradas:</strong> Horas registradas pelo aluno.</li>
           <li><strong>Grupo:</strong> Grupo no qual foi registrado o certificado.</li>
           <li><strong>Horas Aceitas:</strong> Horas previstas pelo sistema que poderão ser aprovadas pelo orientador.</li>
+          <li><strong>Horas Extrapoladas:</strong> Horas previstas pelo sistema que estão extrapolado  e que não serão contabilizadas</li>
           <li><strong>Análises:</strong> Análise do resultado e status das horas registradas e processadas usando o sistema de predição automatizado.</li>
-      </ul>
+          <li><<strong>
+                <span style="display: inline-block; width: 10px; height: 10px; background-color: green; margin-right: 5px;"></span>
+                Cor Verde:
+            </strong>
+            Registro aprovado pelo orientador.
+            <strong>
+                <span style="display: inline-block; width: 10px; height: 10px; background-color: red; margin-left: 15px; margin-right: 5px;"></span>
+                Cor Vermelha:
+            </strong>
+            Registro rejeitado pelo orientador</li>
+
+        </ul>
   </div>
 </div>
 
 
 <table>
   <thead>
-    <tr>
+  <tr>    
       <th>ID</th>
       <th>Nome</th>
       <th>Grupo</th>
@@ -198,9 +238,17 @@ $grupoAtual = '';
   $totalHorasRegistradas += $horasRegistradas;
   $totalHorasPermitidas += $maxHorasPermitidas;
   $totalHorasAceitas += $horasAceitas;
-  $totalHorasExtrapoladas += $horasPorAtividade[$idAtividade]['extrapoladas'];
-  @endphp
-  <tr>
+
+if($horasPorAtividade[$idAtividade]['extrapoladas'] > $horasRegistradas){//vALIDA SIM HORA EXTRAPOLADA E MAIOR PARA SALVAR NA TABELA BEM, MAS SALVA A SUMA TOTAL DA ATIVIDAD EXTRAPOLADAS PORQUE NO E NECESSAIRO VERDAD. 
+ $horasPorAtividade[$idAtividade]['extrapoladas']= $horasRegistradas;
+}
+
+$totalHorasExtrapoladas += $horasPorAtividade[$idAtividade]['extrapoladas'];
+
+  
+ @endphp
+  <tr class="{{ $certificado->type == 'Aprovada' ? 'aprovado' : ($certificado->type == 'Rejeitada' ? 'rejeitado' : '') }}">    
+   
     <td>{{ $certificado->id ?? 'N/A' }}</td>
     <td>{{ $certificado->nome_certificado ?? 'N/A' }}</td>
     <td>{{ $grupoAtividade }}</td>
@@ -225,46 +273,39 @@ $grupoAtual = '';
 
 
 
+
+
 @php
-// Inicializa as variáveis para o resumo
-$totalHorasExcluindoId10 = 0;
-$totalHorasId10 = 0;
-$totalHorasAprovadas = 0;
-$totalCertificadosProcessados = count($certificados);
-
-foreach ($certificados as $certificado) {
-    $idAtividade = $certificado->ngAtividade->id;
-    $horasRegistradas = $certificado->horas_ACC;
-
-    if ($idAtividade == 10) {
-        // Soma as horas para atividades com ID 10
-        $totalHorasId10 += $horasRegistradas;
-    } else {
-        // Soma as horas excluindo atividades com ID 10
-        $totalHorasExcluindoId10 += $horasRegistradas;
-    }
-
-    // Soma as horas aprovadas
-    $totalHorasAprovadas += min($horasRegistradas, ($curso->carga_horaria_ACC * $certificado->ngAtividade->percentual_maximo) / 100);
-}
+$certificadosPendentes = $certificados->where('type', 'Pendente')->count();
+$certificadosAprovados = $certificados->where('type', 'Aprovada')->count();
+$certificadosRejeitados = $certificados->where('type', 'Rejeitada')->count();
 @endphp
-
 
 <div style="border: px solid #ccc; padding: 20px; margin-bottom: 10px;">
   <div class="resumo-container">
       <h2 style="text-align: center;">Resumo das Atividades Complementares</h2>
       <p style="text-align: center;">Aqui está um resumo da predição das horas registradas, a predição de aprovação automatizada e dos certificados processados.</p>
-      <p style="text-align: center;">Este relatório fornece uma visão geral das horas registradas pelos alunos, prevendo a sua conformidade com os requisitos do curso. Além disso, apresenta uma análise automatizada da aprovação dos certificados submetidos, destacando aqueles que atendem aos critérios estabelecidos. Abaixo estão os detalhes sobre o processamento dos certificados e a previsão das horas acumuladas para cada atividade.</p>      <div style="display: flex; justify-content: space-around; margin-top: 20px;">
-          <div class="resumo-column">
-              <h3 style="text-align: center;">Horas Registradas</h3>
-              <p style="text-align: center;"><strong>Total Horas Registradas (ACC):</strong> {{ $totalHorasExcluindoId10 }}</p>
-              <p style="text-align: center;"><strong>Total Horas de  (Extensão):</strong> {{ $totalHorasId10 }}</p>
-          </div>
-          <div class="resumo-column">
-              <h3 style="text-align: center;">Horas Aprovadas e Certificados</h3>
-              <p style="text-align: center;"><strong>Total Horas Aprovadas:</strong> {{ $totalHorasAprovadas }}</p>
-              <p style="text-align: center;"><strong>Total Certificados Processados:</strong> {{ $totalCertificadosProcessados }}</p>
-          </div>
+      <p style="text-align: center;">Este relatório fornece uma visão geral das horas registradas pelos alunos, prevendo a sua conformidade com os requisitos do curso. Além disso, apresenta uma análise automatizada da aprovação dos certificados submetidos, destacando aqueles que atendem aos critérios estabelecidos. Abaixo estão os detalhes sobre o processamento dos certificados e a previsão das horas acumuladas para cada atividade.</p>      
+      <div style="display: flex; justify-content: space-around; margin-top: 20px;">
+           
+                    <div style="border: 1px solid #ccc; padding: 10px; margin-bottom: 5px;">
+
+                              <div class="resumo-column">
+
+                                    <h3 style="text-align: center;">Horas Registradas</h3>
+                                    <p style="text-align: center;"><strong>Total Horas Registradas (ACC):</strong> {{ $totalHorasRegistradas }}</p>
+                                </div>
+                                <div class="resumo-column">
+                                    <h3 style="text-align: center;">Horas Aprovadas</h3>
+                                    <p style="text-align: center;"><strong>Total Horas Aprovadas:</strong> {{ $totalHorasAceitas }}</p>
+                                    <p style="text-align: center;"><strong>Total Horas Extrapoladas:</strong> {{ $totalHorasExtrapoladas }}</p>
+                                    <h3 style="text-align: center;">Certificados</h3>
+                                    <p style="text-align: center;"><strong>Total Certificados Processados:</strong> {{ $certificados->count() }}</p>
+                                    <p style="text-align: center;"><strong>Certificados Pendentes:</strong> {{ $certificadosPendentes }}</p>
+                                    <p style="text-align: center;"><strong>Certificados Aprovados:</strong> {{ $certificadosAprovados }}</p>
+                                    <p style="text-align: center;"><strong>Certificados Rejeitados:</strong> {{ $certificadosRejeitados }}</p>
+                              </div>
+              </div>
       </div>
   </div>
 </div>
@@ -297,6 +338,7 @@ foreach ($certificados as $certificado) {
         $atividade = $data['atividade'];
         $totalQuantidade += $data['count'];
         $totalHorasAcc += $data['horas_acc_sum'];
+        // Certifique-se de que horas_acc_sum está corretamente calculado para cada atividade
       @endphp
       <tr>
         <td>{{$atividade->grupo->nome_grupo }}</td>
@@ -308,12 +350,12 @@ foreach ($certificados as $certificado) {
         <td>{{ $data['comparacao'] }}</td>
       </tr>
     @endforeach
-    <tr>
+   <!-- <tr>
       <td colspan="2"><strong>Total</strong></td>
       <td><strong>{{ $totalQuantidade }}</strong></td>
       <td><strong>{{ $totalHorasAcc }}</strong></td>
       <td></td>
-    </tr>
+    </tr>-->
   </tbody>
 </table>
    <!-- Resumo das Horas ACC -->
@@ -384,6 +426,4 @@ foreach ($certificados as $certificado) {
       <p style="text-align: center;">Esperamos que esta ferramenta tenha proporcionado uma experiência eficiente e útil na análise e gestão de suas atividades complementares e de extensão. Estamos sempre à disposição para melhorias e suporte. Continue contando com a Universidade para seu desenvolvimento acadêmico e profissional.</p>
   </div>
 </div>
-
-
 

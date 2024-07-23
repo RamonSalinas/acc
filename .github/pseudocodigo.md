@@ -103,6 +103,10 @@ $grupoAtual = '';
                             No codigo acima estou tendo problema com os calculas da columna Horas Aceitas já que não comple em sua totalidade as necessidades requeridas.  Para isso desejo que veja a seguinte logica e o exemplo para que ajuste o codigo da minha tabela na columnas Horas Aceitas e adicionalmente preciso que crie uma columna chamada como horas extrapoladas para atender a necessidade.
                             
                              O valor de horas extrapoladas tem que ser salva por cada atividade com idactividade igual quando o registro for um idactividade que ainda não for colocado na tabela,  ele tem que iniciar uma nova conta de horas extrapoladas dessa atividade,  mas quando aparece na tabela com um idatividade já inicializado deve retornar com o valor de horas extrapoladas previamente registrado. Importante saber que tem um contador de Soma das Horas Registradas da atividade e uma Soma das Horas Registradas Geral que é usada para verificar sim as horas Carga Horária Máxima foi supera em caso positovo mostra a mensagem na columna analises horas ACC superadas e sim as  Soma das Horas Registradas da atividade supera o valor das (Percentual Máximo por Atividade * Carga Horária Máxima)  agregue a coolumna de analises a mensgame horas maxima da atividade superada. Segundo o exemplo deve registrar os valores corretos na comumna horas aceitas e horas extrpoladas. 
+
+
+
+                             
                             Vamos pensar que vamos a processar o segundo registro da tabela.   O registro previo tinha registrado 20 no idativiade igual a 1. O seguindo registro também é idatividade igual a 1 tem as seguintes variaveis: 
                             Horas registradas =  6
                             Percentual Máximo por Atividade = 50 porcento
@@ -119,9 +123,9 @@ Então neste certifcado  foi extrapolada uma 1,   e requero que o registre na co
 o seguinte cetificado idatividade = 1   por tanto  e as horas registradas são 7 segundo a logica projetada,  Horas extrapoladas = (33 - 25 - 1.  Horas extrapoladas = 7;  Por tanto na columna  de horas extrapoladas é o número 7  e na columna horas aceitas 0. 
 
 No seguinte certificado o idatividade = 4  por tanto a Soma das Horas Registradas dessa atividade = 0 mas a Soma das Horas Registradas Geral = 33, este registro no campo de Horas Registrada agrega o valor de 30 e (Percentual Máximo por Atividade * Carga Horária Máxima)=  25 horas
- fazendo a logica adequado deve registrar o valor de  na columna Horas Aceitas 25, com a mensagem que ultrapolou as horas da atividade  o valor de  na columna horas Extrapolado 5 e na columna análises mensagem ACC superada Porque a sumatorioa das Horas Registradas Geral debe ser com horas Aceitas por tanto.  33+25 = 58 e Registradas Geral>Carga Horária Máxima.  o valor de Horas Registradas dessa atividade      30                       `Horas Extrapoladas = 26 - 25 - 0
+ fazendo a logica adequado deve registrar o valor de  na columna Horas Aceitas 25, com a mensagem que Alcanço el máximo nesta atividade o valor de  na columna horas Extrapolado 5 e na columna análises mensagem Ae ACC  Sim cumpridas, Porque a sumatorioa das Horas Registradas Geral debe ser com horas Aceitas por tanto.  25+25 = 50 e Registradas Geral>=Carga Horária Máxima.  
 
-
+ No seguinte certificado é novamente idativade = 1 por tanto vai retomar o valor de sumatorioa de horas atividade que esta registrada na última intersão de da atividade  idatividade  1 e na sumatoria horas geral 50.  Horas registradas =8. registrando na columna Horas aceitas 0 e em Horas extrapolada 8 e em análises  
 
 certificado 1    Horas Aceitas Horas Extrapoladas 
 

@@ -19,4 +19,10 @@ class NgAtividadesProgressao extends Model
     {
         return $this->belongsTo(AdGrupoProgressao::class);
     }
+
+  
+public function ngCertificadosProgressao()
+{
+    return $this->hasMany(NgCertificadosProgressao::class, 'ng_atividades_progressao_id');
+}
 }

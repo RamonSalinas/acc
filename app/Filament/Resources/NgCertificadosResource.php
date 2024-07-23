@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\NgCertificadosResource\Pages;
+use App\Models\AdGrupoProgressao;
 use App\Models\NgCertificados;  
 use App\Models\NgAtividades;
 use App\Models\AdCursos;
@@ -53,7 +54,6 @@ class NgCertificadosResource extends Resource
                         $set('horas_ACC', null);
                         $set('carga_horaria', null);
                     }),
-
             Forms\Components\Select::make('id_tipo_atividade')
             ->label('Nome da Atividade')
             ->required()

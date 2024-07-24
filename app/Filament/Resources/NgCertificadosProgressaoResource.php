@@ -21,6 +21,10 @@ use App\Models\NgAtividadesProgressao;
 use App\Models\AdGrupoProgressao;
 use Filament\Notifications\Notification;
 use Carbon\Carbon;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
+
+use App\Models\AdCursos;
 class NgCertificadosProgressaoResource extends Resource
 {
     protected static ?string $model = NgCertificadosProgressao::class;
@@ -82,18 +86,45 @@ class NgCertificadosProgressaoResource extends Resource
                         }
                     }
                 }),
-           TextInput::make('referencia')
+
+            TextInput::make('referencia')
                 ->label('Referência'),
             TextInput::make('quantidade')
                 ->label('Quantidade')
-                ->numeric(),
-         
-                TextInput::make('pontuacao')
+                ->numeric()
+                ->rule('min:1') // Garante que o valor seja maior que 0
+                ->reactive() // Torna este campo reativo
+                ->afterStateUpdated(function (callable $set, callable $get) {
+                    // Obtém os valores necessários para o cálculo
+                    $idTipoAtividade = $get('ad_grupo_progressao_id');
+                    $valorUnitario = $get('referencia');
+                    $quantidade = $get('quantidade');
+
+                    // Realiza o cálculo. Ajuste conforme a lógica necessária.
+                    $pontuacao = $valorUnitario * $idTipoAtividade * $quantidade;
+                    $set('pontuacao', $pontuacao);
+
+                    // Verifica se o curso do usuário está definido
+                    $user = Auth::user();
+                    $curso = AdCursos::find($user->id_curso);
+
+                    if (!$curso) {
+                        Notification::make()
+                            ->title('Erro')
+                            ->body('Curso não encontrado.')
+                            ->danger()
+                            ->send();
+                        return;
+                    }
+                }),
+            TextInput::make('pontuacao')
                 ->label('Pontuação')
-                ->numeric(),
-
-
-                
+                ->default(0)
+                ->disabled()
+                ->extraAttributes(['hidden' => 'hidden']),
+                Forms\Components\Hidden::make('pontuacao')
+                ->default(0),
+                  
             FileUpload::make('arquivo_progressao')
                 ->label('Arquivo de Progressão')
                 ->label('Arquivo de Progressão')

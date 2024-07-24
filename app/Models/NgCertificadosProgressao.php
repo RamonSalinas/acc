@@ -10,6 +10,7 @@ class NgCertificadosProgressao extends Model
     use HasFactory;
 
     protected $table = 'ng_certificados_progressao';
+    
 
     protected $fillable = [
         'ad_grupo_progressao_id',
@@ -47,7 +48,10 @@ class NgCertificadosProgressao extends Model
         static::creating(function ($certificado) {
             if (auth()->check()) {
                 $certificado->id_usuario = auth()->id();
+                // Definir um valor padrão para pontuacao se não estiver definido
+
             }
+
         });
     }
 

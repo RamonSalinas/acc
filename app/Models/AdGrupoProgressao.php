@@ -14,9 +14,10 @@ class AdGrupoProgressao extends Model
         'nome_grupo_progressao',
     ];
 
+
     public function ngCertificadosProgressao()
-    {
-        return $this->hasMany(NgCertificados::class, 'grupo_atividades_progressao', 'id');
-    }
+{
+    return $this->hasMany(NgCertificadosProgressao::class, 'ad_grupo_progressao_id');
+}
 
 }

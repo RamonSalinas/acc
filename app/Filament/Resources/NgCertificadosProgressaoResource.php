@@ -21,9 +21,10 @@ use App\Models\NgAtividadesProgressao;
 use App\Models\AdGrupoProgressao;
 use Filament\Notifications\Notification;
 use Carbon\Carbon;
+use Filament\Forms\Set;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
-
+use Closure;
 use App\Models\AdCursos;
 class NgCertificadosProgressaoResource extends Resource
 {
@@ -94,7 +95,9 @@ class NgCertificadosProgressaoResource extends Resource
                 ->numeric()
                 ->rule('min:1') // Garante que o valor seja maior que 0
                 ->reactive() // Torna este campo reativo
-                ->afterStateUpdated(function (callable $set, callable $get) {
+                ->afterStateUpdated(function (callable $set, callable $get, $state) {
+
+//                ->afterStateUpdated(function (callable $set, callable $get) {
                     // Obtém os valores necessários para o cálculo
                     $idTipoAtividade = $get('ad_grupo_progressao_id');
                     $valorUnitario = $get('referencia');
@@ -129,10 +132,49 @@ class NgCertificadosProgressaoResource extends Resource
                 ->label('Arquivo de Progressão')
                 ->label('Arquivo de Progressão')
                 ->acceptedFileTypes(['image/*', 'application/pdf']),
-            DatePicker::make('data_inicial')
-                ->label('Data Inicial'),
+            
+                DatePicker::make('data_inicial')
+                ->label('Data Inicial')
+                ->required()
+                ->reactive()
+                ->afterStateUpdated(function (callable $set, $state) {
+                    // Limpa a duração se a data inicial for alterada
+                    $set('duracao', null);
+                }),
+            
             DatePicker::make('data_final')
-                ->label('Data Final'),
+                ->label('Data Final')
+                ->required()
+                ->reactive()
+                ->afterStateUpdated(function (callable $set, callable $get, $state) {
+                    $dataInicial = $get('data_inicial');
+                    if (!$state || !$dataInicial) {
+                        return;
+                    }
+
+                    $dataInicial = Carbon::createFromFormat('Y-m-d', $dataInicial);
+                    $dataFinal = Carbon::createFromFormat('Y-m-d', $state);
+
+                    if ($dataFinal->lt($dataInicial)) {
+                        $set('data_final', $dataInicial->addDay()->format('Y-m-d'));
+                        Notification::make()
+                            ->title('Erro')
+                            ->body('A Data Final deve ser posterior à Data Inicial.')
+                            ->danger()
+                            ->send();
+                        return;
+                    }
+
+                    $diferenca = $dataInicial->diff($dataFinal);
+                    $duracao = "{$diferenca->m} mês(es) e {$diferenca->d} dia(s)";
+                    $set('duracao', $duracao);
+                }),
+
+            TextInput::make('duracao')
+                ->label('Duração da Atividade Registrada')
+                ->disabled()
+                ->dehydrated(false)
+                ->visible(fn ($get) => $get('duracao') !== null),
             Textarea::make('observacao')
                 ->label('Observação'),
             Select::make('status')

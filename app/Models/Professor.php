@@ -9,13 +9,21 @@ class Professor extends Model
 {
     use HasFactory;
 
+    protected $table = 'professors';
+
     protected $fillable = [
-        'nome',
-        'email',
+        'user_id', 'email', 'siape', 'lotacao', 'admissao',
+        'classe', 'regime', 'nivel', 'data_ultima_progressao',
+        'intersticio_data_inicial', 'intersticio_data_final'
     ];
 
-    public function users()
+    public function progressaos()
     {
-        return $this->belongsToMany(User::class, 'professor_user', 'professor_id', 'user_id');
+        return $this->hasMany(Progressao::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
     }
 }

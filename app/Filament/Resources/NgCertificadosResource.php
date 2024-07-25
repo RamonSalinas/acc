@@ -24,6 +24,8 @@ class NgCertificadosResource extends Resource
     protected static ?string $model = NgCertificados::class;
 
     protected static ?string $navigationIcon = 'phosphor-certificate-duotone';
+    protected static ?string $navigationGroup = 'Gerenciamento de Certificados';
+
     protected static ?string $label = 'Certificados';
     protected static ?string $navigationLabel = 'Certificados';
     protected static ?string $pluralLabel = 'Certificados';

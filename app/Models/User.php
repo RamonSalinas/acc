@@ -12,6 +12,8 @@ use App\Http\Traits\UserTrait;
 use Filament\Panel;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Fortify\TwoFactorAuthenticatable;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+
 
 class User extends Authenticatable implements FilamentUser
 {
@@ -83,12 +85,17 @@ class User extends Authenticatable implements FilamentUser
     {
         return $this->hasMany(AdCursos::class);
     }
-
     public function professores()
     {
         return $this->belongsToMany(Professor::class, 'professor_user', 'user_id', 'professor_id');
+        //return $this->hasMany(Professor::class);
+
     }
 
+    public function professor()
+    {
+        return $this->hasOne(Professor::class, 'user_id');
+    }
     public function ngCertificados()
     {
         return $this->belongsToMany(NgCertificados::class, 'ng_certificado_user', 'user_id', 'ng_certificados_id');
@@ -98,10 +105,14 @@ class User extends Authenticatable implements FilamentUser
     {
         return $this->belongsTo(AdCursos::class, 'id_curso');
     }
+
+
+
     public function certificados()
     {
-        return $this->hasMany(NgCertificados::class, 'id_usuario');
     }
+
+    
     
 
 }

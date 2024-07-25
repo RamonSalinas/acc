@@ -29,8 +29,10 @@ use App\Models\AdCursos;
 class NgCertificadosProgressaoResource extends Resource
 {
     protected static ?string $model = NgCertificadosProgressao::class;
+    protected static ?string $navigationIcon = 'academicon-dataverse';
+    protected static ?string $navigationGroup = 'Gerenciamento de Progressão';
+    protected static ?string $label = 'Certificados Progressão';
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     public static function form(Form $form): Form
     {
@@ -248,7 +250,7 @@ class NgCertificadosProgressaoResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListNgCertificadosProgressaos::route('/'),
+            'index' => Pages\ListNgCertificadosProgressao::route('/'),
             'create' => Pages\CreateNgCertificadosProgressao::route('/create'),
             'edit' => Pages\EditNgCertificadosProgressao::route('/{record}/edit'),
         ];

@@ -17,7 +17,11 @@ class NgAtividadesProgressaoResource extends Resource
 {
     protected static ?string $model = NgAtividadesProgressao::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'academicon-ads-square';
+    protected static ?string $navigationGroup = 'Gerenciamento de Progressão';
+    protected static ?string $label = 'Atividades Progressão';
+
+
 
     public static function form(Form $form): Form
     {

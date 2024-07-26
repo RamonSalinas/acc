@@ -34,9 +34,9 @@ class ProgressaoResource extends Resource
         return "Progressao-{$ultimoId}-{$dataFormatada}";
     }
 
-      public static function form(Form $form): Form
-    {        /** @var User $user */
-
+    public static function form(Form $form): Form
+    {
+        /** @var User $user */
         $user = Auth::user();
 
         // Verifique se o usuário tem um objeto professor
@@ -62,6 +62,7 @@ class ProgressaoResource extends Resource
 
         return $form
             ->schema([
+
                 TextInput::make('nome_progressao')
                     ->label('Nome da Progressão')
                     ->required()
@@ -180,23 +181,25 @@ class ProgressaoResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
+            ])
+            ->headerActions([
+                Tables\Actions\CreateAction::make()->label('Nova Progressão'),
             ]);
     }
 
+    public static function getRelations(): array
+    {
+        return [
+            // Defina suas relações aqui
+        ];
+    }
 
-public static function getRelations(): array
-{
-    return [
-        // Defina suas relações aqui
-    ];
-}
-
-public static function getPages(): array
-{
-    return [
-        'index' => Pages\ListProgressaos::route('/'),
-        'create' => Pages\CreateProgressao::route('/create'),
-        'edit' => Pages\EditProgressao::route('/{record}/edit'),
-    ];
-}
+    public static function getPages(): array
+    {
+        return [
+            'index' => Pages\ListProgressaos::route('/'),
+            'create' => Pages\CreateProgressao::route('/create'),
+            'edit' => Pages\EditProgressao::route('/{record}/edit'),
+        ];
+    }
 }

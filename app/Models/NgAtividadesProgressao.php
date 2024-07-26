@@ -13,6 +13,7 @@ class NgAtividadesProgressao extends Model
         'nome_da_atividade',
         'ad_grupo_progressao_id',
         'referencia',
+
     ];
 
     public function adGrupoProgressao(): BelongsTo
@@ -20,9 +21,5 @@ class NgAtividadesProgressao extends Model
         return $this->belongsTo(AdGrupoProgressao::class);
     }
 
-  
-public function ngCertificadosProgressao()
-{
-    return $this->hasMany(NgCertificadosProgressao::class, 'ng_atividades_progressao_id');
-}
+
 }

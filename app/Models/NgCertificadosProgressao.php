@@ -24,6 +24,8 @@ class NgCertificadosProgressao extends Model
         'observacao',
         'status',
         'id_usuario',
+        'progressao_id',
+
     ];
 
     public function grupoProgressao()
@@ -42,6 +44,12 @@ class NgCertificadosProgressao extends Model
     {
         return $this->belongsTo(User::class, 'id_usuario');
     }
+
+  
+public function ngCertificadosProgressao()
+{
+    return $this->hasMany(NgCertificadosProgressao::class, 'ng_atividades_progressao_id');
+}
 
     protected static function booted()
     {

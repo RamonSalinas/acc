@@ -95,6 +95,7 @@ class User extends Authenticatable implements FilamentUser
     public function professor()
     {
         return $this->hasOne(Professor::class, 'user_id');
+        
     }
     public function ngCertificados()
     {

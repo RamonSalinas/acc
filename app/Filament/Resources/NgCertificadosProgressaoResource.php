@@ -26,6 +26,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Closure;
 use App\Models\AdCursos;
+use App\Models\Progressao;
 class NgCertificadosProgressaoResource extends Resource
 {
     protected static ?string $model = NgCertificadosProgressao::class;
@@ -37,6 +38,26 @@ class NgCertificadosProgressaoResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
+
+            Select::make('progressao_id')
+            ->label('Nome da Progressão')
+            ->options(function () {
+                return Progressao::pluck('nome_progressao', 'id')->toArray();
+            })
+            ->required()
+            ->reactive()
+            ->searchable()
+            ->getSearchResultsUsing(function (string $search): array {
+                $results = Progressao::where('nome_progressao', 'like', "%{$search}%")->limit(50)->get();
+                return $results->pluck('nome_progressao', 'id')->toArray();
+            })
+            ->getOptionLabelUsing(fn ($value): ?string => Progressao::find($value)?->nome),
+
+
+
+
+
+
            Select::make('ad_grupo_progressao_id')
             ->label('Grupo de Atividades')
             ->options(function () {
@@ -132,13 +153,14 @@ class NgCertificadosProgressaoResource extends Resource
                   
             FileUpload::make('arquivo_progressao')
                 ->label('Arquivo de Progressão')
-                ->label('Arquivo de Progressão')
                 ->acceptedFileTypes(['image/*', 'application/pdf']),
             
                 DatePicker::make('data_inicial')
                 ->label('Data Inicial')
                 ->required()
                 ->reactive()
+                ->default(Carbon::now())
+
                 ->afterStateUpdated(function (callable $set, $state) {
                     // Limpa a duração se a data inicial for alterada
                     $set('duracao', null);
@@ -148,6 +170,8 @@ class NgCertificadosProgressaoResource extends Resource
                 ->label('Data Final')
                 ->required()
                 ->reactive()
+                ->default(Carbon::now())
+
                 ->afterStateUpdated(function (callable $set, callable $get, $state) {
                     $dataInicial = $get('data_inicial');
                     if (!$state || !$dataInicial) {
@@ -178,9 +202,12 @@ class NgCertificadosProgressaoResource extends Resource
                 ->dehydrated(false)
                 ->visible(fn ($get) => $get('duracao') !== null),
             Textarea::make('observacao')
+            ->default('XXXXXX')
+
                 ->label('Observação'),
             Select::make('status')
                 ->label('Status')
+                ->default('ativo')
                 ->options([
                     'ativo' => 'Ativo',
                     'inativo' => 'Inativo',

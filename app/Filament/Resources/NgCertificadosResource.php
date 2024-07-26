@@ -250,6 +250,8 @@ class NgCertificadosResource extends Resource
 
     public static function table(Table $table): Table
     {
+
+        /** @var User $currentUser */
         $currentUser = Auth::user();
 
         $query = static::getModel()::query();
@@ -267,6 +269,7 @@ class NgCertificadosResource extends Resource
         }
 
         return $table
+        
             ->query($query)
             ->columns([
                 Tables\Columns\TextColumn::make('nome_certificado')->sortable()->searchable(),
@@ -309,6 +312,10 @@ class NgCertificadosResource extends Resource
                 // Defina os filtros, se necessário
             ])
             ->actions([
+
+          
+
+
                 Tables\Actions\EditAction::make()
                     ->visible(fn ($record) => !$currentUser->isAdmin() && $record->type == 'Pendente'),
                 Tables\Actions\Action::make('view')

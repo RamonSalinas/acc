@@ -40,19 +40,31 @@ class NgCertificadosProgressaoResource extends Resource
         return $form->schema([
 
             Select::make('progressao_id')
-            ->label('Nome da Progressão')
-            ->options(function () {
-                return Progressao::pluck('nome_progressao', 'id')->toArray();
-            })
-            ->required()
-            ->reactive()
-            ->searchable()
-            ->getSearchResultsUsing(function (string $search): array {
-                $results = Progressao::where('nome_progressao', 'like', "%{$search}%")->limit(50)->get();
-                return $results->pluck('nome_progressao', 'id')->toArray();
-            })
-            ->getOptionLabelUsing(fn ($value): ?string => Progressao::find($value)?->nome),
-
+    ->label('Nome da Progressão')
+    ->options(function () {
+        $options = Progressao::pluck('nome_progressao', 'id')->toArray();
+        if (empty($options)) {
+            Notification::make()
+                ->title('Aviso')
+                ->body('Primeiro precisa registrar uma nova progressão para registrar atividades')
+                ->warning()
+                ->send();
+        }
+        return $options;
+    })
+    ->default(function () {
+        $lastProgressao = Progressao::latest()->first();
+        return $lastProgressao ? $lastProgressao->id : null;
+    })
+    ->required()
+    ->reactive()
+    ->searchable()
+    ->getSearchResultsUsing(function (string $search): array {
+        $results = Progressao::where('nome_progressao', 'like', "%{$search}%")->limit(50)->get();
+        return $results->pluck('nome_progressao', 'id')->toArray();
+    })
+    ->getOptionLabelUsing(fn ($value): ?string => Progressao::find($value)?->nome),
+        
 
 
 
@@ -111,11 +123,21 @@ class NgCertificadosProgressaoResource extends Resource
                     }
                 }),
 
-            TextInput::make('referencia')
-                ->label('Referência'),
+
+                Forms\Components\TextInput::make('referencia') // This hidden field ensures the value is sent to the database
+                ->label('Referência')
+                ->default(0)
+                ->disabled()
+                ->extraAttributes(['hidden' => 'hidden']),
+                
+            Forms\Components\Hidden::make('referencia')
+                ->default(0),
+
+                
             TextInput::make('quantidade')
                 ->label('Quantidade')
                 ->numeric()
+                ->required()
                 ->rule('min:1') // Garante que o valor seja maior que 0
                 ->reactive() // Torna este campo reativo
                 ->afterStateUpdated(function (callable $set, callable $get, $state) {
@@ -153,6 +175,7 @@ class NgCertificadosProgressaoResource extends Resource
                   
             FileUpload::make('arquivo_progressao')
                 ->label('Arquivo de Progressão')
+                //->required()
                 ->acceptedFileTypes(['image/*', 'application/pdf']),
             
                 DatePicker::make('data_inicial')
@@ -160,10 +183,37 @@ class NgCertificadosProgressaoResource extends Resource
                 ->required()
                 ->reactive()
                 ->default(Carbon::now())
-
-                ->afterStateUpdated(function (callable $set, $state) {
+                ->afterStateUpdated(function (callable $set, $state, $get) {
                     // Limpa a duração se a data inicial for alterada
                     $set('duracao', null);
+            
+                    // Obtenha o ID da progressão selecionada
+                    $progressaoId = $get('progressao_id');
+            
+                    if ($progressaoId) {
+                        // Obtenha a progressão correspondente
+                        $progressao = Progressao::find($progressaoId);
+            
+                        if ($progressao) {
+                            // Compare as datas
+                            $intersticioDataInicial = Carbon::parse($progressao->intersticio_data_inicial);
+                            $dataInicial = Carbon::parse($state);
+            
+                            if ($dataInicial->lt($intersticioDataInicial)) {
+                                Notification::make()
+                                    ->title('Aviso')
+                                    ->body('A data do certificado anexar é menor que a data do interstício e poderia não ser considerada o tempo anterior pelo avaliador.')
+                                    ->warning()
+                                    ->send();
+                            } else {
+                                Notification::make()
+                                    ->title('Sucesso')
+                                    ->body('Certificado no período adequado.')
+                                    ->success()
+                                    ->send();
+                            }
+                        }
+                    }
                 }),
             
             DatePicker::make('data_final')
@@ -205,17 +255,24 @@ class NgCertificadosProgressaoResource extends Resource
             ->default('XXXXXX')
 
                 ->label('Observação'),
-            Select::make('status')
+           
+           
+                Forms\Components\TextInput::make('status') // This hidden field ensures the value is sent to the database
                 ->label('Status')
-                ->default('ativo')
-                ->options([
-                    'ativo' => 'Ativo',
-                    'inativo' => 'Inativo',
-                ]),
-                TextInput::make('id_usuario')
+                ->default('Pendente')
+                ->disabled()
+                ->extraAttributes(['hidden' => 'hidden']),
+                
+            Forms\Components\Hidden::make('status')
+                ->default(0),
+           
+           
+                 TextInput::make('id_usuario')
                 ->label('ID do Usuário')
                 ->default(auth()->id())
-                ->disabled(),
+                ->disabled()
+                ->extraAttributes(['hidden' => 'hidden']),
+
         ]);
     }
 

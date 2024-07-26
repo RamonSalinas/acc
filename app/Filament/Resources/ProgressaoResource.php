@@ -14,6 +14,7 @@ use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Select;
 use Livewire\Livewire;
@@ -137,10 +138,15 @@ class ProgressaoResource extends Resource
                     ->required()
                     ->default($professor ? $professor->intersticio_data_final : null),
 
-                TextInput::make('professor_id')
-                    ->label('Professor ID')
-                    ->required()
-                    ->default($professor ? $professor->id : ''),
+
+
+                 TextInput::make('professor_id')
+                 ->label('Professor ID')
+                 ->default($professor ? $professor->id : '')
+                 ->disabled()
+                 ->extraAttributes(['hidden' => 'hidden'])
+                 ->hidden(),
+               
             ]);
     }
 

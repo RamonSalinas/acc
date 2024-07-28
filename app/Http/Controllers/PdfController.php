@@ -16,9 +16,11 @@ class PdfController extends Controller
 {
     public function generatePdf()
 {
+    /** @var User $user */
     $user = Auth::user();
     $curso = AdCursos::find($user->id_curso);
-
+   //     /** @var User $currentUser */
+   //     $currentUser = Auth::user();
     // Verificar se o usuário tem o curso registrado
     if (!$curso) {
         return Redirect::route('error');
@@ -56,7 +58,7 @@ class PdfController extends Controller
     return $pdf->download('certificados.pdf');
 }
 public function generatePdf1()
-    {
+    { 
         $user = Auth::user();
         $curso = AdCursos::find($user->id_curso);
 
@@ -70,6 +72,9 @@ public function generatePdf1()
     ->join('ad_grupo', 'ng_atividades.grupo_atividades', '=', 'ad_grupo.id')
     ->select('ng_certificados.*', 'ng_atividades.grupo_atividades as grupo_atividades', 'ad_grupo.nome_grupo as nome_grupo_atividades'
 );
+
+        /** @var User $user */
+      $currentUser = Auth::user();
 
         if (!$user->isSuperAdmin()) {
             if ($user->isAdmin()) {

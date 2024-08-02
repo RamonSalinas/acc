@@ -5,6 +5,7 @@ use App\Models\NgAtividades;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PdfController;
+use App\Http\Controllers\ProgressaoController;
 
 
 Route::get('/test-professor', function () {
@@ -41,6 +42,14 @@ Route::match(['get', 'post'], '/botman', [BotManController::class, 'handle']);
 Route::get('/chat', function () {
     return view('chat');
 });
+
+
+// Relatorios Progressão
+Route::get('/progressao/todos-certificados', [ProgressaoController::class, 'imprimirRelatorio'])->name('progressao.todosCertificados');
+Route::get('/progressao/contar-relatorios', [ProgressaoController::class, 'imprimirRelatorio'])->name('progressao.contarRelatorios');
+Route::get('/progressao/relatorios-usuario', [ProgressaoController::class, 'imprimirRelatorio'])->name('progressao.relatoriosUsuario');
+Route::get('/progressao/imprimir-relatorio/{tipo}/{progressaoId?}', [ProgressaoController::class, 'imprimirRelatorio'])->name('progressao.imprimirRelatorio');
+Route::get('/progressao/analises/{progressaoId}', [ProgressaoController::class, 'imprimirRelatorio'])->name('progressao.analises');
 
 Route::view('/error', 'error')->name('error');
 

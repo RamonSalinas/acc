@@ -26,3 +26,6 @@ em caso positivo deve mostrar em quantas horas de diferença supera as horas em 
 depois de for detectado que as horas de ACCMAX foram superadas,  todas as seguintes certificados, devera mostrar em uma 
 nova columna chamado detalhes,    "ultrapassou as horas permitidads do curos"  e na columna Horas Não consideras Mostrar 
 o mesmo valor das horas_ACC.  Este é o view  <!DOCTYPE html>
+Preciso instarlar resource chamado de imprimir relatorios progressão usando filament 3 e laravel 10.  desese que mostre um formulario com 3 botões cada botão tera que apuntar a uma
+função diferente do controllador para imprimir.  confeccione as view para o controlador e a rota como o passo a passo onde todo  o processo
+use este exemplo de controlador e bibliotecas  pdf  use Barryvdh\DomPDF\Facade\Pdf;

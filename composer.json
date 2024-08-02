@@ -9,7 +9,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.1",
-        "barryvdh/laravel-dompdf": "^2.2",
+        "barryvdh/laravel-dompdf": "*",
         "botman/botman": "^2.8",
         "botman/driver-web": "^1.5",
         "calebporzio/sushi": "^2.4",

@@ -7,12 +7,15 @@ use App\Models\AdGrupoProgressao;
 use App\Models\Progressao;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ProgressaoController extends Controller
 {
     public function imprimirRelatorio($tipo, $progressaoId = null)
     {
         $userId = auth()->id();
+        $usuario = Auth::user(); // Assuming you are using Laravel's Auth system
+
 
         if (is_numeric($tipo)) {//Validar se o tipo é um número para criar o relatorio exacto da progressão solicitada. 
             $progressaoId = $tipo;
@@ -34,8 +37,13 @@ class ProgressaoController extends Controller
                     $query->where('id_usuario', $userId)
                           ->where('progressao_id', $progressaoId);
                 }, 'ngCertificadosProgressao.adGrupoProgressao'])->get();
-                $pdf = Pdf::loadView('pdf.progressao.analises', compact('grupos'));
+
+
+                $progressao = Progressao::find($progressaoId);
+
+                $pdf = Pdf::loadView('pdf.progressao.analises', compact('grupos', 'progressao', 'usuario'));
                 return $pdf->download('analises.pdf');
+              
 
             case 'contar_relatorios':
                 $count = Progressao::count();

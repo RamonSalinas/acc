@@ -30,13 +30,26 @@ class ImprimirProgressaoResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('nome_progressao')
-                    ->label('Nome da Progressão')
-                    ->required(),
-                Forms\Components\DatePicker::make('data_ultima_progressao')
-                    ->label('Data Última Progressão')
-                    ->required(),
-                // Adicione outros campos conforme necessário
+                Forms\Components\Grid::make()
+                    ->schema([
+                        Forms\Components\TextInput::make('nome_progressao')
+                            ->label('Nome da Progressão')
+                            ->disabled()  // Corrigido aqui
+                            ->required()
+                            ->columnSpan(6), // Ajusta a largura do campo
+                        Forms\Components\DatePicker::make('intersticio_data_inicial')
+                            ->label('Intersticio Progressão Inicial')
+                            ->disabled()  // Corrigido aqui
+                            ->required()
+                            ->columnSpan(6), // Ajusta a largura do campo
+                        Forms\Components\DatePicker::make('intersticio_data_final')
+                            ->label('Intersticio Progressão Final')
+                            ->disabled()  // Corrigido aqui
+                            ->required()
+                            ->columnSpan(6), // Ajusta a largura do campo
+                        // Adicione outros campos conforme necessário
+                    ])
+                    ->columns(1), // Define o número de colunas na grade
             ]);
     }
 
@@ -46,8 +59,11 @@ class ImprimirProgressaoResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('nome_progressao')
                     ->label('Nome da Progressão'),
-                Tables\Columns\TextColumn::make('data_ultima_progressao')
-                    ->label('Data Última Progressão')
+                    Tables\Columns\TextColumn::make('intersticio_data_inicial')
+                    ->label('Intersticio Progressão Inicial')
+                    ->date(),
+                Tables\Columns\TextColumn::make('intersticio_data_final')
+                    ->label('Intersticio Progressão Final')
                     ->date(),
                 // Adicione outras colunas conforme necessário
             ])
@@ -55,6 +71,7 @@ class ImprimirProgressaoResource extends Resource
                 // Adicione os filtros da tabela aqui, se necessário
             ]);
     }
+    
 
     public static function getRelations(): array
     {

@@ -3,7 +3,6 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\NgCertificadosResource\Pages;
-use App\Models\AdGrupoProgressao;
 use App\Models\NgCertificados;  
 use App\Models\NgAtividades;
 use App\Models\AdCursos;
@@ -24,8 +23,6 @@ class NgCertificadosResource extends Resource
     protected static ?string $model = NgCertificados::class;
 
     protected static ?string $navigationIcon = 'phosphor-certificate-duotone';
-    protected static ?string $navigationGroup = 'Gerenciamento de Certificados';
-
     protected static ?string $label = 'Certificados';
     protected static ?string $navigationLabel = 'Certificados';
     protected static ?string $pluralLabel = 'Certificados';
@@ -56,6 +53,7 @@ class NgCertificadosResource extends Resource
                         $set('horas_ACC', null);
                         $set('carga_horaria', null);
                     }),
+
             Forms\Components\Select::make('id_tipo_atividade')
             ->label('Nome da Atividade')
             ->required()
@@ -250,8 +248,6 @@ class NgCertificadosResource extends Resource
 
     public static function table(Table $table): Table
     {
-
-        /** @var User $currentUser */
         $currentUser = Auth::user();
 
         $query = static::getModel()::query();
@@ -269,7 +265,6 @@ class NgCertificadosResource extends Resource
         }
 
         return $table
-        
             ->query($query)
             ->columns([
                 Tables\Columns\TextColumn::make('nome_certificado')->sortable()->searchable(),
@@ -312,10 +307,6 @@ class NgCertificadosResource extends Resource
                 // Defina os filtros, se necessário
             ])
             ->actions([
-
-          
-
-
                 Tables\Actions\EditAction::make()
                     ->visible(fn ($record) => !$currentUser->isAdmin() && $record->type == 'Pendente'),
                 Tables\Actions\Action::make('view')

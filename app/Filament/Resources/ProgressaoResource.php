@@ -38,13 +38,13 @@ class ProgressaoResource extends Resource
     public static function form(Form $form): Form
     {
         /** @var User $user */
-        $user = Auth::user();
+      $user = Auth::user();
 
         // Verifique se o usuário tem um objeto professor
-        if (!$user->professores()->exists()) {
+        if (!$user->professoreshasMany()->exists()) {
             // Crie um novo objeto professor com valores padrão
-            $user->professores()->create([
-                'user_id' => $user->id,
+            $user->professoreshasMany()->create([
+                'user_id' => $user->id, // Certifique-se de que o campo user_id está sendo preenchido
                 'email' => $user->email,
                 'siape' => '0000000',
                 'lotacao' => '',
@@ -56,28 +56,30 @@ class ProgressaoResource extends Resource
                 'intersticio_data_inicial' => Carbon::now(),
                 'intersticio_data_final' => Carbon::now()->addYear(),
             ]);
+
+
         }
+      //  dd('entrou EXISTE');    
 
         // Carregue os dados do professor
-        $professor = $user->professores()->first();
+        $professor = $user->professoreshasMany()->first();
+
+        // Adiciona o ID do professor aos dados
+        $data['professor_id'] = $professor ? $professor->id : null;
 
         return $form
             ->schema([
-
                 TextInput::make('nome_progressao')
                     ->label('Nome da Progressão')
-                    ->required()
                     ->disabled()
                     ->default(self::gerarNomeProgressaoPadrao()),
 
                 TextInput::make('siape')
                     ->label('SIAPE')
-                    ->required()
                     ->default($professor ? $professor->siape : ''),
 
                 Select::make('lotacao')
                     ->label('Lotação')
-                    ->required()
                     ->options([
                         'CCET' => 'CCET',
                         'CBSB' => 'CBSB',
@@ -87,12 +89,10 @@ class ProgressaoResource extends Resource
 
                 DatePicker::make('admissao')
                     ->label('Admissão')
-                    ->required()
                     ->default($professor ? $professor->admissao : null),
 
                 Select::make('classe')
                     ->label('Classe')
-                    ->required()
                     ->options([
                         'A' => 'A',
                         'B' => 'B',
@@ -104,7 +104,6 @@ class ProgressaoResource extends Resource
 
                 Select::make('nivel')
                     ->label('Nível')
-                    ->required()
                     ->options([
                         '1' => '1',
                         '2' => '2',
@@ -115,12 +114,10 @@ class ProgressaoResource extends Resource
 
                 DatePicker::make('data_ultima_progressao')
                     ->label('Data Última Progressão')
-                    ->required()
                     ->default($professor ? $professor->data_ultima_progressao : null),
 
                 Select::make('regime')
                     ->label('Regime')
-                    ->required()
                     ->options([
                         'DE' => 'DE',
                         '20h' => '20h',
@@ -130,23 +127,16 @@ class ProgressaoResource extends Resource
 
                 DatePicker::make('intersticio_data_inicial')
                     ->label('Interstício Data Inicial')
-                    ->required()
                     ->default($professor ? $professor->intersticio_data_inicial : null),
 
                 DatePicker::make('intersticio_data_final')
                     ->label('Interstício Data Final')
-                    ->required()
                     ->default($professor ? $professor->intersticio_data_final : null),
 
-
-
-                 TextInput::make('professor_id')
-                 ->label('Professor ID')
-                 ->default($professor ? $professor->id : '')
-                 ->disabled()
-                 ->extraAttributes(['hidden' => 'hidden'])
-                 ->hidden(),
-               
+                TextInput::make('professor_id')
+                    ->label('Professor ID')
+                    ->default($professor ? $professor->id : ''),
+                   // ->disabled(),
             ]);
     }
 

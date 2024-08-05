@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -12,8 +11,7 @@ use App\Http\Traits\UserTrait;
 use Filament\Panel;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Fortify\TwoFactorAuthenticatable;
-use Illuminate\Database\Eloquent\Relations\HasOne;
-
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Authenticatable implements FilamentUser
 {
@@ -28,7 +26,6 @@ class User extends Authenticatable implements FilamentUser
         'id_curso',
         'id_professor',
         'periodo', 
-
     ];
 
     protected $hidden = [
@@ -46,9 +43,6 @@ class User extends Authenticatable implements FilamentUser
         'profile_photo_url',
     ];
 
-
-    
-
     public function isSuperAdmin(): bool
     {
         return $this->id == 1 && $this->hasRole($this->SUPER_ADMIN);
@@ -57,9 +51,7 @@ class User extends Authenticatable implements FilamentUser
     public function isAdmin(): bool
     {
         return $this->hasRole($this->ADMIN);
-        
     }
-    
 
     public function isUser(): bool
     {
@@ -85,17 +77,17 @@ class User extends Authenticatable implements FilamentUser
     {
         return $this->hasMany(AdCursos::class);
     }
+
     public function professores()
     {
-        return $this->belongsToMany(Professor::class, 'professor_user', 'user_id', 'professor_id');
-        //return $this->hasMany(Professor::class);
+       return $this->belongsToMany(Professor::class, 'professor_user', 'user_id', 'professor_id');
+}
 
-    }
-
-    public function professor()
+    // Relacionamento belongsToMany
+    public function professoreshasMany()
     {
-        return $this->hasOne(Professor::class, 'user_id');
-        
+        return $this->hasMany(Professor::class, 'user_id');
+
     }
     public function ngCertificados()
     {
@@ -107,13 +99,8 @@ class User extends Authenticatable implements FilamentUser
         return $this->belongsTo(AdCursos::class, 'id_curso');
     }
 
-
-
     public function certificados()
     {
+        return $this->hasMany(NgCertificados::class, 'id_usuario');
     }
-
-    
-    
-
 }

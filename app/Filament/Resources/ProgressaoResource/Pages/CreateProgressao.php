@@ -16,42 +16,45 @@ class CreateProgressao extends CreateRecord
     {
         $user = Auth::user();
 
-        // Atualiza ou cria a entrada professor
+        // Verifica se o usuário tem um professor associado
         if ($user->professor) {
+            // Atualiza ou cria a entrada professor
             $user->professor->update([
+                'user_id' => $user->id, // Certifique-se de que o campo user_id está sendo preenchido
                 'siape' => $data['siape'],
                 'lotacao' => $data['lotacao'],
                 'admissao' => $data['admissao'],
                 'classe' => $data['classe'],
-            //    'regime' => $data['regime'],
-               'nivel' => $data['nivel'],
+                'nivel' => $data['nivel'],
                 'data_ultima_progressao' => $data['data_ultima_progressao'],
                 'intersticio_data_inicial' => $data['intersticio_data_inicial'],
                 'intersticio_data_final' => $data['intersticio_data_final'],
             ]);
+
+            // Adiciona o ID do professor aos dados
+            $data['professor_id'] = $user->professor->id;
         } else {
-           //vamos a ver que hago kkk
-        }// Adiciona o ID do professor aos dados
-        $data['professor_id'] = $user->professor->id;
+            // Lógica para quando o usuário não tem um professor associado
+            // Por exemplo, você pode criar um novo professor aqui
+            // $professor = Professor::create([...]);
+            // $data['professor_id'] = $professor->id;
+        }
 
-
-
-
+        // Função para gerar o nome padrão da progressão
         function gerarNomeProgressaoPadrao()
-{
-    // Obter o último ID registrado na tabela de progressões
-    $ultimoId = Progressao::max('id') + 1;
+        {
+            // Obter o último ID registrado na tabela de progressões
+            $ultimoId = Progressao::max('id') + 1;
 
-    // Obter a data atual
-    $dataAtual = Carbon::now();
+            // Obter a data atual
+            $dataAtual = Carbon::now();
 
-    // Formatar a data como dia, mês e ano
-    $dataFormatada = $dataAtual->format('d-m-Y');
+            // Formatar a data como dia, mês e ano
+            $dataFormatada = $dataAtual->format('d-m-Y');
 
-    // Gerar o nome padrão
-    return "Progressao-{$ultimoId}-{$dataFormatada}";
-}
-
+            // Gerar o nome padrão
+            return "Progressao-{$ultimoId}-{$dataFormatada}";
+        }
 
         // Garante que o campo nome_progressao esteja preenchido
         if (empty($data['nome_progressao'])) {

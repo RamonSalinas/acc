@@ -1,16 +1,10 @@
 <?php
-
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 class UpdateProfessorsTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
     public function up()
     {
         Schema::table('professors', function (Blueprint $table) {
@@ -38,19 +32,12 @@ class UpdateProfessorsTable extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
         Schema::table('professors', function (Blueprint $table) {
-            // Reverter as mudanças
+            // Reverter as alterações feitas no método up
             $table->dropForeign(['user_id']);
             $table->renameColumn('user_id', 'nome');
-
-            // Remover as novas colunas
             $table->dropColumn([
                 'siape', 'lotacao', 'admissao', 'classe', 'regime', 'nivel',
                 'data_ultima_progressao', 'intersticio_data_inicial', 'intersticio_data_final'

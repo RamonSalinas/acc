@@ -18,36 +18,5 @@ class ListProgressaos extends ListRecords
         ];
     }
 
-    public function table(Table $table): Table
-    {
-        return $table
-            ->columns([
-                Tables\Columns\TextColumn::make('nome_progressao')
-                    ->label('Nome da Progressão'),
-                Tables\Columns\TextColumn::make('intersticio_data_inicial')
-                    ->label('Interstício Data Inicial')
-                    ->date(),
-                Tables\Columns\TextColumn::make('intersticio_data_final')
-                    ->label('Interstício Data Final')
-                    ->date(),
-                Tables\Columns\TextColumn::make('classe')
-                    ->label('Classe'),
-                Tables\Columns\TextColumn::make('regime')
-                    ->label('Regime'),
-                Tables\Columns\TextColumn::make('nivel')
-                    ->label('Nível'),
-                Tables\Columns\TextColumn::make('data_ultima_progressao')
-                    ->label('Data Última Progressão')
-                    ->date(),
-            ])
-            ->filters([
-                // Adicione filtros aqui, se necessário
-            ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
-            ]);
-    }
+    
 }

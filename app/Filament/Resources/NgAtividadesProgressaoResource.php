@@ -84,4 +84,13 @@ class NgAtividadesProgressaoResource extends Resource
             'edit' => Pages\EditNgAtividadesProgressao::route('/{record}/edit'),
         ];
     }
+
+    public static function canViewAny(): bool
+    {        /** @var User $user */
+
+        $user = auth()->user();
+        return $user && $user->hasRole(['Super-Admin']);
+    }
+
+
 }

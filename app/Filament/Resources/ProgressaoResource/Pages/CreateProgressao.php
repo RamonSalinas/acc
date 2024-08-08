@@ -7,6 +7,7 @@ use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use App\Models\Progressao;
+use App\Models\User;
 
 class CreateProgressao extends CreateRecord
 {
@@ -17,9 +18,11 @@ class CreateProgressao extends CreateRecord
         $user = Auth::user();
 
         // Verifica se o usuário tem um professor associado
-        if ($user->professor) {
+        if ($user->professoreshasMany()->exists()) {
             // Atualiza ou cria a entrada professor
-            $user->professor->update([
+
+            //dd('exite kkkkk');
+            $user->professoreshasMany()->update([
                 'user_id' => $user->id, // Certifique-se de que o campo user_id está sendo preenchido
                 'siape' => $data['siape'],
                 'lotacao' => $data['lotacao'],
@@ -32,12 +35,14 @@ class CreateProgressao extends CreateRecord
             ]);
 
             // Adiciona o ID do professor aos dados
-            $data['professor_id'] = $user->professor->id;
+        $data['professor_id'] = $data['professor_id'];
         } else {
             // Lógica para quando o usuário não tem um professor associado
             // Por exemplo, você pode criar um novo professor aqui
             // $professor = Professor::create([...]);
-            // $data['professor_id'] = $professor->id;
+             //$data['professor_id'] = $professor->id;
+
+            dd('Usuário não tem um professor associado');
         }
 
         // Função para gerar o nome padrão da progressão

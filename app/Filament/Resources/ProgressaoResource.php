@@ -142,8 +142,45 @@ class ProgressaoResource extends Resource
 
     public static function table(Table $table): Table
     {
+        $currentUser = Auth::user();
+
+        $query = static::getModel()::query();
+
+        if ($currentUser instanceof User) {
+            if (!$currentUser->isSuperAdmin()) {
+                if ($currentUser->isAdmin()) {
+                    //$query->whereHas('professor', function ($query) use ($currentUser) {
+                        $professor = Professor::where('user_id', $currentUser->id)->first();
+                        $professorId = $professor ? $professor->id : null;
+                    
+                        // Defina a consulta para a tabela
+                        $query = Progressao::query();
+                    
+                        if ($professorId !== null) {
+                            $query->where('professor_id', $professorId);
+                        }
+                                                   
+                    
+                    $query->whereHas('professor', function ($query) use ($currentUser) {
+
+                                            
+                    });
+                   // dd($currentUser->id_professor);
+                } else {
+                    dd('somos otra cosa diferente de admin');
+                }
+            }
+        }
+
+
+
+
+
+
+
         return $table
-            ->columns([
+        ->query($query)   
+                 ->columns([
                 Tables\Columns\TextColumn::make('nome_progressao')
                     ->label('Nome da Progressão'),
                 Tables\Columns\TextColumn::make('intersticio_data_inicial')
@@ -152,22 +189,11 @@ class ProgressaoResource extends Resource
                 Tables\Columns\TextColumn::make('intersticio_data_final')
                     ->label('Interstício Data Final')
                     ->date(),
-                Tables\Columns\TextColumn::make('professor.siape')
-                    ->label('SIAPE'),
-                Tables\Columns\TextColumn::make('professor.lotacao')
-                    ->label('Lotação'),
-                Tables\Columns\TextColumn::make('professor.admissao')
-                    ->label('Admissão')
-                    ->date(),
-                Tables\Columns\TextColumn::make('professor.classe')
-                    ->label('Classe'),
-                Tables\Columns\TextColumn::make('professor.regime')
-                    ->label('Regime'),
-                Tables\Columns\TextColumn::make('professor.nivel')
-                    ->label('Nível'),
                 Tables\Columns\TextColumn::make('professor.data_ultima_progressao')
                     ->label('Data Última Progressão')
                     ->date(),
+                    Tables\Columns\TextColumn::make('classe')
+                    ->label('Classe'),
             ])
             ->filters([
                 // Adicione filtros aqui, se necessário
@@ -177,9 +203,6 @@ class ProgressaoResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
-            ])
-            ->headerActions([
-                Tables\Actions\CreateAction::make()->label('Nova Progressão'),
             ]);
     }
 

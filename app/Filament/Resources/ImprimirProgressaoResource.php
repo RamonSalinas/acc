@@ -16,6 +16,9 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
 use Filament\Pages\Actions;
+use App\Models\Professor;
+use App\Models\User;
+use App\Models\Progressao;
 
 class ImprimirProgressaoResource extends Resource
 {
@@ -55,7 +58,44 @@ class ImprimirProgressaoResource extends Resource
 
     public static function table(Table $table): Table
     {
+        $currentUser = Auth::user();
+
+        $query = static::getModel()::query();
+
+        if ($currentUser instanceof User) {
+            if (!$currentUser->isSuperAdmin()) {
+                if ($currentUser->isAdmin()) {
+                    //$query->whereHas('professor', function ($query) use ($currentUser) {
+                        $professor = Professor::where('user_id', $currentUser->id)->first();
+                        $professorId = $professor ? $professor->id : null;
+                    
+                        // Defina a consulta para a tabela
+                        $query = Progressao::query();
+                    
+                        if ($professorId !== null) {
+                            $query->where('professor_id', $professorId);
+                        }
+                                                   
+                    
+                    $query->whereHas('professor', function ($query) use ($currentUser) {
+
+                                            
+                    });
+                   // dd($currentUser->id_professor);
+                } else {
+                    dd('somos otra cosa diferente de admin');
+                }
+            }
+        }
+
+
+
+
+
+
+
         return $table
+        ->query($query)   
             ->columns([
                 Tables\Columns\TextColumn::make('nome_progressao')
                     ->label('Nome da Progressão'),

@@ -278,51 +278,64 @@ class NgCertificadosProgressaoResource extends Resource
 
     public static function table(Table $table): Table
     {
+        $currentUser = Auth::user();
+
+        $query = static::getModel()::query();
+
+        if ($currentUser instanceof User) {
+            if (!$currentUser->isSuperAdmin()) {
+               
+                if ($currentUser->isAdmin()) {
+                    //dd('somos admin');
+
+                    $query->where('id_usuario', $currentUser->id);
+
+//                    $query->whereHas('usuario', function ($query) use ($currentUser) {
+    //                    $query->where('id_professor', $currentUser->id);
+  //                  });
+                } else {
+                    $query->where('id_usuario', $currentUser->id);
+                }
+            }
+        }
+
         return $table
-        ->columns([
-            Tables\Columns\TextColumn::make('ad_grupo_progressao_id')
-            ->label('Grupo Progressão'),
-
-            Tables\Columns\TextColumn::make('ng_atividades_progressao_id')
-                ->label('Atividade Progressão'),
-
-            Tables\Columns\TextColumn::make('referencia')
-                ->label('Referência'),
-
-            Tables\Columns\TextColumn::make('quantidade')
-                ->label('Quantidade'),
-
-            Tables\Columns\TextColumn::make('pontuacao')
-                ->label('Pontuação'),
-
-            Tables\Columns\TextColumn::make('data_inicial')
-                ->label('Data Inicial')
-                ->date(),
-
-            Tables\Columns\TextColumn::make('data_final')
-                ->label('Data Final')
-                ->date(),
-
-            Tables\Columns\TextColumn::make('status')
-                ->label('Status'),
-
-            Tables\Columns\TextColumn::make('usuario.name')
-                ->label('Usuário'),
-
-            Tables\Columns\TextColumn::make('pontuacao_avaliador')
-                ->label('Pontuação Avaliador'),
-        ])
-        ->filters([
-            //
-        ])
-        ->actions([
-            Tables\Actions\EditAction::make(),
-            Tables\Actions\DeleteAction::make(),
-        ])
-        ->bulkActions([
-            Tables\Actions\DeleteBulkAction::make(),
-        ]);
-}
+            ->query($query)
+            ->columns([
+                Tables\Columns\TextColumn::make('ad_grupo_progressao_id')
+                    ->label('Grupo Progressão'),
+                Tables\Columns\TextColumn::make('ng_atividades_progressao_id')
+                    ->label('Atividade Progressão'),
+                Tables\Columns\TextColumn::make('referencia')
+                    ->label('Referência'),
+                Tables\Columns\TextColumn::make('quantidade')
+                    ->label('Quantidade'),
+                Tables\Columns\TextColumn::make('pontuacao')
+                    ->label('Pontuação'),
+                Tables\Columns\TextColumn::make('data_inicial')
+                    ->label('Data Inicial')
+                    ->date(),
+                Tables\Columns\TextColumn::make('data_final')
+                    ->label('Data Final')
+                    ->date(),
+                Tables\Columns\TextColumn::make('status')
+                    ->label('Status'),
+                Tables\Columns\TextColumn::make('usuario.name')
+                    ->label('Usuário'),
+                Tables\Columns\TextColumn::make('pontuacao_avaliador')
+                    ->label('Pontuação Avaliador'),
+            ])
+            ->filters([
+                //
+            ])
+            ->actions([
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
+            ])
+            ->bulkActions([
+                Tables\Actions\DeleteBulkAction::make(),
+            ]);
+    }
 
     public static function getRelations(): array
     {

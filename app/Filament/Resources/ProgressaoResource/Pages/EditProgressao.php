@@ -6,6 +6,7 @@ use App\Filament\Resources\ProgressaoResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Professor;
 
 class EditProgressao extends EditRecord
 {
@@ -13,9 +14,15 @@ class EditProgressao extends EditRecord
 
     protected function mutateFormDataBeforeFill(array $data): array
     {
-        $professor = Auth::user()->professor;
+        
+        $currentUser = Auth::user();
 
-        if ($professor) {
+        //$professor = Auth::user()->id_professor;
+
+        $professor = Professor::where('user_id', $currentUser->id)->first();
+        $professorId = $professor ? $professor->id : null;
+
+        if ($professorId) {
             $data['siape'] = $professor->siape;
             $data['lotacao'] = $professor->lotacao;
             $data['admissao'] = $professor->admissao;

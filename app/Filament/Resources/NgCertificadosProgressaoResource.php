@@ -27,6 +27,8 @@ use Illuminate\Support\Facades\Auth;
 use Closure;
 use App\Models\AdCursos;
 use App\Models\Progressao;
+use App\Models\Professor;
+
 class NgCertificadosProgressaoResource extends Resource
 {
     protected static ?string $model = NgCertificadosProgressao::class;
@@ -36,13 +38,30 @@ class NgCertificadosProgressaoResource extends Resource
 
 
     public static function form(Form $form): Form
-    {
+    { 
+        
+        //dd($professorId);
+
         return $form->schema([
 
             Select::make('progressao_id')
     ->label('Nome da Progressão')
     ->options(function () {
-        $options = Progressao::pluck('nome_progressao', 'id')->toArray();
+        $user = Auth::user();
+        $currentUser = Auth::user();
+        $professor = Professor::where('user_id', $currentUser->id)->first();
+        $professorId = $professor ? $professor->id : null;
+
+        $options = Progressao::where('professor_id', $professorId)
+        ->pluck('nome_progressao', 'id')
+        ->toArray();
+//$options = Progressao::pluck('nome_progressao', 'id')->toArray();
+
+
+     //  $options = Progressao::pluck('nome_progressao', 'id')->toArray();
+        
+
+      // $options = $user->progressoes()->pluck('nome_progressao', 'id')->toArray();
         if (empty($options)) {
             Notification::make()
                 ->title('Aviso')
@@ -53,7 +72,11 @@ class NgCertificadosProgressaoResource extends Resource
         return $options;
     })
     ->default(function () {
-        $lastProgressao = Progressao::latest()->first();
+        $currentUser = Auth::user();
+        $professor = Professor::where('user_id', $currentUser->id)->first();
+        $professorId = $professor ? $professor->id : null;
+
+        $lastProgressao = Progressao::where('professor_id', $professorId)->latest()->first();
         return $lastProgressao ? $lastProgressao->id : null;
     })
     ->required()

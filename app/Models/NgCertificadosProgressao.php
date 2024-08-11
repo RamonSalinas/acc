@@ -25,6 +25,9 @@ class NgCertificadosProgressao extends Model
         'status',
         'id_usuario',
         'progressao_id',
+        'quantidade_avaliador', // Novo campo
+        'pontuacao_avaliador',  // Novo campo
+        'observacao_avaliador', // Novo campo
 
     ];
 

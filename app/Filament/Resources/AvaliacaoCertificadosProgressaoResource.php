@@ -298,7 +298,7 @@ dd($professorId);
 
 
             $userIds = User::where('id_professor', $userId)->pluck('id')->toArray();
-dd($userIds);
+//dd($userIds);
             
 //            $certificados = NgCertificadosProgressao::whereIn('id_usuario', $userIds)->get();
 
@@ -316,14 +316,9 @@ dd($userIds);
         return $table
             ->query($query)
             ->columns([
-                Tables\Columns\TextColumn::make('ad_grupo_progressao_id')
-                    ->label('Grupo Progressão'),
-                Tables\Columns\TextColumn::make('ng_atividades_progressao_id')
-                    ->label('Atividade Progressão'),
-                Tables\Columns\TextColumn::make('referencia')
-                    ->label('Referência'),
-                Tables\Columns\TextColumn::make('quantidade')
-                    ->label('Quantidade'),
+                Tables\Columns\TextColumn::make('grupoProgressao.nome_grupo_progressao')
+                ->label('Grupo Progressão'),
+               
                 Tables\Columns\TextColumn::make('pontuacao')
                     ->label('Pontuação'),
                 Tables\Columns\TextColumn::make('data_inicial')

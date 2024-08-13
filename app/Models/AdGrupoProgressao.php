@@ -20,4 +20,6 @@ class AdGrupoProgressao extends Model
     return $this->hasMany(NgCertificadosProgressao::class, 'ad_grupo_progressao_id');
 }
 
+
+
 }

@@ -20,6 +20,7 @@ class ViewNgCertificados extends ViewRecord
 
     protected function getActions(): array
     {
+
         return [
             Action::make('Aprovar')
                 ->label('Aprovar')

@@ -225,7 +225,7 @@ dd($professorId);
                 ->options([
                     'Pendente' => 'Pendente',
                     'Aprovado' => 'Aprovado',
-                    'Rejeitado' => 'Rejeitado',
+                    'Rejeitada' => 'Rejeitada',
                 ])
                 ->default('Pendente'),
 
@@ -304,7 +304,7 @@ dd($professorId);
 
            //dd($certificados);
 
-//                $query->whereIn('id_usuario', $userIds);
+                $query->whereIn('id_usuario', $userIds);
 
                 
             } else {
@@ -319,20 +319,30 @@ dd($professorId);
                 Tables\Columns\TextColumn::make('grupoProgressao.nome_grupo_progressao')
                 ->label('Grupo Progressão'),
                
-                Tables\Columns\TextColumn::make('pontuacao')
-                    ->label('Pontuação'),
-                Tables\Columns\TextColumn::make('data_inicial')
+                 /* Tables\Columns\TextColumn::make('data_inicial')
                     ->label('Data Inicial')
                     ->date(),
                 Tables\Columns\TextColumn::make('data_final')
                     ->label('Data Final')
-                    ->date(),
+                    ->date(),*/
                 Tables\Columns\TextColumn::make('status')
-                    ->label('Status'),
+                ->label('Status')
+                ->badge()
+                ->color(fn ($state) => match($state) {
+                    'Aprovada' => 'success',
+                    'Pendente' => 'warning',
+                    'Rejeitada' => 'danger',
+                    default => null,  // Ou você pode escolher uma cor padrão como 'secondary'
+                })
+                ->tooltip(fn ($state) => $state === 'Rejeitada' ? 'Veja a observação registrada' : null),
+                
                 Tables\Columns\TextColumn::make('usuario.name')
                     ->label('Usuário'),
-                Tables\Columns\TextColumn::make('pontuacao_avaliador')
-                    ->label('Pontuação Avaliador'),
+                Tables\Columns\TextColumn::make('pontuacao')
+                    ->label('Pontuação  Registrada'),
+               
+                    Tables\Columns\TextColumn::make('pontuacao_avaliador')
+                    ->label('Pontuação Avaliada'),
             ])
             ->filters([
                 //

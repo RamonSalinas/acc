@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PdfController;
 use App\Http\Controllers\ProgressaoController;
+//use App\Filament\Resources\NgCertificadosResource\Pages\ViewNgCertificadosProgressao;
+use App\Filament\Resources\NgCertificadosProgressaoResource\Pages\ViewNgCertificadosProgressao;
 
 
 Route::get('/test-professor', function () {
@@ -50,7 +52,8 @@ Route::get('/progressao/contar-relatorios', [ProgressaoController::class, 'impri
 Route::get('/progressao/relatorios-usuario', [ProgressaoController::class, 'imprimirRelatorio'])->name('progressao.relatoriosUsuario');
 Route::get('/progressao/imprimir-relatorio/{tipo}/{progressaoId?}', [ProgressaoController::class, 'imprimirRelatorio'])->name('progressao.imprimirRelatorio');
 Route::get('/progressao/analises/{progressaoId}', [ProgressaoController::class, 'imprimirRelatorio'])->name('progressao.analises');
-
+//Route::get('/ng-certificados-progressao/{record}', [ViewNgCertificadosProgressao::class, 'view'])
+    //->name('filament.admin.resources.ng-certificados-progressao.view');
 Route::view('/error', 'error')->name('error');
 
 Route::get('/', function () {
@@ -63,6 +66,12 @@ Route::get('/logout', function () {
     Auth::logout();
     return redirect(route('login'));
 })->name('logout');
+
+
+
+Route::get('/ng-certificados-progressao/{record}', ViewNgCertificadosProgressao::class)
+    ->name('filament.resources.ng-certificados-progressao.view');
+
 
 Route::middleware([
     'auth:sanctum',

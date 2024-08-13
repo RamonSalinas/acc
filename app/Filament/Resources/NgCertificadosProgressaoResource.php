@@ -47,6 +47,8 @@ class NgCertificadosProgressaoResource extends Resource
             Select::make('progressao_id')
     ->label('Nome da Progressão')
     ->options(function () {
+                       /** @var User $user */
+
         $user = Auth::user();
         $currentUser = Auth::user();
         $professor = Professor::where('user_id', $currentUser->id)->first();
@@ -296,6 +298,20 @@ class NgCertificadosProgressaoResource extends Resource
                 ->disabled()
                 ->extraAttributes(['hidden' => 'hidden']),
 
+
+
+                Textarea::make('observacao_avaliador')
+                ->label('Observação do Avaliador')
+                ->disabled()
+                ->required(),
+
+                TextInput::make('pontuacao_avaliador')
+                ->label('Pontuação Avaliador')
+                ->default(0)
+                ->disabled()
+                ->extraAttributes(['hidden' => 'hidden']),
+
+
         ]);
     }
 
@@ -325,36 +341,64 @@ class NgCertificadosProgressaoResource extends Resource
         return $table
             ->query($query)
             ->columns([
-                Tables\Columns\TextColumn::make('ad_grupo_progressao_id')
+                Tables\Columns\TextColumn::make('grupoProgressao.nome_grupo_progressao')
                     ->label('Grupo Progressão'),
-                Tables\Columns\TextColumn::make('ng_atividades_progressao_id')
+                /*Tables\Columns\TextColumn::make('ng_atividades_progressao_id')
                     ->label('Atividade Progressão'),
                 Tables\Columns\TextColumn::make('referencia')
                     ->label('Referência'),
                 Tables\Columns\TextColumn::make('quantidade')
-                    ->label('Quantidade'),
-                Tables\Columns\TextColumn::make('pontuacao')
-                    ->label('Pontuação'),
-                Tables\Columns\TextColumn::make('data_inicial')
+                    ->label('Quantidade'),*/
+                    Tables\Columns\TextColumn::make('status')
+                    ->label('Status')
+                    ->badge()
+                    ->color(fn ($state) => match($state) {
+                        'Aprovada' => 'success',
+                        'Pendente' => 'warning',
+                        'Rejeitada' => 'danger',
+                        default => null,  // Ou você pode escolher uma cor padrão como 'secondary'
+                    })
+                    ->tooltip(fn ($state) => $state === 'Rejeitada' ? 'Veja a observação do Avaliador' : null),
+        
+                    Tables\Columns\TextColumn::make('pontuacao')
+                    ->label('Pontuação Solicitada'),
+                Tables\Columns\TextColumn::make('pontuacao_avaliador')
+                ->label('Pontuação Avaliador'),
+               /* Tables\Columns\TextColumn::make('data_inicial')
                     ->label('Data Inicial')
                     ->date(),
                 Tables\Columns\TextColumn::make('data_final')
                     ->label('Data Final')
-                    ->date(),
-                Tables\Columns\TextColumn::make('status')
-                    ->label('Status'),
-                Tables\Columns\TextColumn::make('usuario.name')
-                    ->label('Usuário'),
-                Tables\Columns\TextColumn::make('pontuacao_avaliador')
-                    ->label('Pontuação Avaliador'),
+                    ->date(),*/
+                
+                /*Tables\Columns\TextColumn::make('usuario.name')
+                    ->label('Usuário'),*/
+                
             ])
             ->filters([
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
-            ])
+                  /** @var User $user */
+
+            Tables\Actions\EditAction::make()
+                      ->visible(fn ($record) => $record->status == 'Pendente'),
+                    Tables\Actions\Action::make('view')
+                        ->label('Ver')
+                        ->url(fn ($record) => route('filament.resources.ng-certificados-progressao.view', ['record' => $record]))
+                        ->icon('heroicon-o-eye'),
+                     //   ->visible(fn ($record) => $currentUser->isAdmin() || $record->status != 'Pendente'),
+                    Tables\Actions\DeleteAction::make(),
+                    Tables\Actions\Action::make('download')
+                    ->label('Baixar')
+                    ->url(function ($record) {
+                        return $record->arquivo_progressao ? asset('storage/' .$record->arquivo_progressao) : null;
+                    })
+                    ->icon('academicon-dryad-square') // Ícone de download
+                    ->openUrlInNewTab()
+                    ->tooltip('Baixar arquivo')
+                    ->visible(fn ($record) => $record->arquivo_progressao !== null) // A ação só é visível se houver um arquivo
+                ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
             ]);
@@ -373,6 +417,8 @@ class NgCertificadosProgressaoResource extends Resource
             'index' => Pages\ListNgCertificadosProgressao::route('/'),
             'create' => Pages\CreateNgCertificadosProgressao::route('/create'),
             'edit' => Pages\EditNgCertificadosProgressao::route('/{record}/edit'),
+            'view' => Pages\ViewNgCertificadosProgressao::route('/{record}'),
+
         ];
     }
 }

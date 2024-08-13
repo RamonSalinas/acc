@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Progressao extends Model
+class ImprimirRelatorioAvaliador extends Model
 {
     use HasFactory;
 
@@ -22,13 +22,8 @@ class Progressao extends Model
         'data_ultima_progressao'
     ];
 
-   // public function professor()
-   // {
-   //     return $this->belongsTo(Professor::class);
-   // }
-
     public function professor()
     {
-        return $this->belongsTo(Professor::class, 'professor_id');
+        return $this->belongsTo(Professor::class);
     }
 }

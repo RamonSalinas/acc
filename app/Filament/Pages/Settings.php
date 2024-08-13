@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\AdCursos;
 use App\Models\User;
+use App\Models\Professor;
 use Spatie\Permission\Models\Role;
 
 class Settings extends Page implements HasForms
@@ -116,6 +117,8 @@ class Settings extends Page implements HasForms
         ]);
 
         try {
+               /** @var User $user */
+
             $user = Auth::user();
             $user->name = $this->name;
             $user->email = $this->email;
@@ -145,6 +148,8 @@ class Settings extends Page implements HasForms
         ]);
 
         try {
+            /** @var User $user */
+
             $user = Auth::user();
             $user->password = Hash::make($this->password);
             $user->save();
@@ -245,11 +250,22 @@ class Settings extends Page implements HasForms
                             )
                             ->searchable()
                             ->preload(),
-                        Select::make('id_professor')
+                            /*  Vamos a ver quando o professor for um usuário estudante funcina bem este código
+                        Select::make('id_professor0')
                             ->label('Professor')
                             ->options(fn () => User::whereColumn('id', 'id_professor')->pluck('name', 'id'))
                             ->searchable()
                             ->preload(),
+
+                 */
+                            Select::make('id_professor')
+                            ->label('Professor')
+                            ->options(fn () => Professor::with('user')->get()->mapWithKeys(function ($professor) {
+                                return [$professor->user_id => $professor->user->name];
+                            }))
+                            ->searchable()
+                            ->preload(),
+             
                     ])->columns(3),
             ]);
     }

@@ -81,7 +81,7 @@ class User extends Authenticatable implements FilamentUser
     public function professores()
     {
        return $this->belongsToMany(Professor::class, 'professor_user', 'user_id', 'professor_id');
-}
+    }
 
     // Relacionamento belongsToMany
     public function professoreshasMany()

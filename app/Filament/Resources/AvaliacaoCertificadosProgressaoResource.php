@@ -298,11 +298,13 @@ dd($professorId);
 
 
             $userIds = User::where('id_professor', $userId)->pluck('id')->toArray();
-            $certificados = NgCertificadosProgressao::whereIn('id_usuario', $userIds)->get();
+dd($userIds);
+            
+//            $certificados = NgCertificadosProgressao::whereIn('id_usuario', $userIds)->get();
 
            //dd($certificados);
 
-                $query->whereIn('id_usuario', $userIds);
+//                $query->whereIn('id_usuario', $userIds);
 
                 
             } else {

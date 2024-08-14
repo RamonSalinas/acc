@@ -46,6 +46,18 @@ class EditImprimirProgressao extends EditRecord
                         session()->flash('error', 'Progressao ID is missing.');
                     }
                 }),
+    
+            Actions\ButtonAction::make('relatorioAvaliacao')
+                ->label('Relatorio de Avaliação')
+                ->color('success')
+                ->icon('heroicon-o-document-text')
+                ->action(function () {
+                    if ($this->record->id) {
+                        $this->redirect(route('progressao.relatorioavaliacao', ['progressaoId' => $this->record->id]));
+                    } else {
+                        session()->flash('error', 'Progressao ID is missing.');
+                    }
+                }),
         ];
     }
 }

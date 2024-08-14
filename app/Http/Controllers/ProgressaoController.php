@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\NgCertificadosProgressao;
 use App\Models\AdGrupoProgressao;
+use App\Models\Professor;
 use App\Models\Progressao;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -11,18 +12,32 @@ use Illuminate\Support\Facades\Auth;
 
 class ProgressaoController extends Controller
 {
+
+    public function imprimirRelatorioAvaliacao($progressaoId)
+    {
+        $userId = auth()->id();
+        $usuario = Auth::user();
+
+        $grupos = AdGrupoProgressao::with(['ngCertificadosProgressao' => function($query) use ($userId, $progressaoId) {
+            $query->where('id_usuario', $userId)
+                  ->where('progressao_id', $progressaoId);
+        }, 'ngCertificadosProgressao.adGrupoProgressao'])->get();
+
+        $progressao = Progressao::find($progressaoId);
+        $professor = Professor::find($progressao->professor_id);
+        $pdf = Pdf::loadView('pdf.progressao.relatorioavaliacao', compact('grupos', 'progressao', 'usuario', 'professor'))->setPaper('a4', 'landscape');
+        return $pdf->download('relatorioavaliacao.pdf');
+    }
+
     public function imprimirRelatorio($tipo, $progressaoId = null)
     {
         $userId = auth()->id();
-        $usuario = Auth::user(); // Assuming you are using Laravel's Auth system
+        $usuario = Auth::user();
 
-
-        if (is_numeric($tipo)) {//Validar se o tipo é um número para criar o relatorio exacto da progressão solicitada. 
+        if (is_numeric($tipo)) {
             $progressaoId = $tipo;
             $tipo = 'analises';
-       } 
-
-
+        }
 
         switch ($tipo) {
             case 'todos_certificados':
@@ -37,13 +52,18 @@ class ProgressaoController extends Controller
                     $query->where('id_usuario', $userId)
                           ->where('progressao_id', $progressaoId);
                 }, 'ngCertificadosProgressao.adGrupoProgressao'])->get();
-
-
                 $progressao = Progressao::find($progressaoId);
-
                 $pdf = Pdf::loadView('pdf.progressao.analises', compact('grupos', 'progressao', 'usuario'));
                 return $pdf->download('analises.pdf');
-              
+
+            case 'relatorioavaliacao':
+                $grupos = AdGrupoProgressao::with(['ngCertificadosProgressao' => function($query) use ($userId, $progressaoId) {
+                    $query->where('id_usuario', $userId)
+                          ->where('progressao_id', $progressaoId);
+                }, 'ngCertificadosProgressao.adGrupoProgressao'])->get();
+                $progressao = Progressao::find($progressaoId);
+                $pdf = Pdf::loadView('pdf.progressao.relatorioavaliacao', compact('grupos', 'progressao', 'usuario'))->setPaper('a4', 'landscape');
+                return $pdf->download('relatorioavaliacao.pdf');
 
             case 'contar_relatorios':
                 $count = Progressao::count();

@@ -46,14 +46,15 @@ Route::get('/chat', function () {
 });
 
 
-// Relatorios Progressão
+// Relatorios Progressão Imprimir
 Route::get('/progressao/todos-certificados', [ProgressaoController::class, 'imprimirRelatorio'])->name('progressao.todosCertificados');
 Route::get('/progressao/contar-relatorios', [ProgressaoController::class, 'imprimirRelatorio'])->name('progressao.contarRelatorios');
 Route::get('/progressao/relatorios-usuario', [ProgressaoController::class, 'imprimirRelatorio'])->name('progressao.relatoriosUsuario');
 Route::get('/progressao/imprimir-relatorio/{tipo}/{progressaoId?}', [ProgressaoController::class, 'imprimirRelatorio'])->name('progressao.imprimirRelatorio');
+//Route::get('/progressao/analises/{progressaoId}', [ProgressaoController::class, 'imprimirRelatorio'])->name('progressao.analises');
+//Route::get('/progressao/relatorioavaliacao/{progressaoId}', [ProgressaoController::class, 'imprimirRelatorioAvaliacao'])->name('progressao.relatorioavaliacao');
 Route::get('/progressao/analises/{progressaoId}', [ProgressaoController::class, 'imprimirRelatorio'])->name('progressao.analises');
-//Route::get('/ng-certificados-progressao/{record}', [ViewNgCertificadosProgressao::class, 'view'])
-    //->name('filament.admin.resources.ng-certificados-progressao.view');
+Route::get('/progressao/relatorioavaliacao/{progressaoId}', [ProgressaoController::class, 'imprimirRelatorioAvaliacao'])->name('progressao.relatorioavaliacao');
 Route::view('/error', 'error')->name('error');
 
 Route::get('/', function () {
@@ -68,7 +69,7 @@ Route::get('/logout', function () {
 })->name('logout');
 
 
-
+//Ruta para la vista de los certificados de progresión não editaveis
 Route::get('/ng-certificados-progressao/{record}', ViewNgCertificadosProgressao::class)
     ->name('filament.resources.ng-certificados-progressao.view');
 

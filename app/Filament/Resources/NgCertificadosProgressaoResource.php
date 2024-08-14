@@ -302,6 +302,7 @@ class NgCertificadosProgressaoResource extends Resource
 
                 Textarea::make('observacao_avaliador')
                 ->label('Observação do Avaliador')
+                ->default('.')
                 ->disabled()
                 ->required(),
 

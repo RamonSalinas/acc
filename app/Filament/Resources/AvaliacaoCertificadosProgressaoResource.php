@@ -112,6 +112,7 @@ dd($professorId);
                 ->numeric()
                 ->required()
                 ->rule('min:1')
+                ->disabled()
                 ->reactive()
                 ->afterStateUpdated(function (callable $set, callable $get, $state) {
                     $idTipoAtividade = $get('ad_grupo_progressao_id');
@@ -151,6 +152,7 @@ dd($professorId);
                 ->label('Data Inicial')
                 ->required()
                 ->reactive()
+                ->disabled()
                 ->default(Carbon::now())
                 ->afterStateUpdated(function (callable $set, $state, $get) {
                     $set('duracao', null);
@@ -185,6 +187,7 @@ dd($professorId);
                 ->label('Data Final')
                 ->required()
                 ->reactive()
+                ->disabled()
                 ->default(Carbon::now())
                 ->afterStateUpdated(function (callable $set, callable $get, $state) {
                     $dataInicial = $get('data_inicial');
@@ -218,6 +221,7 @@ dd($professorId);
 
             Textarea::make('observacao')
                 ->default('XXXXXX')
+                ->disabled()
                 ->label('Observação'),
 
                 Select::make('status')
@@ -349,8 +353,16 @@ dd($professorId);
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
-            ])
+                Tables\Actions\Action::make('download')
+                    ->label('Baixar')
+                    ->url(function ($record) {
+                        return $record->arquivo_progressao ? asset('storage/' .$record->arquivo_progressao) : null;
+                    })
+                    ->icon('academicon-dryad-square') // Ícone de download
+                    ->openUrlInNewTab()
+                    ->tooltip('Baixar arquivo')
+                    ->visible(fn ($record) => $record->arquivo_progressao !== null) // A ação só é visível se houver um arquivo
+                ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
             ]);

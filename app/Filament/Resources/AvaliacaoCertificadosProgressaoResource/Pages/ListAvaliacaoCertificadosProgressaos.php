@@ -10,10 +10,5 @@ class ListAvaliacaoCertificadosProgressaos extends ListRecords
 {
     protected static string $resource = AvaliacaoCertificadosProgressaoResource::class;
 
-    protected function getHeaderActions(): array
-    {
-        return [
-            Actions\CreateAction::make(),
-        ];
-    }
+    
 }

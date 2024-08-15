@@ -16,36 +16,24 @@ class EditImprimirProgressao extends EditRecord
         return 'Criar Novo Relatório Detalhado'; // Título da página de criação
     }
 
-    public function getFormActions(): array
-    {
-        return [
-            Actions\ButtonAction::make('save')
-                ->label('Salvar')
-                ->submit('save')
-                ->hidden()
-                ->color('primary'),
-
-            Actions\ButtonAction::make('cancel')
-                ->label('Cancelar')
-                ->url($this->getResource()::getUrl('index'))
-                ->hidden()
-                ->color('secondary'),
-        ];
-    }
-    
-
     protected function getHeaderActions(): array
     {
         return [
+            Actions\Action::make('relatoriosUsuario')
+                ->label('Requerimento')
+                ->url(route('progressao.imprimirRelatorio', ['tipo' => 'relatorios_usuario', 'progressaoId' => $this->record->id])),
+    
             Actions\ButtonAction::make('gerarRelatorio')
                 ->label('Gerar Relatório')
-                ->action(function () {
-                    if ($this->record->id) {
-                        $this->redirect(route('progressao.analises', ['progressaoId' => $this->record->id]));
-                    } else {
-                        session()->flash('error', 'Progressao ID is missing.');
-                    }
-                }),
+                ->url(route('progressao.imprimirRelatorio', ['tipo' => 'analises',  'progressaoId' => $this->record->id])),
+
+              // ->action(function () {
+               //     if ($this->record->id) {
+               //         $this->redirect(route('progressao.imprimirRelatorio', ['tipo' => 'analises', 'progressaoId' => $this->record->id]));
+               //     } else {
+               //         session()->flash('error', 'Progressao ID is missing.');
+                 //   }
+               // }),
     
             Actions\ButtonAction::make('relatorioAvaliacao')
                 ->label('Relatorio de Avaliação')
@@ -53,11 +41,12 @@ class EditImprimirProgressao extends EditRecord
                 ->icon('heroicon-o-document-text')
                 ->action(function () {
                     if ($this->record->id) {
-                        $this->redirect(route('progressao.relatorioavaliacao', ['progressaoId' => $this->record->id]));
+                        $this->redirect(route('progressao.imprimirRelatorio', ['tipo' => 'relatorioavaliacao', 'progressaoId' => $this->record->id]));
                     } else {
                         session()->flash('error', 'Progressao ID is missing.');
                     }
                 }),
         ];
     }
+
 }

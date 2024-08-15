@@ -21,9 +21,7 @@ class ListImprimirProgressaos extends ListRecords
             Actions\Action::make('contarRelatorios')
                 ->label('Contar Relatórios')
                 ->url(route('progressao.imprimirRelatorio', ['tipo' => 'contar_relatorios'])),
-            Actions\Action::make('relatoriosUsuario')
-                ->label('Relatórios do Usuário')
-                ->url(route('progressao.imprimirRelatorio', ['tipo' => 'relatorios_usuario'])),
+
         ];
     }
 }

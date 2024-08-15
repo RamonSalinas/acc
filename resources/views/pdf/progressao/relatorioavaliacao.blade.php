@@ -236,3 +236,4 @@
     <span style="color: {{ $corDiferenca }};">{{ $diferenca }}</span> horas.
 </p>
 <p>Os certificados rejeitados totalizam <span style="color: red;">{{ $certificadosRejeitados }}</span> horas.</p>
+

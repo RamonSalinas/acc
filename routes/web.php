@@ -47,7 +47,7 @@ Route::get('/chat', function () {
 
 
 // Relatorios Progressão Imprimir
-Route::get('/progressao/todos-certificados', [ProgressaoController::class, 'imprimirRelatorio'])->name('progressao.todosCertificados');
+Route::get('/progressao/Parecer_Conclusivo', [ProgressaoController::class, 'imprimirRelatorio'])->name('progressao.Parecer_Conclusivo');
 Route::get('/progressao/contar-relatorios', [ProgressaoController::class, 'imprimirRelatorio'])->name('progressao.contarRelatorios');
 Route::get('/progressao/relatorios-usuario', [ProgressaoController::class, 'imprimirRelatorio'])->name('progressao.relatoriosUsuario');
 Route::get('/progressao/imprimir-relatorio/{tipo}/{progressaoId?}', [ProgressaoController::class, 'imprimirRelatorio'])->name('progressao.imprimirRelatorio');

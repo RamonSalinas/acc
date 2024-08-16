@@ -28,6 +28,8 @@ use App\Models\AdCursos;
 use App\Models\Progressao;
 use App\Models\Professor;
 
+use function Pest\Laravel\disableCookieEncryption;
+
 class AvaliacaoCertificadosProgressaoResource extends Resource
 {
     protected static ?string $model = NgCertificadosProgressao::class;
@@ -146,6 +148,7 @@ dd($professorId);
 
             FileUpload::make('arquivo_progressao')
                 ->label('Arquivo de Progressão')
+                ->disabled()
                 ->acceptedFileTypes(['image/*', 'application/pdf']),
 
             DatePicker::make('data_inicial')

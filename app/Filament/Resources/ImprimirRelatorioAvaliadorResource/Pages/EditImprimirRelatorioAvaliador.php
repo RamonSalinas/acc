@@ -19,9 +19,23 @@ class EditImprimirRelatorioAvaliador extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\Action::make('relatoriosUsuario')
-                ->label('Requerimento Avaliador')
-                ->url(route('progressao.imprimirRelatorio', ['tipo' => 'relatorios_usuario', 'progressaoId' => $this->record->id])),
+
+            Actions\Action::make('Parecer_Conclusivo')
+                ->label('Parecer Conclusivo')
+                ->url(route('progressao.imprimirRelatorio', ['tipo' => 'Parecer_Conclusivo', 'progressaoId' => $this->record->id]))
+                ->color('info')
+                ->icon('heroicon-o-document-text'),
+
+            Actions\Action::make('contarRelatorios')
+            ->label('Relatórios Desempenho')
+            ->url(route('progressao.imprimirRelatorio', ['tipo' => 'contar_relatorios', 'progressaoId' => $this->record->id]))
+            ->color('warning')
+            ->icon('heroicon-o-document-text'),
+
+
+           // Actions\Action::make('relatoriosUsuario')
+           //     ->label('Requerimento Avaliador')
+            //    ->url(route('progressao.imprimirRelatorio', ['tipo' => 'relatorios_usuario', 'progressaoId' => $this->record->id,'professorId' => $this->record->id])),
     
             Actions\ButtonAction::make('gerarRelatorio')
                 ->label('Gerar Relatório Avaliador')

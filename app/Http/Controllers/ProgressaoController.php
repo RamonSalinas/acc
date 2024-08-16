@@ -9,12 +9,13 @@ use App\Models\Progressao;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 
 class ProgressaoController extends Controller
 {
 
     public function imprimirRelatorioAvaliacao($progressaoId)
-    {
+    {  
         $userId = auth()->id();
         $usuario = Auth::user();
 
@@ -36,37 +37,166 @@ class ProgressaoController extends Controller
 
    
     switch ($tipo) {
-        case 'todos_certificados':
-            $grupos = AdGrupoProgressao::with(['ngCertificadosProgressao' => function($query) use ($userId) {
-                $query->where('id_usuario', $userId);
-            }, 'ngCertificadosProgressao.adGrupoProgressao'])->get();
-            $pdf = Pdf::loadView('pdf.progressao.todos_certificados', compact('grupos'))->setPaper('a4', 'landscape');
-            return $pdf->download('todos_certificados.pdf');
-
-        case 'analises':
-            $grupos = AdGrupoProgressao::with(['ngCertificadosProgressao' => function($query) use ($userId, $progressaoId) {
-                $query->where('id_usuario', $userId)
-                      ->where('progressao_id', $progressaoId);
-            }, 'ngCertificadosProgressao.adGrupoProgressao'])->get();
+        case 'Parecer_Conclusivo':
+            $count = Progressao::count();
             $progressao = Progressao::find($progressaoId);
-           
-            $pdf = Pdf::loadView('pdf.progressao.analises', compact('grupos', 'progressao', 'usuario'));
-            return $pdf->download('analises.pdf');
-
-            case 'relatorioavaliacao':
+            $professorID = $progressao->professor_id;
+            $professor = Professor::where('id', $professorID)->first();
+            $professorIDuser=$professor->user_id;
+            $user = User::where('id', $professorIDuser)->first();
+            $userId=$user->id;// Id do professor da Progressão Para imprimir o relatorio e dados certos
                 $grupos = AdGrupoProgressao::with(['ngCertificadosProgressao' => function($query) use ($userId, $progressaoId) {
                     $query->where('id_usuario', $userId)
                           ->where('progressao_id', $progressaoId);
                 }, 'ngCertificadosProgressao.adGrupoProgressao'])->get();
-                $progressao = Progressao::find($progressaoId);
-                $professor = Professor::where('user_id', $userId)->first(); // Adicione esta linha
-                
-                $pdf = Pdf::loadView('pdf.progressao.relatorioavaliacao', compact('grupos', 'progressao', 'usuario', 'professor'))->setPaper('a4', 'landscape');
+               // $progressao = Progressao::find($progressaoId);
+               
+               // $professor = Professor::where('user_id', $userId)->first(); // Adicione esta linha
+               $grupos = AdGrupoProgressao::with(['ngCertificadosProgressao' => function($query) use ($userId, $progressaoId) {
+                $query->where('id_usuario', $userId)
+                      ->where('progressao_id', $progressaoId);
+            }, 'ngCertificadosProgressao.adGrupoProgressao'])->get();
+            
+            $aprovadoPorGrupo = [];
+            $pendenteRejeitadaPorGrupo = [];
+            
+            // Iterar sobre os grupos e calcular as somas
+            foreach ($grupos as $grupo) {
+                $aprovadoPorGrupo[$grupo->id] = 0.0;
+                $pendenteRejeitadaPorGrupo[$grupo->id] = 0.0;
+            
+                foreach ($grupo->ngCertificadosProgressao as $certificado) {
+                    $pontuacao = floatval($certificado->pontuacao_avaliador);
+                    if ($certificado->status == 'Aprovado') {
+                        $aprovadoPorGrupo[$grupo->id] += $pontuacao;
+                    } elseif ($certificado->status == 'Pendente' || $certificado->status == 'Rejeitada') {
+                        $pendenteRejeitadaPorGrupo[$grupo->id] += $pontuacao;
+                    }
+                }
+            }
+            
+            // Garantir que grupos sem certificados tenham valor 0
+            foreach ($grupos as $grupo) {
+                if (!isset($aprovadoPorGrupo[$grupo->id])) {
+                    $aprovadoPorGrupo[$grupo->id] = 0.0;
+                }
+                if (!isset($pendenteRejeitadaPorGrupo[$grupo->id])) {
+                    $pendenteRejeitadaPorGrupo[$grupo->id] = 0.0;
+                }
+            }
+               
+               
+               
+               
+               
+               
+      
+            $dataAtual = now();
+
+               $nomeProfessor = $user->name;// Nome do professor da Progressão
+             //   $pdf = Pdf::loadView('pdf.progressao.relatorioavaliacao', compact('grupos', 'progressao', 'usuario', 'professor','nomeProfessor'));
+            $pdf = Pdf::loadView('pdf.progressao.todos_certificados', compact('grupos', 'progressao', 'usuario', 'professor','dataAtual','nomeProfessor','aprovadoPorGrupo', 'pendenteRejeitadaPorGrupo'));
+            //$pdf = Pdf::loadView('', compact('grupos'));
+            return $pdf->download('todos_certificados.pdf');
+
+        case 'analises':
+            $progressao = Progressao::find($progressaoId);
+            $professorID = $progressao->professor_id;
+            $professor = Professor::where('id', $professorID)->first();
+            $professorIDuser=$professor->user_id;
+            $user = User::where('id', $professorIDuser)->first();
+            $userId=$user->id;// Id do professor da Progressão Para imprimir o relatorio e dados certos
+
+            $grupos = AdGrupoProgressao::with(['ngCertificadosProgressao' => function($query) use ($userId, $progressaoId) {
+                $query->where('id_usuario', $userId)
+                      ->where('progressao_id', $progressaoId);
+            }, 'ngCertificadosProgressao.adGrupoProgressao'])->get();
+            $nomeProfessor = $user->name;// Nome do professor da Progressão
+
+           // dd($nomeProfessor);
+            $pdf = Pdf::loadView('pdf.progressao.analises', compact('grupos', 'progressao', 'usuario','nomeProfessor'));
+            return $pdf->download('analises.pdf');
+
+            case 'relatorioavaliacao':
+            $progressao = Progressao::find($progressaoId);
+            $professorID = $progressao->professor_id;
+            $professor = Professor::where('id', $professorID)->first();
+            $professorIDuser=$professor->user_id;
+            $user = User::where('id', $professorIDuser)->first();
+            $userId=$user->id;// Id do professor da Progressão Para imprimir o relatorio e dados certos
+                $grupos = AdGrupoProgressao::with(['ngCertificadosProgressao' => function($query) use ($userId, $progressaoId) {
+                    $query->where('id_usuario', $userId)
+                          ->where('progressao_id', $progressaoId);
+                }, 'ngCertificadosProgressao.adGrupoProgressao'])->get();
+               // $progressao = Progressao::find($progressaoId);
+               
+               // $professor = Professor::where('user_id', $userId)->first(); // Adicione esta linha
+               $nomeProfessor = $user->name;// Nome do professor da Progressão
+
+                $pdf = Pdf::loadView('pdf.progressao.relatorioavaliacao', compact('grupos', 'progressao', 'usuario', 'professor','nomeProfessor'))->setPaper('a4', 'landscape');
                 return $pdf->download('relatorioavaliacao.pdf');
 
         case 'contar_relatorios':
             $count = Progressao::count();
-            return view('pdf.progressao.contar_relatorios', compact('count'));
+            $progressao = Progressao::find($progressaoId);
+            $professorID = $progressao->professor_id;
+            $professor = Professor::where('id', $professorID)->first();
+            $professorIDuser=$professor->user_id;
+            $user = User::where('id', $professorIDuser)->first();
+            $userId=$user->id;// Id do professor da Progressão Para imprimir o relatorio e dados certos
+                $grupos = AdGrupoProgressao::with(['ngCertificadosProgressao' => function($query) use ($userId, $progressaoId) {
+                    $query->where('id_usuario', $userId)
+                          ->where('progressao_id', $progressaoId);
+                }, 'ngCertificadosProgressao.adGrupoProgressao'])->get();
+               // $progressao = Progressao::find($progressaoId);
+               
+               // $professor = Professor::where('user_id', $userId)->first(); // Adicione esta linha
+               $grupos = AdGrupoProgressao::with(['ngCertificadosProgressao' => function($query) use ($userId, $progressaoId) {
+                $query->where('id_usuario', $userId)
+                      ->where('progressao_id', $progressaoId);
+            }, 'ngCertificadosProgressao.adGrupoProgressao'])->get();
+            
+            $aprovadoPorGrupo = [];
+            $pendenteRejeitadaPorGrupo = [];
+            
+            // Iterar sobre os grupos e calcular as somas
+            foreach ($grupos as $grupo) {
+                $aprovadoPorGrupo[$grupo->id] = 0.0;
+                $pendenteRejeitadaPorGrupo[$grupo->id] = 0.0;
+            
+                foreach ($grupo->ngCertificadosProgressao as $certificado) {
+                    $pontuacao = floatval($certificado->pontuacao_avaliador);
+                    if ($certificado->status == 'Aprovado') {
+                        $aprovadoPorGrupo[$grupo->id] += $pontuacao;
+                    } elseif ($certificado->status == 'Pendente' || $certificado->status == 'Rejeitada') {
+                        $pendenteRejeitadaPorGrupo[$grupo->id] += $pontuacao;
+                    }
+                }
+            }
+            
+            // Garantir que grupos sem certificados tenham valor 0
+            foreach ($grupos as $grupo) {
+                if (!isset($aprovadoPorGrupo[$grupo->id])) {
+                    $aprovadoPorGrupo[$grupo->id] = 0.0;
+                }
+                if (!isset($pendenteRejeitadaPorGrupo[$grupo->id])) {
+                    $pendenteRejeitadaPorGrupo[$grupo->id] = 0.0;
+                }
+            }
+               
+               
+               
+               
+               
+               
+      
+            $dataAtual = now();
+
+               $nomeProfessor = $user->name;// Nome do professor da Progressão
+             //   $pdf = Pdf::loadView('pdf.progressao.relatorioavaliacao', compact('grupos', 'progressao', 'usuario', 'professor','nomeProfessor'));
+            $pdf = Pdf::loadView('pdf.progressao.contar_relatorios', compact('grupos', 'progressao', 'usuario', 'professor','dataAtual','nomeProfessor','aprovadoPorGrupo', 'pendenteRejeitadaPorGrupo'));
+            return $pdf->download('RelatoriosDesempenho.pdf');
+
 
         case 'relatorios_usuario':
             $progressao = Progressao::find($progressaoId);

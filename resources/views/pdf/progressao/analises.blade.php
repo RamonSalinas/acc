@@ -41,7 +41,7 @@
     <div class="centralizado">
 
         <h2>Dados da Progressão</h2>
-        <p>Docente: {{ $usuario->name }}</p>
+        <p>Docente: {{ $nomeProfessor }}</p>
         <p>Professor ID: {{ $progressao->professor_id }}</p>
         <p>Nome da Progressão: {{ $progressao->nome_progressao }}</p>
         <p>Data Inicial do Interstício: {{ $progressao->intersticio_data_inicial }}</p>

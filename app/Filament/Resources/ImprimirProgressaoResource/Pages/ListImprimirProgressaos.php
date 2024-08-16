@@ -15,12 +15,7 @@ class ListImprimirProgressaos extends ListRecords
     protected function getActions(): array
     {
         return [
-            Actions\Action::make('todosCertificados')
-                ->label('Todos Certificados')
-                ->url(route('progressao.imprimirRelatorio', ['tipo' => 'todos_certificados'])),
-            Actions\Action::make('contarRelatorios')
-                ->label('Contar Relatórios')
-                ->url(route('progressao.imprimirRelatorio', ['tipo' => 'contar_relatorios'])),
+                   
 
         ];
     }

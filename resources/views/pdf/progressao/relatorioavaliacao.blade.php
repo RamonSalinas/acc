@@ -222,7 +222,7 @@
         $certificadosRejeitados = 0;
         foreach ($grupos as $grupo) {
             foreach ($grupo->ngCertificadosProgressao as $certificado) {
-                if ($certificado->status != 'Rejeitada') {
+				if ($certificado->status != 'Rejeitada' && $certificado->status != 'Pendente') {
                     $totalPontuacaoAvaliadorFiltrada += $certificado->pontuacao_avaliador;
                 } else {
                     $certificadosRejeitados += $certificado->pontuacao_avaliador;

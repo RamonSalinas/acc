@@ -23,4 +23,13 @@ class EditAvaliacaoCertificadosProgressao extends EditRecord
             ->visible(fn() => $this->record->arquivo_progressao !== null),
     ];
     }
+
+    protected function afterSave(): void
+    {
+        $this->redirect(AvaliacaoCertificadosProgressaoResource::getUrl('index'));
+    }
+
+
+
+
 }

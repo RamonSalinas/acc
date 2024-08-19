@@ -77,7 +77,7 @@
 	</tr>
 	<tr>
 		<td height="34" align="left" valign=middle><b>Ao(À) Professor(a) </b></td>
-		<td colspan=5 align="left" valign=middle bgcolor="#FFF2CC"><br></td>
+		<td colspan=8 align="left" valign=middle bgcolor="#FFF2CC"><b>{{ $progressao->nome_direcao}}</b><br></td>
 		<td align="left" valign=middle><br></td>
 		<td align="left" valign=middle><br></td>
 	</tr>

@@ -27,28 +27,15 @@ class EditImprimirRelatorioAvaliador extends EditRecord
                 ->icon('heroicon-o-document-text'),
 
             Actions\Action::make('contarRelatorios')
-            ->label('Relatórios Desempenho')
-            ->url(route('progressao.imprimirRelatorio', ['tipo' => 'contar_relatorios', 'progressaoId' => $this->record->id]))
-            ->color('warning')
-            ->icon('heroicon-o-document-text'),
+                ->label('Relatórios Desempenho')
+                ->url(route('progressao.imprimirRelatorio', ['tipo' => 'contar_relatorios', 'progressaoId' => $this->record->id]))
+                ->color('warning')
+                ->icon('heroicon-o-document-text'),
 
-
-           // Actions\Action::make('relatoriosUsuario')
-           //     ->label('Requerimento Avaliador')
-            //    ->url(route('progressao.imprimirRelatorio', ['tipo' => 'relatorios_usuario', 'progressaoId' => $this->record->id,'professorId' => $this->record->id])),
-    
             Actions\ButtonAction::make('gerarRelatorio')
                 ->label('Gerar Relatório Avaliador')
-                ->url(route('progressao.imprimirRelatorio', ['tipo' => 'analises',  'progressaoId' => $this->record->id])),
+                ->url(route('progressao.imprimirRelatorio', ['tipo' => 'analises', 'progressaoId' => $this->record->id])),
 
-              // ->action(function () {
-               //     if ($this->record->id) {
-               //         $this->redirect(route('progressao.imprimirRelatorio', ['tipo' => 'analises', 'progressaoId' => $this->record->id]));
-               //     } else {
-               //         session()->flash('error', 'Progressao ID is missing.');
-                 //   }
-               // }),
-    
             Actions\ButtonAction::make('relatorioAvaliacao')
                 ->label('Relatorio de Avaliação Avaliador')
                 ->color('success')
@@ -63,4 +50,18 @@ class EditImprimirRelatorioAvaliador extends EditRecord
         ];
     }
 
+    protected function afterSave(): void
+    {
+        $this->redirect(ImprimirRelatorioAvaliadorResource::getUrl('index'));
+    }
+
+    public function getFormActions(): array  //esta funciona tirou o botão da parite inferior  mas não mostra o novo botão mas não tem problema sob ver que não afecte na frete o ssitema 
+    {
+        return [
+            Actions\ButtonAction::make('voltar') 
+                ->label('Voltar')
+                ->url(ImprimirRelatorioAvaliadorResource::getUrl('index'))
+                ->color('secondary'),
+        ];
+    }
 }

@@ -164,16 +164,16 @@
             <td>Todos os Grupos</td>
             <td>{{ $totalQuantidade }}</td>
             <td>{{ $totalPontuacao }}</td>
-            <td>{{ $totalPontuacaoAvaliador }}</td> <!-- Total pontos avaliador -->
+            <td>{{ $totalPontuacaoAvaliadorController }}</td> <!-- Total pontos avaliador -->
             <td>
             @foreach($grupos as $index => $grupo)
                         {{ $grupo->nome_grupo_progressao }}: {{ $grupoPontuacoes[$index] }}<br>
             @endforeach
             </td>
-        </tr>
+        </tr>                                               
         <tr>
-            <td colspan="4"><strong>Total Geral</strong></td>
-            <td>(Professor:<strong>{{ $totalPontuacao }}</strong>) (Avaliador: <strong>{{ $totalPontuacaoAvaliador }}</strong>)</td>
+            <td colspan="4"><strong>Total Geral</strong></td>totalPontuacaoAvaliador
+            <td>(Professor:<strong>{{ $totalPontuacao }}</strong>) (Avaliador: <strong>{{ $totalPontuacaoAvaliadorController }}</strong>)</td>
         </tr>
     </tbody>
 </table>
@@ -310,7 +310,7 @@ FIM Sumatória de Todos os Grupos-->
 
 <p>No período de progressão, foram rejeitados {{ $certificadosRejeitados }} certificados, aprovados {{ $certificadosAprovados }} certificados, e {{ $certificadosEmAnalise }} certificados ainda estão em análise. 
     A pontuação final, considerando o valor do avaliador, é de: 
-    <h2> Pontuação Deferida Avaliador: <strong>{{ $totalPontuacaoAvaliadorCertificados }}.</h2></strong></p>
+    <h2> Pontuação Deferida Avaliador: <strong>{{ $totalPontuacaoAvaliadorController}}.</h2></strong></p>
 
 
 <!-- FIM Tabela de Certificados Rejeitados -->

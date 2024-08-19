@@ -132,7 +132,9 @@
 		<td align="left" valign=middle><font size=1><br></font></td>
 	</tr>
 	<tr>
-		
+	<h2> Pontuação Deferida Avaliador: <strong>{{ $totalPontuacaoAvaliadorController}}.</h2></strong></p>
+
+	
 
 <!-- Inicio Tabela Análises Progressão-->
 <<!-- Inicio Tabela Análises Progressão-->
@@ -190,7 +192,10 @@
             @php
                 $grupoQuantidade += $certificado->quantidade;
                 $grupoPontuacao += $certificado->pontuacao;
-                $grupoPontuacaoAvaliador += $certificado->pontuacao_avaliador; // Soma pontos avaliador do grupo
+                //$grupoPontuacaoAvaliador += $certificado->pontuacao_avaliador; // Soma pontos avaliador do grupo
+				if ($certificado->status == 'Aprovado') {
+                    $grupoPontuacaoAvaliador += $certificado->pontuacao_avaliador; // Soma pontos avaliador do grupo apenas se aprovado
+                }
             @endphp
         @endforeach
         <tr style="background-color: #d3d3d3;">
@@ -216,24 +221,8 @@
 @endforeach
 <!-- Fim Tabela Análises Progressão-->
 
-<p>No total, foram solicitadas {{ $totalPontuacao }} horas. A pontuação total aprovada pelo avaliador foi de 
-    @php
-        $totalPontuacaoAvaliadorFiltrada = 0;
-        $certificadosRejeitados = 0;
-        foreach ($grupos as $grupo) {
-            foreach ($grupo->ngCertificadosProgressao as $certificado) {
-				if ($certificado->status != 'Rejeitada' && $certificado->status != 'Pendente') {
-                    $totalPontuacaoAvaliadorFiltrada += $certificado->pontuacao_avaliador;
-                } else {
-                    $certificadosRejeitados += $certificado->pontuacao_avaliador;
-                }
-            }
-        }
-        $diferenca = $totalPontuacaoAvaliadorFiltrada - $totalPontuacao;
-        $corDiferenca = $diferenca < 0 ? 'red' : 'green';
-    @endphp
-    {{ $totalPontuacaoAvaliadorFiltrada }} horas, sendo a diferença de 
-    <span style="color: {{ $corDiferenca }};">{{ $diferenca }}</span> horas.
-</p>
-<p>Os certificados rejeitados totalizam <span style="color: red;">{{ $certificadosRejeitados }}</span> horas.</p>
+
+
+
+
 

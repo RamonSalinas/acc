@@ -41,17 +41,23 @@ class AvaliacaoCertificadosProgressaoResource extends Resource
     {
         return $form->schema([
             TextInput::make('progressao_id')
-                ->label('Nome da Progressão')
-                ->default(function () {
-                    $currentUser = Auth::user();
-                    $professor = Professor::where('user_id', $currentUser->id)->first();
-                    $professorId = $professor ? $professor->id : null;
-dd($professorId);
-                    $lastProgressao = Progressao::where('professor_id', $professorId)->latest()->first();
-                    return $lastProgressao ? $lastProgressao->nome_progressao : null; // Retorna o nome da progressão
-                })
-                ->required()
-                ->disabled(), // Impede que o campo seja modificado
+            ->label('Nome da Progressão')
+            ->default(function () {
+                $currentUser = Auth::user();
+                $professor = Professor::where('user_id', $currentUser->id)->first();
+                $professorId = $professor ? $professor->id : null;
+                $lastProgressao = Progressao::where('professor_id', $professorId)->latest()->first();
+                return $lastProgressao ? $lastProgressao->nome_progressao : null; // Retorna o nome da progressão
+            })
+            ->required()
+            ->disabled() // Impede que o campo seja modificado
+            ->afterStateHydrated(function ($state, $set, $get) {
+                Notification::make()
+                ->title('Por favor, atualize o status do certificado e defina o valor aprovado')
+                ->body('Apreciado avaliador, solicitamos que atualize o status do certificado, defina o valor que considerar apropriado no formulário anexado, e adicione sua observação. Após isso, não se esqueça de salvar as alterações.')
+                    ->info()
+                    ->send();
+            }),
 
             Select::make('ad_grupo_progressao_id')
                 ->label('Grupo de Atividades')
@@ -234,8 +240,9 @@ dd($professorId);
                     'Aprovado' => 'Aprovado',
                     'Rejeitada' => 'Rejeitada',
                 ])
-                ->default('Pendente'),
-
+                ->default('Pendente')
+                ->extraAttributes(['class' => 'text-red-500 border-2 border-red-500 p-2 rounded']),
+                
                 TextInput::make('quantidade_avaliador')
                 ->label('Quantidade Avaliador')
                 ->numeric()
@@ -320,36 +327,40 @@ dd($professorId);
             }
             }
 
-        return $table
+            return $table
             ->query($query)
             ->columns([
                 Tables\Columns\TextColumn::make('grupoProgressao.nome_grupo_progressao')
-                ->label('Grupo Progressão'),
-               
-                 /* Tables\Columns\TextColumn::make('data_inicial')
+                    ->label('Grupo Progressão')
+                    ->alignCenter(),
+                /* Tables\Columns\TextColumn::make('data_inicial')
                     ->label('Data Inicial')
-                    ->date(),
+                    ->date()
+                    ->alignCenter(),
                 Tables\Columns\TextColumn::make('data_final')
                     ->label('Data Final')
-                    ->date(),*/
+                    ->date()
+                    ->alignCenter(),*/
                 Tables\Columns\TextColumn::make('status')
-                ->label('Status')
-                ->badge()
-                ->color(fn ($state) => match($state) {
-                    'Aprovada' => 'success',
-                    'Pendente' => 'warning',
-                    'Rejeitada' => 'danger',
-                    default => null,  // Ou você pode escolher uma cor padrão como 'secondary'
-                })
-                ->tooltip(fn ($state) => $state === 'Rejeitada' ? 'Veja a observação registrada' : null),
-                
+                    ->label('Status')
+                    ->badge()
+                    ->color(fn ($state) => match($state) {
+                        'Aprovada' => 'success',
+                        'Pendente' => 'warning',
+                        'Rejeitada' => 'danger',
+                        default => null,  // Ou você pode escolher uma cor padrão como 'secondary'
+                    })
+                    ->tooltip(fn ($state) => $state === 'Rejeitada' ? 'Veja a observação registrada' : null)
+                    ->alignCenter(),
                 Tables\Columns\TextColumn::make('usuario.name')
-                    ->label('Usuário'),
+                    ->label('Usuário')
+                    ->alignCenter(),
                 Tables\Columns\TextColumn::make('pontuacao')
-                    ->label('Pontuação  Registrada'),
-               
-                    Tables\Columns\TextColumn::make('pontuacao_avaliador')
-                    ->label('Pontuação Avaliada'),
+                    ->label('Pontuação Registrada')
+                    ->alignCenter(),
+                Tables\Columns\TextColumn::make('pontuacao_avaliador')
+                    ->label('Pontuação Avaliada')
+                    ->alignCenter(),
             ])
             ->filters([
                 //

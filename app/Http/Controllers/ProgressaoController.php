@@ -115,16 +115,16 @@ class ProgressaoController extends Controller
                 $nomeProfessor = $user->name; // Nome do professor da Progressão
             
                 // Calcular totalPontuacaoAvaliador
-                $totalPontuacaoAvaliador = 0.0;
+                $totalPontuacaoAvaliadorController = 0.0;
                 foreach ($grupos as $grupo) {
                     foreach ($grupo->ngCertificadosProgressao as $certificado) {
                         if ($certificado->status != 'Pendente' && $certificado->status != 'Rejeitada') {
-                            $totalPontuacaoAvaliador += floatval($certificado->pontuacao_avaliador);
+                            $totalPontuacaoAvaliadorController += floatval($certificado->pontuacao_avaliador);
                         }
                     }
                 }
            // dd($totalPontuacaoAvaliador);
-                $pdf = Pdf::loadView('pdf.progressao.analises', compact('grupos', 'progressao', 'usuario', 'nomeProfessor', 'totalPontuacaoAvaliador'));
+                $pdf = Pdf::loadView('pdf.progressao.analises', compact('grupos', 'progressao', 'usuario', 'nomeProfessor', 'totalPontuacaoAvaliadorController'));
                 return $pdf->download('analises.pdf');
 
             case 'relatorioavaliacao':
@@ -142,9 +142,18 @@ class ProgressaoController extends Controller
                
                // $professor = Professor::where('user_id', $userId)->first(); // Adicione esta linha
             $nomeProfessor = $user->name;// Nome do professor da Progressão
+
+            $totalPontuacaoAvaliadorController = 0.0;
+                foreach ($grupos as $grupo) {
+                    foreach ($grupo->ngCertificadosProgressao as $certificado) {
+                        if ($certificado->status != 'Pendente' && $certificado->status != 'Rejeitada') {
+                            $totalPontuacaoAvaliadorController += floatval($certificado->pontuacao_avaliador);
+                        }
+                    }
+                }
             
 
-                $pdf = Pdf::loadView('pdf.progressao.relatorioavaliacao', compact('grupos', 'progressao', 'usuario', 'professor','nomeProfessor'))->setPaper('a4', 'landscape');
+                $pdf = Pdf::loadView('pdf.progressao.relatorioavaliacao', compact('grupos', 'progressao', 'usuario', 'professor','nomeProfessor','totalPontuacaoAvaliadorController'))->setPaper('a4', 'landscape');
                 return $pdf->download('relatorioavaliacao.pdf');
 
         case 'contar_relatorios':

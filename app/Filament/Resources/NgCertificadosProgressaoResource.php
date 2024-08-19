@@ -28,6 +28,7 @@ use Closure;
 use App\Models\AdCursos;
 use App\Models\Progressao;
 use App\Models\Professor;
+use Filament\Forms\Components\Hidden;
 
 class NgCertificadosProgressaoResource extends Resource
 {
@@ -159,28 +160,27 @@ class NgCertificadosProgressaoResource extends Resource
                 ->default(0),
 
                 
-            TextInput::make('quantidade')
+                TextInput::make('quantidade')
                 ->label('Quantidade')
                 ->numeric()
                 ->required()
                 ->rule('min:1') // Garante que o valor seja maior que 0
+                ->extraAttributes(['min' => 1]) // Define o valor mínimo permitido
                 ->reactive() // Torna este campo reativo
                 ->afterStateUpdated(function (callable $set, callable $get, $state) {
-
-//                ->afterStateUpdated(function (callable $set, callable $get) {
                     // Obtém os valores necessários para o cálculo
                     $idTipoAtividade = $get('ad_grupo_progressao_id');
                     $valorUnitario = $get('referencia');
                     $quantidade = $get('quantidade');
-
+            
                     // Realiza o cálculo. Ajuste conforme a lógica necessária.
                     $pontuacao = $valorUnitario * $idTipoAtividade * $quantidade;
                     $set('pontuacao', $pontuacao);
-
+            
                     // Verifica se o curso do usuário está definido
                     $user = Auth::user();
                     $curso = AdCursos::find($user->id_curso);
-
+            
                     if (!$curso) {
                         Notification::make()
                             ->title('Erro')
@@ -292,11 +292,15 @@ class NgCertificadosProgressaoResource extends Resource
                 ->default(0),
            
            
-                 TextInput::make('id_usuario')
-                ->label('ID do Usuário')
-                ->default(auth()->id())
-                ->disabled()
-                ->extraAttributes(['hidden' => 'hidden']),
+              //   TextInput::make('id_usuario')
+              //  ->label('ID do Usuário')
+              //  ->default(auth()->id())
+              //  ->disabled()
+              //  ->extraAttributes(['hidden' => 'hidden']),
+
+
+                Hidden::make('id_usuario')
+                ->default(auth()->id()),
 
 
 
@@ -338,44 +342,50 @@ class NgCertificadosProgressaoResource extends Resource
                 }
             }
         }
-
         return $table
-            ->query($query)
-            ->columns([
-                Tables\Columns\TextColumn::make('grupoProgressao.nome_grupo_progressao')
-                    ->label('Grupo Progressão'),
-                /*Tables\Columns\TextColumn::make('ng_atividades_progressao_id')
-                    ->label('Atividade Progressão'),
-                Tables\Columns\TextColumn::make('referencia')
-                    ->label('Referência'),
-                Tables\Columns\TextColumn::make('quantidade')
-                    ->label('Quantidade'),*/
-                    Tables\Columns\TextColumn::make('status')
-                    ->label('Status')
-                    ->badge()
-                    ->color(fn ($state) => match($state) {
-                        'Aprovada' => 'success',
-                        'Pendente' => 'warning',
-                        'Rejeitada' => 'danger',
-                        default => null,  // Ou você pode escolher uma cor padrão como 'secondary'
-                    })
-                    ->tooltip(fn ($state) => $state === 'Rejeitada' ? 'Veja a observação do Avaliador' : null),
-        
-                    Tables\Columns\TextColumn::make('pontuacao')
-                    ->label('Pontuação Solicitada'),
-                Tables\Columns\TextColumn::make('pontuacao_avaliador')
-                ->label('Pontuação Avaliador'),
-               /* Tables\Columns\TextColumn::make('data_inicial')
-                    ->label('Data Inicial')
-                    ->date(),
-                Tables\Columns\TextColumn::make('data_final')
-                    ->label('Data Final')
-                    ->date(),*/
-                
-                /*Tables\Columns\TextColumn::make('usuario.name')
-                    ->label('Usuário'),*/
-                
-            ])
+        ->query($query)
+        ->columns([
+            Tables\Columns\TextColumn::make('grupoProgressao.nome_grupo_progressao')
+                ->label('Grupo Progressão')
+                ->alignCenter(),
+            /*Tables\Columns\TextColumn::make('ng_atividades_progressao_id')
+                ->label('Atividade Progressão')
+                ->alignCenter(),
+            Tables\Columns\TextColumn::make('referencia')
+                ->label('Referência')
+                ->alignCenter(),
+            Tables\Columns\TextColumn::make('quantidade')
+                ->label('Quantidade')
+                ->alignCenter(),*/
+            Tables\Columns\TextColumn::make('status')
+                ->label('Status')
+                ->badge()
+                ->color(fn ($state) => match($state) {
+                    'Aprovada' => 'success',
+                    'Pendente' => 'warning',
+                    'Rejeitada' => 'danger',
+                    default => null,  // Ou você pode escolher uma cor padrão como 'secondary'
+                })
+                ->tooltip(fn ($state) => $state === 'Rejeitada' ? 'Veja a observação do Avaliador' : null)
+                ->alignCenter(),
+            Tables\Columns\TextColumn::make('pontuacao')
+                ->label('Pontuação Solicitada')
+                ->alignCenter(),
+            Tables\Columns\TextColumn::make('pontuacao_avaliador')
+                ->label('Pontuação Avaliador')
+                ->alignCenter(),
+            /*Tables\Columns\TextColumn::make('data_inicial')
+                ->label('Data Inicial')
+                ->date()
+                ->alignCenter(),
+            Tables\Columns\TextColumn::make('data_final')
+                ->label('Data Final')
+                ->date()
+                ->alignCenter(),*/
+            /*Tables\Columns\TextColumn::make('usuario.name')
+                ->label('Usuário')
+                ->alignCenter(),*/
+        ])
             ->filters([
                 //
             ])

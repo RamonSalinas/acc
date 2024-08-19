@@ -17,7 +17,8 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Select;
-use Livewire\Livewire;
+use Filament\Forms\Components\Checkbox;
+use Filament\Notifications\Notification;
 
 class ProgressaoResource extends Resource
 {
@@ -38,7 +39,7 @@ class ProgressaoResource extends Resource
     public static function form(Form $form): Form
     {
         /** @var User $user */
-      $user = Auth::user();
+        $user = Auth::user();
 
         // Verifique se o usuário tem um objeto professor
         if (!$user->professoreshasMany()->exists()) {
@@ -56,10 +57,7 @@ class ProgressaoResource extends Resource
                 'intersticio_data_inicial' => Carbon::now(),
                 'intersticio_data_final' => Carbon::now()->addYear(),
             ]);
-
-
         }
-      //  dd('entrou EXISTE');    
 
         // Carregue os dados do professor
         $professor = $user->professoreshasMany()->first();
@@ -70,9 +68,15 @@ class ProgressaoResource extends Resource
         return $form
             ->schema([
                 TextInput::make('nome_progressao')
-                    ->label('Nome da Progressão')
-                    ->disabled()
-                    ->default(self::gerarNomeProgressaoPadrao()),
+                    ->label('Codigo da Progressão')
+                    ->default(self::gerarNomeProgressaoPadrao())
+                    ->afterStateHydrated(function ($state, $set, $get) {
+                        Notification::make()
+                            ->title('Por favor, atualize o campo "Código da Progressão, quando tiver o código do processo.')
+                            ->body('Um nome genérico foi atribuído temporariamente. É obrigatório atualizar este campo com o código do processo para que o parecer seja gerado corretamente.')
+                            ->info()
+                            ->send();
+                    }),
 
                 TextInput::make('siape')
                     ->label('SIAPE')
@@ -133,10 +137,23 @@ class ProgressaoResource extends Resource
                     ->label('Interstício Data Final')
                     ->default($professor ? $professor->intersticio_data_final : null),
 
-                TextInput::make('professor_id')
-                    ->label('Professor ID')
+                Hidden::make('professor_id')
                     ->default($professor ? $professor->id : ''),
-                   // ->disabled(),
+
+                    TextInput::make('nome_direcao')
+                    ->label('Nome do Diretor(a) do Centro de Lotação'),
+
+                Checkbox::make('licence_maternidade')
+                    ->label('Você é uma servidora com licença maternidade concedida no período avaliado?')
+                    ->reactive(),
+
+                DatePicker::make('data_inicial_licenca')
+                    ->label('Data Inicial da Licença de Maternidade')
+                    ->visible(fn ($get) => $get('licence_maternidade')),
+
+                DatePicker::make('data_final_licenca')
+                    ->label('Data Final da Licença de Maternidade')
+                    ->visible(fn ($get) => $get('licence_maternidade')),
             ]);
     }
 
@@ -149,51 +166,45 @@ class ProgressaoResource extends Resource
         if ($currentUser instanceof User) {
             if (!$currentUser->isSuperAdmin()) {
                 if ($currentUser->isAdmin()) {
-                    //$query->whereHas('professor', function ($query) use ($currentUser) {
-                        $professor = Professor::where('user_id', $currentUser->id)->first();
-                        $professorId = $professor ? $professor->id : null;
-                    
-                        // Defina a consulta para a tabela
-                        $query = Progressao::query();
-                    
-                        if ($professorId !== null) {
-                            $query->where('professor_id', $professorId);
-                        }
-                                                   
-                    
-                    $query->whereHas('professor', function ($query) use ($currentUser) {
+                    $professor = Professor::where('user_id', $currentUser->id)->first();
+                    $professorId = $professor ? $professor->id : null;
 
-                                            
+                    $query = Progressao::query();
+
+                    if ($professorId !== null) {
+                        $query->where('professor_id', $professorId);
+                    }
+
+                    $query->whereHas('professor', function ($query) use ($currentUser) {
+                        // Adicione lógica adicional aqui, se necessário
                     });
-                   // dd($currentUser->id_professor);
                 } else {
                     dd('somos otra cosa diferente de admin');
                 }
             }
         }
 
-
-
-
-
-
-
         return $table
-        ->query($query)   
-                 ->columns([
+            ->query($query)
+            ->columns([
                 Tables\Columns\TextColumn::make('nome_progressao')
-                    ->label('Nome da Progressão'),
+                    ->label('Nome da Progressão')
+                    ->alignCenter(),
                 Tables\Columns\TextColumn::make('intersticio_data_inicial')
                     ->label('Interstício Data Inicial')
-                    ->date(),
+                    ->date()
+                    ->alignCenter(),
                 Tables\Columns\TextColumn::make('intersticio_data_final')
                     ->label('Interstício Data Final')
-                    ->date(),
+                    ->date()
+                    ->alignCenter(),
                 Tables\Columns\TextColumn::make('professor.data_ultima_progressao')
                     ->label('Data Última Progressão')
-                    ->date(),
-                    Tables\Columns\TextColumn::make('classe')
-                    ->label('Classe'),
+                    ->date()
+                    ->alignCenter(),
+                Tables\Columns\TextColumn::make('classe')
+                    ->label('Classe')
+                    ->alignCenter(),
             ])
             ->filters([
                 // Adicione filtros aqui, se necessário

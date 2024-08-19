@@ -93,30 +93,34 @@ class ImprimirRelatorioAvaliadorResource extends Resource
             }
             }
         return $table
-        ->query($query)   
-            ->columns([
-       
-                Tables\Columns\TextColumn::make('professor.user.name')
-                    ->label('ID Professor')
-                    ->sortable()
-                    ->searchable(),
-                    Tables\Columns\TextColumn::make('nome_progressao')
-                    ->label('ID Progressão'),
-                    Tables\Columns\TextColumn::make('intersticio_data_inicial')
-                    ->label('Intersticio Progressão Inicial')
-                    ->date(),
-                Tables\Columns\TextColumn::make('intersticio_data_final')
-                    ->label('Intersticio Progressão Final')
-                    ->date(),
-                    Tables\Columns\TextColumn::make('progressao')
-            ->label('Progressão')
-            ->getStateUsing(function ($record) {
-                $start = \Carbon\Carbon::parse($record->intersticio_data_inicial);
-                $end = \Carbon\Carbon::parse($record->intersticio_data_final);
-                return $start->diffInDays($end) . ' dias';
-            }),
-                // Adicione outras colunas conforme necessário
-            ])
+        ->query($query)
+        ->columns([
+            Tables\Columns\TextColumn::make('professor.user.name')
+                ->label('ID Professor')
+                ->sortable()
+                ->searchable()
+                ->alignCenter(),
+            Tables\Columns\TextColumn::make('nome_progressao')
+                ->label('ID Progressão')
+                ->alignCenter(),
+            Tables\Columns\TextColumn::make('intersticio_data_inicial')
+                ->label('Intersticio Progressão Inicial')
+                ->date()
+                ->alignCenter(),
+            Tables\Columns\TextColumn::make('intersticio_data_final')
+                ->label('Intersticio Progressão Final')
+                ->date()
+                ->alignCenter(),
+            Tables\Columns\TextColumn::make('progressao')
+                ->label('Progressão')
+                ->getStateUsing(function ($record) {
+                    $start = \Carbon\Carbon::parse($record->intersticio_data_inicial);
+                    $end = \Carbon\Carbon::parse($record->intersticio_data_final);
+                    return $start->diffInDays($end) . ' dias';
+                })
+                ->alignCenter(),
+            // Adicione outras colunas conforme necessário
+        ])
             ->filters([
                 // Adicione os filtros da tabela aqui, se necessário
             ]);

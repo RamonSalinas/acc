@@ -19,7 +19,11 @@ class Progressao extends Model
         'classe',
         'regime',
         'nivel',
-        'data_ultima_progressao'
+        'data_ultima_progressao',
+        'nome_direcao', // Novo campo
+        'licence_maternidade', // Novo campo
+        'data_inicial_licenca', // Novo campo
+        'data_final_licenca' // Novo campo
     ];
 
    // public function professor()

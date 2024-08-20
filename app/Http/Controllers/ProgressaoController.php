@@ -10,6 +10,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
+use App\Models\PontosProgressao;
 
 class ProgressaoController extends Controller
 {
@@ -151,9 +152,18 @@ class ProgressaoController extends Controller
                         }
                     }
                 }
-            
+               // $pontosProgressao = PontosProgressao::all();
+                // Obtenha os pontos da progressão que correspondem à classe e nível da progressão
+                $pontosProgressao = PontosProgressao::where('classe', $progressao->classe)
+                ->where('nivel', $progressao->nivel)
+                ->first();
 
-                $pdf = Pdf::loadView('pdf.progressao.relatorioavaliacao', compact('grupos', 'progressao', 'usuario', 'professor','nomeProfessor','totalPontuacaoAvaliadorController'))->setPaper('a4', 'landscape');
+                // Verifique se há correspondência e defina o valor dos pontos ou "N/A"
+                $pontos = $pontosProgressao ? $pontosProgressao->pontos : 'N/A';
+
+
+                //dd($pontos);
+                $pdf = Pdf::loadView('pdf.progressao.relatorioavaliacao', compact('grupos', 'progressao', 'usuario', 'professor', 'nomeProfessor', 'totalPontuacaoAvaliadorController', 'pontos'))->setPaper('a4', 'landscape');
                 return $pdf->download('relatorioavaliacao.pdf');
 
         case 'contar_relatorios':
@@ -204,7 +214,12 @@ class ProgressaoController extends Controller
                 }
             }
                
-               
+            $pontosProgressao = PontosProgressao::where('classe', $progressao->classe)
+            ->where('nivel', $progressao->nivel)
+            ->first();
+
+            // Verifique se há correspondência e defina o valor dos pontos ou "N/A"
+            $pontos = $pontosProgressao ? $pontosProgressao->pontos : 'N/A'; 
                
                
                
@@ -214,7 +229,7 @@ class ProgressaoController extends Controller
 
                $nomeProfessor = $user->name;// Nome do professor da Progressão
              //   $pdf = Pdf::loadView('pdf.progressao.relatorioavaliacao', compact('grupos', 'progressao', 'usuario', 'professor','nomeProfessor'));
-            $pdf = Pdf::loadView('pdf.progressao.contar_relatorios', compact('grupos', 'progressao', 'usuario', 'professor','dataAtual','nomeProfessor','aprovadoPorGrupo', 'pendenteRejeitadaPorGrupo'));
+            $pdf = Pdf::loadView('pdf.progressao.contar_relatorios', compact('grupos', 'progressao', 'usuario', 'professor','dataAtual','nomeProfessor','aprovadoPorGrupo', 'pendenteRejeitadaPorGrupo','pontos'));
             return $pdf->download('RelatoriosDesempenho.pdf');
 
 
@@ -230,7 +245,16 @@ class ProgressaoController extends Controller
             $pdf = Pdf::loadView('pdf.progressao.relatorios_usuario', compact('progressao', 'professor', 'dataAtual', 'nomeProfessor'));
             return $pdf->download('relatorios_usuario.pdf');
 
-        default:
+            case 'portaria':
+                $progressao = Progressao::find($progressaoId);
+                $professor = Professor::find($progressao->professor_id);
+                $pdf = Pdf::loadView('pdf.progressao.portaria', compact('progressao', 'professor', 'usuario'))->setPaper('a4', 'landscape');
+                return $pdf->download('portaria.pdf');
+
+         ;      
+        
+        
+            default:
             return abort(404, 'Tipo de relatório não encontrado');
     }
 }

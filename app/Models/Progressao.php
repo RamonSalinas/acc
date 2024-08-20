@@ -23,7 +23,10 @@ class Progressao extends Model
         'nome_direcao', // Novo campo
         'licence_maternidade', // Novo campo
         'data_inicial_licenca', // Novo campo
-        'data_final_licenca' // Novo campo
+        'data_final_licenca', // Novo campo
+        'num_portaria', // Novo campo
+        'data_portaria', // Novo campo
+        'arquivo_portaria' // Novo campo
     ];
 
    // public function professor()

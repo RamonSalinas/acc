@@ -143,7 +143,7 @@ $somaAprovado = ($aprovadoPorGrupo[1] ?? 0) +
     <tr>
     <tr>
     <td height="34" align="left" valign="middle"><b>Portaria de Designação nº:</b></td>
-    <td colspan="5" align="left" valign="middle" bgcolor="#FFF2CC"><b>xxxxxxxxxxxxxxxxx</b><br></td>
+    <td colspan="5" align="left" valign="middle" bgcolor="#FFF2CC"><b>{{ $progressao->nome_progressao}}</b><br></td>
     <td align="left" valign=middle><br></td>
     <td align="left" valign=middle><br></td>
     </tr>

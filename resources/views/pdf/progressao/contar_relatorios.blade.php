@@ -126,27 +126,35 @@ setlocale(LC_TIME, 'pt_BR.UTF-8'); // Define o locale para português do Brasil
 		<td style="border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000" align="center" valign=middle bgcolor="#F8CBAD"><font size=1>a</font></td>
 		<td style="border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000" colspan=2 align="center" valign=middle sdval="42667" sdnum="1046;0;D/M/AAAA"><font size=1>{{$professor->intersticio_data_final}}</font></td>
 		</tr>
-	<tr>
-		<td style="border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000" colspan=2 height="36" align="left" valign=middle bgcolor="#F8CBAD">Trata de avaliação de servidora com licença maternidade concedida no período avaliado?</td>
-		<td style="border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000" align="left" valign=middle><a class="comment-indicator"></a>
-		<comment>Inoformar SIM ou NÃO</comment>
-		<font size=1><br></font></td>
-		<td style="border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000" align="left" valign=middle sdnum="1046;0;D/M/AAAA"><a class="comment-indicator"></a>
-		<comment>informar a data de início da licença, conforme o formato abaixo:
-
-DD/MM/AAAA
-
-Informar a data de início da licença, independentemente da data de início do interstício.</comment>
-		<font size=1><br></font></td>
-		<td style="border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000" align="center" valign=middle bgcolor="#F8CBAD">a</td>
-		<td style="border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000" align="left" valign=middle sdnum="1046;0;D/M/AAAA"><a class="comment-indicator"></a>
-	<comment>informar a data de término da licença,  conforme o formato abaixo:
-
-DD/MM/AAAA
-
-Informar a data de início da licença, independentemente da data de início do interstício.</comment>
-	<font size=1><br></font></td>
-	</tr>
+		<tbody>
+    <tr>
+        <td style="border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000" colspan=2 height="42" align="left" valign=middle bgcolor="#F8CBAD">
+            Trata de avaliação de servidora com licença maternidade concedida no período avaliado?
+        </td>
+        <td style="border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000" align="left" valign=middle>
+            @if ($progressao->licence_maternidade == 1)
+                SIM
+            @else
+                NÃO
+            @endif
+        </td>
+        <td style="border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000" align="left" valign=middle sdnum="1046;0;D/M/AAAA">
+            @if ($progressao->data_inicial_licenca)
+                {{ \Carbon\Carbon::parse($progressao->data_inicial_licenca)->format('d/m/Y') }}
+            @else
+                NÃO APLICA
+            @endif
+        </td>
+        <td style="border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000" align="center" valign=middle bgcolor="#F8CBAD">a</td>
+        <td style="border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000" align="left" valign=middle sdnum="1046;0;D/M/AAAA">
+            @if ($progressao->data_final_licenca)
+                {{ \Carbon\Carbon::parse($progressao->data_final_licenca)->format('d/m/Y') }}
+            @else
+                NÃO APLICA
+            @endif
+        </td>
+     </tr>
+</tbody>
 	<tr>
 		<td style="border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000" colspan=6 height="23" align="center" valign=middle bgcolor="#F8CBAD"><b>Promoção/progressão pretendida</b></td>
 		</tr>
@@ -176,7 +184,7 @@ I, II, III ou IV</comment>
 	</tr>
 	<tr>
 		<td style="border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000" colspan=2 height="45" align="left" valign=middle bgcolor="#F8CBAD">Pontuação necessária para a progressão ou promoção pretendida, conforme normativa vigente</td>
-		<td style="border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000" align="center" valign=middle sdval="45" sdnum="1046;"><font size=1>45</font></td>
+		<td style="border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000" align="center" valign=middle sdval="45" sdnum="1046;"><font size=2>{{$pontos}}</font></td>
 		<td style="border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000" colspan=2 align="left" valign=middle bgcolor="#F8CBAD">pontos</td>
 		<td style="border-bottom: 1px solid #000000; border-left: 1px solid #000000" align="center" valign=middle bgcolor="#F8CBAD" sdval="45" sdnum="1046;"><font size=1 color="#F8CBAD">45</font></td>
 	</tr>

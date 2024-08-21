@@ -129,10 +129,14 @@ class ProgressaoController extends Controller
                 return $pdf->download('analises.pdf');
 
             case 'relatorioavaliacao':
+
             $progressao = Progressao::find($progressaoId);
+
             $professorID = $progressao->professor_id;
             $professor = Professor::where('id', $professorID)->first();
             $professorIDuser=$professor->user_id;
+           // dd('DD Controller',$professorIDuser);
+
             $user = User::where('id', $professorIDuser)->first();
             $userId=$user->id;// Id do professor da Progressão Para imprimir o relatorio e dados certos
                 $grupos = AdGrupoProgressao::with(['ngCertificadosProgressao' => function($query) use ($userId, $progressaoId) {

@@ -138,7 +138,9 @@ class ImprimirRelatorioAvaliadorResource extends Resource
         return [
             'index' => Pages\ListImprimirRelatorioAvaliadors::route('/'),
             'create' => Pages\CreateImprimirRelatorioAvaliador::route('/create'),
-            'edit' => Pages\EditImprimirRelatorioAvaliador::route('/{record}/edit'),
+            'edit' => PortariaResource\Pages\EditPortaria::route('/{record}/edit'), // Alterado para usar EditPortaria
+
+ //           'edit' => Pages\EditImprimirRelatorioAvaliador::route('/{record}/edit'),
         ];
     }
 }

@@ -20,6 +20,8 @@ class ProfessorResource extends Resource
     protected static ?string $navigationIcon = 'academicon-moodle';
 
     protected static ?string $label = 'Orientandores';
+    protected static ?string $navigationGroup = 'Orientaçãoes Academicas';
+
     protected static ?string $navigationLabel = 'Orientandores';
     protected static ?string $pluralLabel = 'Orientandores';
 

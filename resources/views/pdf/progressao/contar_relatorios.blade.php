@@ -1,4 +1,21 @@
 @php
+
+    // Formatando a data para o formato desejado
+ // Verifica se os campos estão vazios
+ 	$numPortariaVazio = empty($progressao->num_portaria);
+    $dataPortariaVazio = empty($progressao->data_portaria);
+
+    // Se a data estiver preenchida, formata-a
+    if (!$dataPortariaVazio) {
+        $dataPortaria = \Carbon\Carbon::parse($progressao->data_portaria);
+        $dia = $dataPortaria->format('d');
+        $mes = $dataPortaria->format('F');
+        $ano = $dataPortaria->format('Y');
+    }
+
+
+
+
     $somaAprovado = ($aprovadoPorGrupo[1] ?? 0) +
                     ($aprovadoPorGrupo[2] ?? 0) +
                     ($aprovadoPorGrupo[3] ?? 0) +
@@ -186,7 +203,7 @@ I, II, III ou IV</comment>
 		<td style="border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000" colspan=2 height="45" align="left" valign=middle bgcolor="#F8CBAD">Pontuação necessária para a progressão ou promoção pretendida, conforme normativa vigente</td>
 		<td style="border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000" align="center" valign=middle sdval="45" sdnum="1046;"><font size=2>{{$pontos}}</font></td>
 		<td style="border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000" colspan=2 align="left" valign=middle bgcolor="#F8CBAD">pontos</td>
-		<td style="border-bottom: 1px solid #000000; border-left: 1px solid #000000" align="center" valign=middle bgcolor="#F8CBAD" sdval="45" sdnum="1046;"><font size=1 color="#F8CBAD">45</font></td>
+		<td style="border-bottom: 1px solid #000000; border-left: 1px solid #000000" align="center" valign=middle bgcolor="#F8CBAD" sdval="45" sdnum="1046;"><font size=1 color="#F8CBAD">XXXXXXX</font></td>
 	</tr>
 	<tr>
 		<td height="34" align="left" valign=middle><font size=1><br></font></td>
@@ -266,8 +283,21 @@ I, II, III ou IV</comment>
 		<td colspan=6 height="24" align="left" valign=bottom><b><font size=1>Relator: {{ $usuario->name }} </font></b></td>
 		</tr>
 	<tr>
-		<td colspan=6 height="33" align="left" valign=bottom><b><font size=1>Dados da Designação: Portaria de nº __________     de  _____  de _______________________ de _________ .</font></b></td>
-		</tr>
+
+	
+	<td colspan=6 height="33" align="left" valign=bottom>
+    <b>
+        <font size=1>
+            @if($numPortariaVazio || $dataPortariaVazio)
+			<b><font size="1" color="red">Registre as informações de Designação de portaria e data quando tiver eles disponivéis.</font></b>
+            @else
+                Dados da Designação: Portaria de nº {{ $progressao->num_portaria }} de {{ $dia }} de {{ $mes }} de {{ $ano }}.
+            @endif
+        </font>
+    </b>
+</td>	
+	
+	</tr>
 	<tr>
 		<td height="33" align="left" valign=middle><font size=1><br></font></td>
 		<td align="left" valign=middle><font size=1><br></font></td>

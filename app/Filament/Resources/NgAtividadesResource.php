@@ -17,7 +17,8 @@
     class NgAtividadesResource extends Resource
     {
         protected static ?string $model = NgAtividades::class;
-    
+        protected static ?string $navigationGroup = 'Orientaçãoes Academicas';
+
         protected static ?string $navigationIcon = 'academicon-obp';
         protected static ?string $label = 'Atividades';
 

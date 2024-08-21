@@ -19,7 +19,7 @@ class RoleResource extends Resource
     protected static ?string $model = Role::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-finger-print';
-    protected static ?string $navigationGroup = 'Settings';
+    protected static ?string $navigationGroup = 'Configuração';
     protected static ?int $navigationSort = 1;
 
     public static function getModelLabel(): string

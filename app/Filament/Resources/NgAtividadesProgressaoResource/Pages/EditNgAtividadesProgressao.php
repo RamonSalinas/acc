@@ -16,4 +16,10 @@ class EditNgAtividadesProgressao extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
+
+   protected function afterSave(): void
+    {
+        $this->redirect(NgAtividadesProgressaoResource::getUrl('index'));
+    }
+
 }

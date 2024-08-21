@@ -60,4 +60,9 @@ class EditProgressao extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
+
+    protected function afterSave(): void
+    {
+        $this->redirect(ProgressaoResource::getUrl('index'));
+    }
 }

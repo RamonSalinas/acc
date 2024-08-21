@@ -21,6 +21,8 @@ class AdCursosResource extends Resource
     
     protected static ?string $label = 'Cursos UFOB';
     protected static ?string $navigationLabel = 'Cursos UFOB';
+    protected static ?string $navigationGroup = 'Orientaçãoes Academicas';
+
     protected static ?string $pluralLabel = 'Cursos UFOB';
 
     public static function form(Form $form): Form

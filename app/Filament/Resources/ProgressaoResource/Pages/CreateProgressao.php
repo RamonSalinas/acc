@@ -14,9 +14,11 @@ class CreateProgressao extends CreateRecord
     protected static string $resource = ProgressaoResource::class;
 
     protected function mutateFormDataBeforeCreate(array $data): array
-    {
-        $user = Auth::user();
+    { 
 
+         /** @var User $user */
+         $user = Auth::user();
+        
         // Verifica se o usuário tem um professor associado
         if ($user->professoreshasMany()->exists()) {
             // Atualiza ou cria a entrada professor
@@ -67,5 +69,11 @@ class CreateProgressao extends CreateRecord
         }
 
         return $data;
+    }
+
+
+    protected function afterSave(): void
+    {
+        $this->redirect(ProgressaoResource::getUrl('index'));
     }
 }

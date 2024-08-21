@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Log;
 class NgCertificadosResource extends Resource
 {
     protected static ?string $model = NgCertificados::class;
+    protected static ?string $navigationGroup = 'Orientaçãoes Academicas';
 
     protected static ?string $navigationIcon = 'phosphor-certificate-duotone';
     protected static ?string $label = 'Certificados';

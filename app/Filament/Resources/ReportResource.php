@@ -20,6 +20,8 @@ use Illuminate\Database\Eloquent\Builder;
 class ReportResource extends Resource
 {
     protected static ?string $model = User::class;
+    protected static ?string $navigationGroup = 'Orientaçãoes Academicas';
+
     protected static ?string $navigationIcon = 'academicon-open-data';
     protected static ?string $navigationLabel = 'Reportes';
     protected static ?string $pluralLabel = 'Reportes';

@@ -17,7 +17,7 @@ class Progressao extends Model
         'intersticio_data_inicial', 
         'intersticio_data_final',
         'classe',
-        'regime',
+        'regime',      
         'nivel',
         'data_ultima_progressao',
         'nome_direcao', // Novo campo

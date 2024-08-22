@@ -17,6 +17,14 @@ class User extends Authenticatable implements FilamentUser
 {
     use HasApiTokens, HasFactory, HasProfilePhoto, Notifiable, TwoFactorAuthenticatable, HasRoles, UserTrait;
 
+
+    const SUPER_ADMIN = 'Super-Admin';
+const ADMIN = 'Admin';
+const USER = 'User';
+const ESPECIALISTA = 'Especialista';
+const AVALIADOR = 'Avaliador';
+const COORDENADOR = 'Coordenador';
+
     protected $fillable = [
         'name',
         'cpf',
@@ -44,29 +52,39 @@ class User extends Authenticatable implements FilamentUser
     ];
 
     public function isSuperAdmin(): bool
-    {
-        return $this->id == 1 && $this->hasRole($this->SUPER_ADMIN);
-    }
+{
+    return $this->id == 1 && $this->hasRole(self::SUPER_ADMIN);
+}
 
-    public function isAdmin(): bool
-    {
-        return $this->hasRole($this->ADMIN);
-    }
+public function isAdmin(): bool
+{
+    return $this->hasRole(self::ADMIN);
+}
 
-    public function isUser(): bool
-    {
-        return $this->hasRole($this->USER);
-    }
+public function isAvaliador(): bool
+{
+    return $this->hasRole(self::AVALIADOR);
+}
 
-    public function isEspecialista(): bool
-    {
-        return $this->hasRole($this->ESPECIALISTA);
-    }
+public function isUser(): bool
+{
+    return $this->hasRole(self::USER);
+}
 
-    public function canAccessPanel(Panel $panel): bool
-    {
-        return $this->hasRole([$this->SUPER_ADMIN, $this->ADMIN, $this->USER, $this->ESPECIALISTA]) && $this->is_active;
-    }
+public function isEspecialista(): bool
+{
+    return $this->hasRole(self::ESPECIALISTA);
+}
+
+public function isCoordenador(): bool
+{
+    return $this->hasRole(self::COORDENADOR);
+}
+
+public function canAccessPanel(Panel $panel): bool
+{
+    return $this->hasRole([self::SUPER_ADMIN, self::ADMIN, self::USER, self::ESPECIALISTA, self::AVALIADOR, self::COORDENADOR]) && $this->is_active;
+}
 
     public function ng_certificado()
     {

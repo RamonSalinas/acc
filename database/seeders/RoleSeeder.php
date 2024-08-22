@@ -1,19 +1,19 @@
 <?php
-
-namespace Database\Seeders;
-
-use App\Http\Traits\UserTrait;
 use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
 class RoleSeeder extends Seeder
 {
-    use UserTrait;
-    private $guard = "web";
-    /**
-     * Run the database seeds.
-     */
+    private $guard = 'web';
+
+    const SUPER_ADMIN = 'SuperAdmin';
+    const ADMIN = 'Admin';
+    const USER = 'User';
+    const ESPECIALISTA = 'Especialista';
+    const AVALIADOR = 'Avaliador';
+    const COORDENADOR = 'Coordenador';
+
     public function run(): void
     {
         // Reset cached roles and permissions
@@ -21,26 +21,38 @@ class RoleSeeder extends Seeder
 
         $superAdmin = Role::create([
             'guard_name' => $this->guard,
-            'name' => $this->SUPER_ADMIN
+            'name' => self::SUPER_ADMIN
         ]);
 
         $superAdmin->givePermissionTo(Permission::all());
 
-        $admin =Role::create([
+        $admin = Role::create([
             'guard_name' => $this->guard,
-            'name' => $this->ADMIN
+            'name' => self::ADMIN
         ]);
-        $admin->givePermissionTo(['role.view.all','user.view.all','user.view','user.update']);
+        $admin->givePermissionTo(['role.view.all', 'user.view.all', 'user.view', 'user.update']);
 
-        $especialista =Role::create([
+        $especialista = Role::create([
             'guard_name' => $this->guard,
-            'name' => $this->ESPECIALISTA
+            'name' => self::ESPECIALISTA
         ]);
-        $especialista->givePermissionTo(['role.view.all','user.view.all','user.view','user.update']);
+        $especialista->givePermissionTo(['role.view.all', 'user.view.all', 'user.view', 'user.update']);
 
         Role::create([
             'guard_name' => $this->guard,
-            'name' => $this->USER
+            'name' => self::USER
         ]);
+
+        $avaliador = Role::create([
+            'guard_name' => $this->guard,
+            'name' => self::AVALIADOR
+        ]);
+        $avaliador->givePermissionTo(['user.view.all', 'user.view']);
+
+        $coordenador = Role::create([
+            'guard_name' => $this->guard,
+            'name' => self::COORDENADOR
+        ]);
+        $coordenador->givePermissionTo(['role.view.all', 'user.view.all', 'user.view', 'user.update', 'user.create']);
     }
 }

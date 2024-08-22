@@ -16,6 +16,7 @@ use Filament\Tables\Actions\BulkAction;
 use Filament\Notifications\Notification;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
+use App\Exports\BulkExport;
 
 class ReportResource extends Resource
 {
@@ -28,6 +29,9 @@ class ReportResource extends Resource
 
     public static function table(Table $table): Table
     {
+        /**@var  */
+ /** @var User $currentUser */
+
         $currentUser = Auth::user();
 
         // Obter IDs dos usuários que possuem certificados
@@ -131,4 +135,45 @@ class ReportResource extends Resource
             'edit' => Pages\EditReport::route('/{record}/edit'),
         ];
     }
+
+    public static function canViewAny(): bool
+    {
+        /** @var User $user */
+        $user = Auth::user();
+    
+        // Verifica se o usuário está autenticado
+        if ($user) {
+            // Verifica se o usuário atual é um Super Admin
+            if ($user->isSuperAdmin()) {
+                // Se for um Super Admin, retorna true para permitir ver todos os registros
+                return true;
+            }
+    
+            // Verifica se o usuário atual é um Admin
+            if ($user->isAdmin()) {
+                // Se for um Admin, retorna false para não permitir ver todos os registros
+                return true;
+            }
+    
+            // Verifica se o usuário atual é um Avaliador
+           if ($user->isAvaliador()) {
+              // Se for um Avaliador, retorna true para permitir ver todos os registros
+               return true;
+           }
+  // Verifica se o usuário atual é um Alumnos
+            if ($user->isEspecialista()) {
+                // Se for um Avaliador, retorna true para permitir ver todos os registros
+                return true;
+            }
+
+
+
+        }
+    
+        // Se não for nenhum dos casos acima, retorna false por padrão
+        return false;
+    }
+
+
+
 }

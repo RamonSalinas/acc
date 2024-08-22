@@ -397,4 +397,36 @@ class AvaliacaoCertificadosProgressaoResource extends Resource
             'edit' => Pages\EditAvaliacaoCertificadosProgressao::route('/{record}/edit'),
         ];
     }
+    public static function canViewAny(): bool
+    {
+        /** @var User $user */
+        $user = Auth::user();
+    
+        // Verifica se o usuário está autenticado
+        if ($user) {
+            // Verifica se o usuário atual é um Super Admin
+            if ($user->isSuperAdmin()) {
+                // Se for um Super Admin, retorna true para permitir ver todos os registros
+                return true;
+            }
+    
+            // Verifica se o usuário atual é um Admin
+            if ($user->isAdmin()) {
+                // Se for um Admin, retorna false para não permitir ver todos os registros
+                return false;
+            }
+    
+            // Verifica se o usuário atual é um Avaliador
+           if ($user->isAvaliador()) {
+              // Se for um Avaliador, retorna true para permitir ver todos os registros
+               return true;
+           }
+        }
+    
+        // Se não for nenhum dos casos acima, retorna false por padrão
+        return false;
+    }
+
+
+
 }

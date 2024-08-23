@@ -299,7 +299,7 @@ class AvaliacaoCertificadosProgressaoResource extends Resource
 
         if ($currentUser instanceof User) {
             if (!$currentUser->isSuperAdmin()) {
-                if ($currentUser->isAdmin()) {
+                if ($currentUser->isAvaliador()) {
                  $currentUser = Auth::user();
                 // Obter o professor associado ao usuário atual
                 $professor = Professor::where('user_id', $currentUser->id)->first();
@@ -307,7 +307,7 @@ class AvaliacaoCertificadosProgressaoResource extends Resource
                 if ($professor) {
                     $userId = $professor->user_id;
                     } else {
-                        dd('Professor não encontrado');
+                        dd('"Nenhum professor associado foi encontrado para sua conta de usuário. Por favor, entre em contato com a coordenação do curso para verificar seu registro."');
                     }
 
 
@@ -322,7 +322,7 @@ class AvaliacaoCertificadosProgressaoResource extends Resource
 
                 
             } else {
-                      dd('entro no else porque?');
+                      dd('entro no else porque não é avaliador Verdad?');
             }
             }
             }

@@ -10,6 +10,7 @@ use Filament\Tables;
 use Filament\Tables\Table; // Importação correta
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 
 class PortariaResource extends Resource
 {
@@ -105,7 +106,7 @@ class PortariaResource extends Resource
             // Verifica se o usuário atual é um Avaliador
            if ($user->isAvaliador()) {
               // Se for um Avaliador, retorna true para permitir ver todos os registros
-               return false;
+               return true;
            }
         }
     

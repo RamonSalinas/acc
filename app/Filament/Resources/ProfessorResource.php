@@ -12,6 +12,7 @@ use Filament\Tables\Table;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Role;
+use Filament\Pages\Page;
 
 class ProfessorResource extends Resource
 {
@@ -39,11 +40,13 @@ class ProfessorResource extends Resource
                     ->required()
                     ->email()
                     ->maxLength(255),
+   
                 Forms\Components\TextInput::make('password')
                     ->label('Senha')
                     ->password()
                     ->default(Hash::make('1'))
-                    ->readOnly(),
+                    ->required(),
+                   // ->readOnly(),
                 Forms\Components\Toggle::make('is_active')
                     ->label('Ativo')
                     ->default(true),
@@ -55,8 +58,8 @@ class ProfessorResource extends Resource
                         return $role::where('id', '!=', 1);
                     })
                     ->preload()//Retirar de aqui a permisão..
-                    ->default([Role::where('name', 'Admin')->first()->id])
-                    ->visible(Auth::user()->hasPermissionTo('role.update')),
+                    ->default([Role::where('name', 'Admin')->first()->id]),
+                   // ->visible(Auth::user()->hasPermissionTo('role.update')),
 
                 Forms\Components\Select::make('id_curso')
                     ->label('Curso')
@@ -120,10 +123,11 @@ class ProfessorResource extends Resource
     }
 
     public static function canViewAny(): bool
-    {    /** @var User $user */
-
+    {
+        /** @var User $user */
         $user = Auth::user();
-        // Verifica se o usuário atual é um Super Admin
+    
+        // Verifica se o usuário está autenticado
         if ($user) {
             // Verifica se o usuário atual é um Super Admin
             if ($user->isSuperAdmin()) {
@@ -136,7 +140,25 @@ class ProfessorResource extends Resource
                 // Se for um Admin, retorna false para não permitir ver todos os registros
                 return false;
             }
+    
+            // Verifica se o usuário atual é um Avaliador
+           if ($user->isAvaliador()) {
+              // Se for um Avaliador, retorna true para permitir ver todos os registros
+               return false;
+           }
+  // Verifica se o usuário atual é um Alumnos
+            if ($user->isEspecialista()) {
+                // Se for um Avaliador, retorna true para permitir ver todos os registros
+                return false;
+            }
+ 
+            if ($user->isCoordenador()) {
+             // Se for um Avaliador, retorna true para permitir ver todos os registros
+             return true;
+         }
+ 
         }
+    
         // Se não for nenhum dos casos acima, retorna false por padrão
         return false;
     }
@@ -149,8 +171,27 @@ class ProfessorResource extends Resource
 
     public static function updateRecord($record, $data)
     {
-        // Atualize os dados na tabela de usuários (users)
-        $record->update($data);
-        return $record;
+          // Se a senha estiver vazia, remova-a dos dados a serem atualizados
+    if (empty($data['password'])) {
+        unset($data['password']);
+    } else {
+        // Caso contrário, faça o hash da nova senha
+        $data['password'] = Hash::make($data['password']);
     }
+
+    // Atualize os dados na tabela de usuários (users)
+    $record->update($data);
+    return $record;
+    }
+
+
+
+
+
+
+
+
+
+
+
 }

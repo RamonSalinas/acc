@@ -12,6 +12,8 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 
 class NgAtividadesProgressaoResource extends Resource
 {
@@ -21,43 +23,37 @@ class NgAtividadesProgressaoResource extends Resource
     protected static ?string $navigationGroup = 'Gerenciamento de Progressão';
     protected static ?string $label = 'Atividades Progressão';
 
-
-
     public static function form(Form $form): Form
     {
         return $form
-        ->schema([
-            Forms\Components\Select::make('ad_grupo_progressao_id')
-                ->label('Grupo de Progressão')
-                ->relationship('adGrupoProgressao', 'nome_grupo_progressao') // Certifique-se de que o método relationship está correto
-                ->required(),
-          
-            Forms\Components\TextInput::make('nome_da_atividade')
-                ->label('Nome da Atividade de Progressão')
-                ->required(),
-          
-            Forms\Components\TextInput::make('referencia')
-                ->label('Referência')
-                ->numeric()
-                ->required(),
-        ]);
+            ->schema([
+                Forms\Components\Select::make('ad_grupo_progressao_id')
+                    ->label('Grupo de Progressão')
+                    ->relationship('adGrupoProgressao', 'nome_grupo_progressao')
+                    ->required(),
+                Forms\Components\TextInput::make('nome_da_atividade')
+                    ->label('Nome da Atividade de Progressão')
+                    ->required(),
+                Forms\Components\TextInput::make('referencia')
+                    ->label('Referência')
+                    ->numeric()
+                    ->required(),
+            ]);
     }
 
     public static function table(Table $table): Table
     {
-        return $table 
-        
-        ->columns([
-          //  Tables\Columns\TextColumn::make('adGrupoProgressao.nome_grupo_progressao')
-          Tables\Columns\TextColumn::make('adGrupoProgressao.id')
-                ->label('Grupo'),
-            Tables\Columns\TextColumn::make('nome_da_atividade')
-                ->label('Nome da Atividade de Progressão'),
-            Tables\Columns\TextColumn::make('referencia')
-                ->label('Referência'),
-        ])
+        return $table
+            ->columns([
+                Tables\Columns\TextColumn::make('adGrupoProgressao.id')
+                    ->label('Grupo'),
+                Tables\Columns\TextColumn::make('nome_da_atividade')
+                    ->label('Nome da Atividade de Progressão'),
+                Tables\Columns\TextColumn::make('referencia')
+                    ->label('Referência'),
+            ])
             ->filters([
-                //
+                // Adicione filtros aqui, se necessário
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -72,7 +68,7 @@ class NgAtividadesProgressaoResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            // Adicione relações aqui, se necessário
         ];
     }
 
@@ -86,11 +82,32 @@ class NgAtividadesProgressaoResource extends Resource
     }
 
     public static function canViewAny(): bool
-    {        /** @var User $user */
+    {
+        /** @var User $user */
+        $user = Auth::user();
 
-        $user = auth()->user();
-        return $user && $user->hasRole(['Super-Admin']);
+        if ($user) {
+            if ($user->isSuperAdmin()) {
+                return true;
+            }
+
+            if ($user->isAdmin()) {
+                return false;
+            }
+
+            if ($user->isAvaliador()) {
+                return true;
+            }
+
+            if ($user->isEspecialista()) {
+                return false;
+            }
+
+            if ($user->isCoordenador()) {
+                return true;
+            }
+        }
+
+        return false;
     }
-
-
 }

@@ -60,7 +60,7 @@ class ImprimirRelatorioAvaliadorResource extends Resource
 
         if ($currentUser instanceof User) {
             if (!$currentUser->isSuperAdmin()) {
-                if ($currentUser->isAdmin()) {
+                if ($currentUser->isAvaliador()) {
                  $currentUser = Auth::user();
                 // Obter o professor associado ao usuário atual
                 $professor = Professor::where('user_id', $currentUser->id)->first();

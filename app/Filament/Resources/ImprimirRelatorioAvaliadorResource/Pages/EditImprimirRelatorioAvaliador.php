@@ -15,9 +15,11 @@ use App\Models\AdGrupoProgressao;
 class EditImprimirRelatorioAvaliador extends EditRecord
 {
     protected static string $resource = ImprimirRelatorioAvaliadorResource::class;
-
     public function mount($record): void
     {
+        
+        //dd('DD Edit IMPRIMIR RELATORIO AVALIADOR',$record);
+
         parent::mount($record);
         $this->verificarEContinuar();
     }

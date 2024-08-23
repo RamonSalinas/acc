@@ -16,4 +16,11 @@ class EditProfessor extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
+
+    public function update()
+    {
+        $this->record = ProfessorResource::updateRecord($this->record, $this->form->getState());
+        $this->notify('success', 'Professor atualizado com sucesso!');
+    }
+
 }

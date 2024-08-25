@@ -29,7 +29,8 @@ class ListNgCertificados extends ListRecords
         }
     
         // Verifica se o usuário é um administrador
-        if ($currentUser->isAdmin()) {
+        if ($currentUser->isAdmin() || $currentUser->isAvaliador()) {
+            
             // Se for um administrador, retorna apenas o botão de download do PDF
             return [
                 Actions\Action::make('downloadPdf')

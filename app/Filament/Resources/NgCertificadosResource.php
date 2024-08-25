@@ -256,7 +256,8 @@ class NgCertificadosResource extends Resource
 
        if ($currentUser instanceof User) {
             if (!$currentUser->isSuperAdmin()) {
-                if ($currentUser->isAdmin()) {
+                if ($currentUser->isAdmin() || $currentUser->isAvaliador()) {
+                    
                     $query->whereHas('user', function ($query) use ($currentUser) {
                         $query->where('id_professor', $currentUser->id);
                     });
@@ -310,13 +311,11 @@ class NgCertificadosResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
-                    ->visible(fn ($record) => !$currentUser->isAdmin() && $record->type == 'Pendente'),
-                Tables\Actions\Action::make('view')
+                ->visible(fn ($record) => !($currentUser->isAdmin() || $currentUser->isAvaliador()) && $record->type == 'Pendente'),                Tables\Actions\Action::make('view')
                     ->label('Ver')
                     ->url(fn ($record) => route('filament.admin.resources.ng-certificados.view', $record))
                     ->icon('heroicon-o-eye')
-                    ->visible(fn ($record) => $currentUser->isAdmin() || $record->type != 'Pendente'),
-                Tables\Actions\DeleteAction::make(),
+                    ->visible(fn ($record) => !($currentUser->isAdmin() || $currentUser->isAvaliador()) && $record->type == 'Pendente'),                Tables\Actions\DeleteAction::make(),
                 Tables\Actions\Action::make('download')
                 ->label('Baixar')
                 ->url(function ($record) {

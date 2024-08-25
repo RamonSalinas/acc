@@ -16,9 +16,8 @@ class PortariaResource extends Resource
 {
     protected static ?string $model = Progressao::class;
 
-    protected static ?string $navigationIcon = 'mdi-code-block-braces';
-    protected static ?string $navigationGroup = 'Avaliação de Progressão';
-    protected static ?string $label = 'Porteria';
+    // Remover do painel de navegação e menu
+    protected static bool $shouldRegisterNavigation = false;
 
     public static function form(Form $form): Form
     {
@@ -35,8 +34,8 @@ class PortariaResource extends Resource
                     ->required(),
 
                 Forms\Components\TextInput::make('nome_progressao')
-                ->label('ID Progressão')
-                ->required(),
+                    ->label('ID Progressão')
+                    ->required(),
             ]);
     }
 
@@ -55,8 +54,6 @@ class PortariaResource extends Resource
                     ->label('Número da Portaria')
                     ->sortable()
                     ->searchable(),
-
-              
             ])
             ->filters([
                 //
@@ -84,6 +81,7 @@ class PortariaResource extends Resource
             'editImprimirRelatorioAvaliador' => ImprimirRelatorioAvaliadorResource\Pages\EditImprimirRelatorioAvaliador::route('/{record}/edit'),
         ];
     }
+
     public static function canViewAny(): bool
     {
         /** @var User $user */
@@ -104,16 +102,13 @@ class PortariaResource extends Resource
             }
     
             // Verifica se o usuário atual é um Avaliador
-           if ($user->isAvaliador()) {
-              // Se for um Avaliador, retorna true para permitir ver todos os registros
-               return true;
-           }
+            if ($user->isAvaliador()) {
+                // Se for um Avaliador, retorna true para permitir ver todos os registros
+                return true;
+            }
         }
     
         // Se não for nenhum dos casos acima, retorna false por padrão
         return false;
     }
-
-
-
 }

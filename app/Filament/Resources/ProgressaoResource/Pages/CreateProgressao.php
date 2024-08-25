@@ -37,7 +37,7 @@ class CreateProgressao extends CreateRecord
             ]);
 
             // Adiciona o ID do professor aos dados
-        $data['professor_id'] = $data['professor_id'];
+      //  $data['professor_id'] = $data['professor_id'];
         } else {
             // Lógica para quando o usuário não tem um professor associado
             // Por exemplo, você pode criar um novo professor aqui

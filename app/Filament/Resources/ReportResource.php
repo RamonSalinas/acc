@@ -39,7 +39,7 @@ class ReportResource extends Resource
             ->where(function ($query) use ($currentUser) {
                 // Se não for SuperAdmin, incluir condição baseada no perfil
                 if (!$currentUser->isSuperAdmin()) {
-                    if ($currentUser->isAdmin() || $currentUser->isEspecialista()) {
+                    if ($currentUser->isAdmin() || $currentUser->isEspecialista()|| $currentUser->isAvaliador()) {
                         $query->whereHas('user', function ($query) use ($currentUser) {
                             $query->where('id_professor', $currentUser->id);
                         });
@@ -101,8 +101,8 @@ class ReportResource extends Resource
                 // Defina os filtros, se necessário
             ])
             ->actions([
-                !$currentUser->isAdmin()
-                    ? Tables\Actions\EditAction::make()
+                !($currentUser->isAdmin() || $currentUser->isAvaliador())
+                                    ? Tables\Actions\EditAction::make()
                     : Tables\Actions\Action::make('generatePdf')
                         ->label('Gerar PDF')
                         ->url(fn ($record) => route('pdf_generatePdfuser', ['id' => $record->id]))

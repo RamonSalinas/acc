@@ -96,7 +96,7 @@ class NgAtividadesProgressaoResource extends Resource
             }
 
             if ($user->isAvaliador()) {
-                return true;
+                return false;
             }
 
             if ($user->isEspecialista()) {

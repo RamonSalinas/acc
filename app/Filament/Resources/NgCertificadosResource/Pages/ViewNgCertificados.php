@@ -29,6 +29,7 @@ class ViewNgCertificados extends ViewRecord
                         'type' => 'Aprovada',
                     ]);
                     
+                    
                     Log::info('Ação Aprovar iniciada', ['record_id' => $this->record->id, 'user_id' => $this->record->id_usuario]);
                     $this->notifyAluno($this->record->id_usuario, 'Certificado Aprovado', 'O certificado foi aprovado pelo seu orientador.');
                     
@@ -42,8 +43,7 @@ class ViewNgCertificados extends ViewRecord
                 })
                 ->color('success')
                 ->icon('phosphor-certificate-duotone')
-                ->visible(fn() => Auth::user()->isAdmin()), // Visível apenas para administradores
-
+                ->visible(fn() => Auth::user()->isAdmin() || Auth::user()->isAvaliador()), // Visível apenas para administradores ou avaliadores
 
             Action::make('Rejeitar')
                 ->label('Rejeitar')
@@ -73,8 +73,7 @@ class ViewNgCertificados extends ViewRecord
                 })
                 ->color('danger')
                 ->icon('phosphor-certificate-duotone')
-                ->visible(fn() => Auth::user()->isAdmin()), // Visível apenas para administradores
-
+                ->visible(fn() => Auth::user()->isAdmin() || Auth::user()->isAvaliador()), // Visível apenas para administradores ou avaliadores
             
             Action::make('Baixar')
                 ->label('Baixar Arquivo')

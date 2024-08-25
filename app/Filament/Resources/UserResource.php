@@ -128,15 +128,25 @@ class UserResource extends Resource
                             )
                             ->searchable()
                             ->preload(),
-                        Forms\Components\Select::make('id_professor')
+
+                            Forms\Components\Select::make('id_professor')
                             ->label('Professor')
-                            ->options(function () {
-                                return User::whereColumn('id', 'id_professor')
-                                           ->get()
-                                           ->pluck('name', 'id');
-                            })
+                            ->options(fn () => Professor::with('user')->get()->mapWithKeys(function ($professor) {
+                                return [$professor->user_id => $professor->user->name];
+                            }))
                             ->searchable()
                             ->preload(),
+
+
+                      //  Forms\Components\Select::make('id_professor')
+                       //     ->label('Professor')
+                        //    ->options(function () {
+                        //        return User::whereColumn('id', 'id_professor')
+                        //                   ->get()
+                         //                  ->pluck('name', 'id');
+                          //  })
+                          //  ->searchable()
+                         //   ->preload(),
                     ])->columns(3)
             ]);
     }

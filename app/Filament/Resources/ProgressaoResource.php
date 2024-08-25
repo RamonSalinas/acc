@@ -165,7 +165,7 @@ class ProgressaoResource extends Resource
 
         if ($currentUser instanceof User) {
             if (!$currentUser->isSuperAdmin()) {
-                if ($currentUser->isAdmin()) {
+                if ($currentUser->isAdmin() || $currentUser->isAvaliador()) {
                     $professor = Professor::where('user_id', $currentUser->id)->first();
                     $professorId = $professor ? $professor->id : null;
 

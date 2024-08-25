@@ -64,8 +64,9 @@ class ImprimirProgressaoResource extends Resource
 
         if ($currentUser instanceof User) {
             if (!$currentUser->isSuperAdmin()) {
-                if ($currentUser->isAdmin()) {
-                    //$query->whereHas('professor', function ($query) use ($currentUser) {
+                if ($currentUser->isAdmin() || $currentUser->isAvaliador()) {      
+                    
+                       //$query->whereHas('professor', function ($query) use ($currentUser) {
                         $professor = Professor::where('user_id', $currentUser->id)->first();
                         $professorId = $professor ? $professor->id : null;
                     

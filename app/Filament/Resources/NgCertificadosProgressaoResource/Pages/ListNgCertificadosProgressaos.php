@@ -6,7 +6,7 @@ use App\Filament\Resources\NgCertificadosProgressaoResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
-class ListNgCertificadosProgressao extends ListRecords
+class ListNgCertificadosProgressaos extends ListRecords
 {
     protected static string $resource = NgCertificadosProgressaoResource::class;
 

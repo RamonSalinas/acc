@@ -261,7 +261,7 @@ class Settings extends Page implements HasForms
                             Select::make('id_professor')
                             ->label('Professor')
                             ->options(fn () => Professor::with('user')->get()->mapWithKeys(function ($professor) {
-                                return [$professor->user_id => $professor->user->name];
+                               return [$professor->user_id => $professor->user->name];
                             }))
                             ->searchable()
                             ->preload(),

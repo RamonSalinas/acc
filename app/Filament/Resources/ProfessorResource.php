@@ -13,6 +13,9 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Role;
 use Filament\Pages\Page;
+use App\Models\Professor;
+use Illuminate\Support\Facades\Log;
+
 
 class ProfessorResource extends Resource
 {
@@ -163,35 +166,16 @@ class ProfessorResource extends Resource
         return false;
     }
 
-    public static function createRecord($data)
-    {
-        // Salve os dados na tabela de usuários (users)
-        return User::create($data);
-    }
+ //     public static function createRecord($data)
+ //   {
+   //     // Salve os dados na tabela de usuários (users)
+  //      return User::create($data);
+  //  }
 
-    public static function updateRecord($record, $data)
-    {
-          // Se a senha estiver vazia, remova-a dos dados a serem atualizados
-    if (empty($data['password'])) {
-        unset($data['password']);
-    } else {
-        // Caso contrário, faça o hash da nova senha
-        $data['password'] = Hash::make($data['password']);
-    }
-
-    // Atualize os dados na tabela de usuários (users)
-    $record->update($data);
-    return $record;
-    }
-
-
-
-
-
-
-
-
-
-
-
+   // public static function updateRecord($record, $data)
+    //{
+        // Atualize os dados na tabela de usuários (users)
+    //    $record->update($data);
+      //  return $record;
+   // }
 }

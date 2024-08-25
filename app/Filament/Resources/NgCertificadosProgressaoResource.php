@@ -425,7 +425,8 @@ class NgCertificadosProgressaoResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListNgCertificadosProgressao::route('/'),
+            
+            'index' => Pages\ListNgCertificadosProgressaos::route('/'),
             'create' => Pages\CreateNgCertificadosProgressao::route('/create'),
             'edit' => Pages\EditNgCertificadosProgressao::route('/{record}/edit'),
             'view' => Pages\ViewNgCertificadosProgressao::route('/{record}'),

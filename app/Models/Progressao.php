@@ -38,4 +38,9 @@ class Progressao extends Model
     {
         return $this->belongsTo(Professor::class, 'professor_id');
     }
+
+    public function certificados()
+    {
+        return $this->hasMany(NgCertificadosProgressao::class);
+    }
 }

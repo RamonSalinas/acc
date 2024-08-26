@@ -26,4 +26,9 @@ class ImprimirRelatorioAvaliador extends Model
     {
         return $this->belongsTo(Professor::class);
     }
+
+    public function certificados()
+    {
+        return $this->hasMany(NgCertificadosProgressao::class, 'progressao_id', 'id');
+    }
 }

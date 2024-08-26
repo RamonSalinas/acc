@@ -59,59 +59,50 @@ class ImprimirProgressaoResource extends Resource
     public static function table(Table $table): Table
     {
         $currentUser = Auth::user();
-
-        $query = static::getModel()::query();
+        $query = Progressao::query();
 
         if ($currentUser instanceof User) {
             if (!$currentUser->isSuperAdmin()) {
                 if ($currentUser->isAdmin() || $currentUser->isAvaliador()) {      
-                    
-                       //$query->whereHas('professor', function ($query) use ($currentUser) {
-                        $professor = Professor::where('user_id', $currentUser->id)->first();
-                        $professorId = $professor ? $professor->id : null;
-                    
-                        // Defina a consulta para a tabela
-                        $query = Progressao::query();
-                    
-                        if ($professorId !== null) {
-                            $query->where('professor_id', $professorId);
-                        }
-                                                   
-                    
-                    $query->whereHas('professor', function ($query) use ($currentUser) {
+                    $professor = Professor::where('user_id', $currentUser->id)->first();
+                    $professorId = $professor ? $professor->id : null;
 
-                                            
-                    });
-                   // dd($currentUser->id_professor);
+                    if ($professorId !== null) {
+                        $query->where('professor_id', $professorId);
+                    }
                 } else {
                     dd('somos otra cosa diferente de admin');
                 }
             }
         }
 
-
-
-
-
-
-
         return $table
-        ->query($query)   
+            ->query($query)
             ->columns([
                 Tables\Columns\TextColumn::make('nome_progressao')
-                    ->label('Nome da Progressão'),
-                    Tables\Columns\TextColumn::make('intersticio_data_inicial')
+                    ->label('Nome da Progressão')
+                    ->alignCenter(), // Centraliza o texto na coluna
+                Tables\Columns\TextColumn::make('intersticio_data_inicial')
                     ->label('Intersticio Progressão Inicial')
-                    ->date(),
+                    ->date()
+                    ->alignCenter(), // Centraliza o texto na coluna
                 Tables\Columns\TextColumn::make('intersticio_data_final')
                     ->label('Intersticio Progressão Final')
-                    ->date(),
-                // Adicione outras colunas conforme necessário
+                    ->date()
+                    ->alignCenter(), // Centraliza o texto na coluna
+                Tables\Columns\BadgeColumn::make('certificados_count')
+                    ->label('Quantidade de Certificados')
+                    ->counts('certificados')
+                    ->color('success') // Adiciona um badge de cor verde
+                    ->alignCenter(), // Centraliza o texto na coluna
             ])
             ->filters([
                 // Adicione os filtros da tabela aqui, se necessário
-            ]);
+            ])
+            ->defaultSort('nome_progressao', 'asc') // Centraliza a tabela
+            ->striped(); // Adiciona listras à tabela para melhor visualização
     }
+
     
 
     public static function getRelations(): array

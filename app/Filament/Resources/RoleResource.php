@@ -13,6 +13,7 @@ use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use App\Models\User;
 
 class RoleResource extends Resource
 {
@@ -92,9 +93,11 @@ class RoleResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
-            ])->checkIfRecordIsSelectableUsing(
-                fn (Role $record): bool => $record->id != 1 && Auth::user()->hasPermissionTo('role.delete'),
-            );
+
+            ]);
+            // ])->checkIfRecordIsSelectableUsing(
+              //  fn (Role $record): bool => $record->id != 1 && Auth::user()->hasPermissionTo('role.delete'),
+          //  );
     }
 
     public static function getRelations(): array

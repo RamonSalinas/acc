@@ -16,6 +16,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class User extends Authenticatable implements FilamentUser
 {
     use HasApiTokens, HasFactory, HasProfilePhoto, Notifiable, TwoFactorAuthenticatable, HasRoles, UserTrait;
+    use HasRoles;
+
 
 
     const SUPER_ADMIN = 'Super-Admin';

@@ -172,15 +172,35 @@ class NgCertificadosProgressaoResource extends Resource
                     $idTipoAtividade = $get('ad_grupo_progressao_id');
                     $valorUnitario = $get('referencia');
                     $quantidade = $get('quantidade');
-            
+                
+                    // Validar se os valores são numéricos
+                    if (!is_numeric($quantidade)) {
+                        Notification::make()
+                            ->title('Erro')
+                            ->body('Valores inválidos fornecidos.')
+                            ->danger()
+                            ->send();
+                        return;
+                    }
+                
+                    // Validar se os valores não são negativos
+                    if ($idTipoAtividade < 0 || $valorUnitario < 0 || $quantidade < 0) {
+                        Notification::make()
+                            ->title('Erro')
+                            ->body('Valores não podem ser negativos.')
+                            ->danger()
+                            ->send();
+                        return;
+                    }
+                
                     // Realiza o cálculo. Ajuste conforme a lógica necessária.
                     $pontuacao = $valorUnitario * $idTipoAtividade * $quantidade;
                     $set('pontuacao', $pontuacao);
-            
+                
                     // Verifica se o curso do usuário está definido
                     $user = Auth::user();
                     $curso = AdCursos::find($user->id_curso);
-            
+                
                     if (!$curso) {
                         Notification::make()
                             ->title('Erro')
@@ -346,8 +366,10 @@ class NgCertificadosProgressaoResource extends Resource
         ->query($query)
         ->columns([
             Tables\Columns\TextColumn::make('grupoProgressao.nome_grupo_progressao')
-                ->label('Grupo Progressão')
-                ->alignCenter(),
+            ->label('Grupo Progressão')
+            ->alignCenter()
+            ->limit(40) // Limita o texto a 20 caracteres
+            ->tooltip(fn ($record) => $record->grupoProgressao->nome_grupo_progressao), // Mostra o texto completo ao passar o mouse
             /*Tables\Columns\TextColumn::make('ng_atividades_progressao_id')
                 ->label('Atividade Progressão')
                 ->alignCenter(),

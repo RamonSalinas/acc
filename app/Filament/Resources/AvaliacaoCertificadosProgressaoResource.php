@@ -247,12 +247,32 @@ class AvaliacaoCertificadosProgressaoResource extends Resource
                 ->label('Quantidade Avaliador')
                 ->numeric()
                 ->required()
-                ->rule('min:1')
+                ->rule('min:0')
                 ->reactive()
                 ->afterStateUpdated(function (callable $set, callable $get, $state) {
                     $idTipoAtividade = $get('ad_grupo_progressao_id');
                     $valorUnitario = $get('referencia');
                     $quantidade = $get('quantidade_avaliador');
+
+                    // Validar se os valores são numéricos
+                    if (!is_numeric($quantidade)) {
+                        Notification::make()
+                            ->title('Erro')
+                            ->body('Valores inválidos fornecidos.')
+                            ->danger()
+                            ->send();
+                        return;
+                    }
+
+                    // Validar se os valores não são negativos
+                    if ($idTipoAtividade < 0 || $valorUnitario < 0 || $quantidade < 0) {
+                        Notification::make()
+                            ->title('Erro')
+                            ->body('Valores não podem ser negativos.')
+                            ->danger()
+                            ->send();
+                        return;
+                    }
 
                     $pontuacao = $valorUnitario * $idTipoAtividade * $quantidade;
                     $set('pontuacao_avaliador', $pontuacao);
@@ -269,7 +289,6 @@ class AvaliacaoCertificadosProgressaoResource extends Resource
                         return;
                     }
                 }),
-
             TextInput::make('pontuacao_avaliador')
                 ->label('Pontuação Avaliador')
                 ->default(0)
@@ -332,7 +351,9 @@ class AvaliacaoCertificadosProgressaoResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('grupoProgressao.nome_grupo_progressao')
                     ->label('Grupo Progressão')
-                    ->alignCenter(),
+                    ->alignCenter()
+                    ->limit(40)// Limita o texto a 20 caracteres
+                    ->tooltip(fn ($record) => $record->grupoProgressao->nome_grupo_progressao), // Mostra o texto completo ao passar o mouse
                 /* Tables\Columns\TextColumn::make('data_inicial')
                     ->label('Data Inicial')
                     ->date()

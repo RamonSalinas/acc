@@ -36,6 +36,9 @@ class ProgressaoResource extends Resource
         return "Progressao-{$ultimoId}-{$dataFormatada}";
     }
 
+
+    
+
     public static function form(Form $form): Form
     {
         /** @var User $user */
@@ -95,7 +98,7 @@ class ProgressaoResource extends Resource
                     ->label('Admissão')
                     ->default($professor ? $professor->admissao : null),
 
-                Select::make('classe')
+                     Select::make('classe')
                     ->label('Classe')
                     ->options([
                         'A' => 'A',
@@ -104,7 +107,42 @@ class ProgressaoResource extends Resource
                         'D' => 'D',
                         'E' => 'E',
                     ])
-                    ->default($professor ? $professor->classe : ''),
+                    ->default($professor ? $professor->classe : '')
+                    ->reactive()
+                    ->afterStateUpdated(function (callable $set, callable $get, $state) use ($professor) {
+                        $defaultClasse = $professor ? $professor->classe : '';
+                        $defaultNivel = $professor ? $professor->nivel : '';
+                        $selectedClasse = $get('classe');
+                        $selectedNivel = $get('nivel');
+
+                        // Verifica se a nova seleção é menor que a anterior
+                        if ($selectedClasse < $defaultClasse || ($selectedClasse == $defaultClasse && $selectedNivel < $defaultNivel)) {
+                            Notification::make()
+                                ->title('Erro')
+                                ->body('A progressão não pode ser menor que o registro anterior. Por favor, preencha novamente.')
+                                ->danger()
+                                ->send();
+                        }
+
+                        // Verifica se o usuário chegou na classe E e nível 1
+                        if ($selectedClasse == 'E' && $selectedNivel != '1') {
+                            Notification::make()
+                                ->title('Erro')
+                                ->body('Você chegou ao nível superior. O nível deve permanecer 1.')
+                                ->danger()
+                                ->send();
+                            $set('nivel', '1');
+                        }
+
+                        // Verifica se o valor default é o mesmo na classe e no nível
+                        if ($selectedClasse == $defaultClasse && $selectedNivel == $defaultNivel) {
+                            Notification::make()
+                                ->title('Aviso')
+                                ->body('O valor da progressão não mudou. Os dados serão mantidos.')
+                                ->info()
+                                ->send();
+                        }
+                    }),
 
                 Select::make('nivel')
                     ->label('Nível')
@@ -114,7 +152,42 @@ class ProgressaoResource extends Resource
                         '3' => '3',
                         '4' => '4',
                     ])
-                    ->default($professor ? $professor->nivel : ''),
+                    ->default($professor ? $professor->nivel : '')
+                    ->reactive()
+                    ->afterStateUpdated(function (callable $set, callable $get, $state) use ($professor) {
+                        $defaultClasse = $professor ? $professor->classe : '';
+                        $defaultNivel = $professor ? $professor->nivel : '';
+                        $selectedClasse = $get('classe');
+                        $selectedNivel = $get('nivel');
+
+                        // Verifica se a nova seleção é menor que a anterior
+                        if ($selectedClasse < $defaultClasse || ($selectedClasse == $defaultClasse && $selectedNivel < $defaultNivel)) {
+                            Notification::make()
+                                ->title('Erro')
+                                ->body('A progressão não pode ser menor que o registro anterior. Por favor, preencha novamente.')
+                                ->danger()
+                                ->send();
+                        }
+
+                        // Verifica se o usuário chegou na classe E e nível 1
+                        if ($selectedClasse == 'E' && $selectedNivel != '1') {
+                            Notification::make()
+                                ->title('Erro')
+                                ->body('Você chegou ao nível superior. O nível deve permanecer 1.')
+                                ->danger()
+                                ->send();
+                            $set('nivel', '1');
+                        }
+
+                        // Verifica se o valor default é o mesmo na classe e no nível
+                        if ($selectedClasse == $defaultClasse && $selectedNivel == $defaultNivel) {
+                            Notification::make()
+                                ->title('Aviso')
+                                ->body('O valor da progressão não mudou. Os dados serão mantidos.')
+                                ->info()
+                                ->send();
+                        }
+                    }),
 
                 DatePicker::make('data_ultima_progressao')
                     ->label('Data Última Progressão')

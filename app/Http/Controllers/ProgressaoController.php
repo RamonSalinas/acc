@@ -85,18 +85,20 @@ class ProgressaoController extends Controller
                     $pendenteRejeitadaPorGrupo[$grupo->id] = 0.0;
                 }
             }
+
+            $pontosProgressao = PontosProgressao::where('classe', $progressao->classe)
+            ->where('nivel', $progressao->nivel)
+            ->first();
+
+            // Verifique se há correspondência e defina o valor dos pontos ou "N/A"
+            $pontos = $pontosProgressao ? $pontosProgressao->pontos : 'N/A'; 
                
                
-               
-               
-               
-               
-      
             $dataAtual = now();
 
                $nomeProfessor = $user->name;// Nome do professor da Progressão
              //   $pdf = Pdf::loadView('pdf.progressao.relatorioavaliacao', compact('grupos', 'progressao', 'usuario', 'professor','nomeProfessor'));
-            $pdf = Pdf::loadView('pdf.progressao.todos_certificados', compact('grupos', 'progressao', 'usuario', 'professor','dataAtual','nomeProfessor','aprovadoPorGrupo', 'pendenteRejeitadaPorGrupo'));
+            $pdf = Pdf::loadView('pdf.progressao.todos_certificados', compact('grupos', 'progressao', 'usuario', 'professor','dataAtual','nomeProfessor','aprovadoPorGrupo', 'pendenteRejeitadaPorGrupo','pontos'));
             //$pdf = Pdf::loadView('', compact('grupos'));
             return $pdf->download('todos_certificados.pdf');
 

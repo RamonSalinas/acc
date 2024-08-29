@@ -320,6 +320,8 @@ class NgCertificadosResource extends Resource
                 ->label('Baixar')
                 ->url(function ($record) {
                     return $record->arquivo ? asset('storage/' . $record->arquivo) : null;
+
+                    
                 })
                 ->icon('academicon-dryad-square') // Ícone de download
                 ->openUrlInNewTab()

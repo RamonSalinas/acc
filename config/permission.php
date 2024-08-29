@@ -76,7 +76,8 @@ return [
          * Change this if you want to name the related pivots other than defaults
          */
         'role_pivot_key' => null, //default 'role_id',
-        'permission_pivot_key' => null, //default 'permission_id',
+            'permission_morph_key' => 'permission_id',  // Isso deve estar definido
+
 
         /*
          * Change this if you want to name the related model primary key other than

@@ -165,19 +165,23 @@ $somaAprovado = ($aprovadoPorGrupo[1] ?? 0) +
 	<tr>
 		</tr>
 	
-    <tr>
         <td colspan=8 rowspan=2 height="45" align="justify" valign=top>Trata-se de processo criado pelo Centro.  <b>{{ $professor->lotacao }}</b><br>     
-        O processo tem por objeto a análise da solicitação de avaliação de desempenho docente para fins de progressão na carreira do Magistério Superior no âmbito da Universidade Federal do Oeste da Bahia. 
-        O relatório apresentado contém XXX folhas, estando devidamente comprovado pelo(a) requerente. Foram avaliadas as atividades desenvolvidas no interstício compreendido no período 
-        de <b>{{$progressao->intersticio_data_inicial}} </b> a <b>{{$progressao->intersticio_data_final}}</b>, considerando-se as exigênicas para acesso à classe\nível {{$progressao->classe. '/' .$progressao->nivel}}.  <br><br>
-        Diante das informações prestadas e considerando a análise realizada com base na Resolução nº 01/2017 do Conselho Universitário da Universidade Federal do Oeste da Bahia, registra-se que o(a) docente alcançou <b> {{$somaAprovado}}</b>.  <br><br>
-        Neste sentido, considero(amos) o(a) professor(a) <b>{{$nomeProfessor}}</b> apto(a) a progredir da clase <b>{{$professor->classe. '/' .$professor->nivel}}</b> para a classe/nível <b>{{$progressao->classe. '/' .$progressao->nivel}}</b> , 
-        referento ao interstício de <b>{{$progressao->intersticio_data_inicial}} </b> a <b>{{$progressao->intersticio_data_final}}</b>,.<br> 
-    <br>
-   
-    Salvo melhor Juízo, este é o parecer.  
-    <br>
-    <br>
+O processo tem por objeto a análise da solicitação de avaliação de desempenho docente para fins de progressão na carreira do Magistério Superior no âmbito da Universidade Federal do Oeste da Bahia. 
+O relatório apresentado contém XXX folhas, estando devidamente comprovado pelo(a) requerente. Foram avaliadas as atividades desenvolvidas no interstício compreendido no período 
+de <b>{{$progressao->intersticio_data_inicial}} </b> a <b>{{$progressao->intersticio_data_final}}</b>, considerando-se as exigênicas para acesso à classe/nivel {{$progressao->classe. '/' .$progressao->nivel}}.  <br><br>
+Diante das informações prestadas e considerando a análise realizada com base na Resolução nº 01/2017 do Conselho Universitário da Universidade Federal do Oeste da Bahia, registra-se que o(a) docente alcançou <b> {{$somaAprovado}}</b>.  <br><br>
+Neste sentido, considero(amos) o(a) professor(a) <b>{{$nomeProfessor}}</b> 
+@if($somaAprovado >= $pontos)
+    apto(a) a progredir da classe <b>{{$professor->classe. '/' .$professor->nivel}}</b> para a classe/nível <b>{{$progressao->classe. '/' .$progressao->nivel}}</b>
+@else
+    não apto(a) a progredir da classe <b>{{$professor->classe. '/' .$professor->nivel}}</b> para a classe/nível <b>{{$progressao->classe. '/' .$progressao->nivel}}</b>
+@endif
+, referente ao interstício de <b>{{$progressao->intersticio_data_inicial}} </b> a <b>{{$progressao->intersticio_data_final}}</b>.<br> 
+<br>
+
+Salvo melhor Juízo, este é o parecer.  
+<br>
+<br>
   
 
     {{ $local }}, {{ $dia }} de {{ $mes }} de {{ $ano }}

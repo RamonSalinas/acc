@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Filament\Pages;
 
 use Filament\Actions\Action;
@@ -55,8 +54,9 @@ class Settings extends Page implements HasForms
     public $id_professor;
     public $roles;
     public $userId;
-
     public $language;
+    public $password;
+    public $password_confirmation;
 
     public function mount(): void
     {

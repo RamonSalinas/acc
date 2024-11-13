@@ -1,0 +1,57 @@
+
+networks:
+  app-tier:
+    driver: bridge
+
+services:
+  app:
+    container_name: laravel_acc
+    build:
+      context: .
+      args:
+        user: sammy
+        uid: 1000
+      dockerfile: Dockerfile
+    volumes:
+      - /home/adrian/acc:/var/www/html  # Certifique-se de que o caminho esteja correto
+    restart: always
+    env_file:
+      - .env
+    networks:
+      - app-tier
+    ports:
+      - "8081:80"
+    depends_on:
+      - db
+    command: >
+      sh -c "
+      /usr/local/bin/wait-for-it.sh db:3306 --timeout=60 --strict -- 
+      chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache &&
+      chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache &&
+      php artisan config:clear &&
+      php artisan key:generate &&
+      php artisan config:clear &&
+      php artisan cache:clear &&
+      php artisan migrate --force &&
+      apache2-foreground
+      "
+
+  db:
+    container_name: laravel_acc_db
+    image: bitnami/mysql:8.2
+    restart: always
+    environment:
+      ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_ROOT_USER: ${DB_USERNAME}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+    networks:
+      - app-tier
+    ports:
+      - "3307:3306"
+    volumes:
+      - db_data:/bitnami/mysql/data
+
+volumes:
+  db_data:

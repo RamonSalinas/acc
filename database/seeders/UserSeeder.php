@@ -43,25 +43,29 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        //create Super Admin
-        $superAdmin = new User();
-        $superAdmin->name = $this->faker->firstName. ' '. $this->faker->lastName;
-        $superAdmin->email = 'superadmin@ims.com';
-        $superAdmin->email_verified_at = now();
-        $superAdmin->password = Hash::make(123456);
-        $superAdmin->is_active = $this->USER_ACTIVE;
-        $superAdmin->save();
+        // Create or update Super Admin
+        $superAdmin = User::updateOrCreate(
+            ['email' => 'superadmin@ims.com'], // Condição de atualização
+            [
+                'name' => $this->faker->firstName . ' ' . $this->faker->lastName,
+                'email_verified_at' => now(),
+                'password' => Hash::make(123456), // ajuste conforme necessário
+                'is_active' => $this->USER_ACTIVE
+            ]
+        );
 
         $superAdmin->assignRole($this->SUPER_ADMIN, $this->ADMIN);
 
-        //create Admin
-        $admin = new User();
-        $admin->name = $this->faker->firstName. ' '. $this->faker->lastName;
-        $admin->email = 'admin@ims.com';
-        $admin->email_verified_at = now();
-        $admin->password = Hash::make(123456);
-        $admin->is_active = $this->USER_ACTIVE;
-        $admin->save();
+        // Create or update Admin
+        $admin = User::updateOrCreate(
+            ['email' => 'admin@ims.com'], // Condição de atualização
+            [
+                'name' => $this->faker->firstName . ' ' . $this->faker->lastName,
+                'email_verified_at' => now(),
+                'password' => Hash::make(123456), // ajuste conforme necessário
+                'is_active' => $this->USER_ACTIVE
+            ]
+        );
 
         $admin->assignRole($this->ADMIN);
     }

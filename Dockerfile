@@ -1,0 +1,32 @@
+FROM elrincondeisma/php-for-laravel:8.3.7
+
+WORKDIR /app
+COPY . .
+
+RUN composer install
+RUN composer require laravel/octane
+
+# Instalar Node.js usando n
+RUN apk add --no-cache curl && \
+    curl -L https://raw.githubusercontent.com/tj/n/master/bin/n -o /usr/local/bin/n && \
+    chmod +x /usr/local/bin/n && \
+    n 18.17.1 && \
+    apk del curl
+
+# Instalar dependências do projeto
+RUN npm install
+
+# Compilar os ativos
+RUN npm run build
+
+COPY .envDev .env
+RUN mkdir -p /app/storage/logs
+
+
+# Gerar nova chave de aplicação
+RUN php artisan key:generate
+
+RUN php artisan octane:install --server="swoole"
+
+CMD php artisan octane:start --server="swoole" --host="0.0.0.0"
+EXPOSE 8000

@@ -26,7 +26,13 @@ RUN mkdir -p /app/storage/logs
 # Gerar nova chave de aplicação
 RUN php artisan key:generate
 
+# Criar link simbólico para o diretório de armazenamento
+RUN php artisan storage:link
+
 RUN php artisan octane:install --server="swoole"
+
+# Definir o volume para persistência de dados
+VOLUME ["/app/storage"]
 
 CMD php artisan octane:start --server="swoole" --host="0.0.0.0"
 EXPOSE 8000

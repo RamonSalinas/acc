@@ -35,7 +35,7 @@ class AdminPanelProvider extends PanelProvider
         return $panel
             ->default()
             ->brandName('ACC Admin')
-            ->brandLogo(asset('assets/logo.svg'))
+            ->brandLogo(env(key: 'APP_URL') . '/assets/logo.svg')
             ->favicon(asset('favicon.ico'))
             ->id('admin')
             ->path('admin')

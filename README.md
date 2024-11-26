@@ -256,3 +256,13 @@ Feel free to use, modify, and distribute this starter project in accordance with
 # acc
 Sistema para Calcular ACC dos alunos da UFOB Cursos da UFOB.   Usando um sistema de banco de dados relacional e boas práticas de programação. 
 >>>>>>> 30f95fe8ff603d1c7bf29634c89afee288262e6d
+
+Traits are reusable code components that enhance code organization. To create a new trait, simply run:
+docker build . -t accclear
+docker run -it -p 8000:8000 accclear
+php artisan storage:link
+
+
+docker build -t acc_progressao .
+
+docker run -it -p 8000:8000 -v $(pwd)/storage/app/public:/app/storage/app/public acc_progressao

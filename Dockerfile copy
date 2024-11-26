@@ -34,7 +34,5 @@ RUN php artisan octane:install --server="swoole"
 # Definir o volume para persistência de dados
 VOLUME ["/app/storage"]
 
-#CMD php artisan octane:start --server="swoole" --host="0.0.0.0"
-CMD ["php", "artisan", "octane:start", "--server=swoole", "--host=0.0.0.0"]
-
+CMD php artisan octane:start --server="swoole" --host="0.0.0.0"
 EXPOSE 8000

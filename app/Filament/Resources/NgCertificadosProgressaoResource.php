@@ -30,6 +30,8 @@ use App\Models\Progressao;
 use App\Models\Professor;
 use Filament\Forms\Components\Hidden;
 
+use function Laravel\Prompts\alert;
+
 class NgCertificadosProgressaoResource extends Resource
 {
     protected static ?string $model = NgCertificadosProgressao::class;
@@ -194,7 +196,9 @@ class NgCertificadosProgressaoResource extends Resource
                     }
                 
                     // Realiza o cálculo. Ajuste conforme a lógica necessária.
-                    $pontuacao = $valorUnitario * $idTipoAtividade * $quantidade;
+
+                    $pontuacao = $valorUnitario * $quantidade;
+                    
                     $set('pontuacao', $pontuacao);
                 
                     // Verifica se o curso do usuário está definido
@@ -287,17 +291,19 @@ class NgCertificadosProgressaoResource extends Resource
                     }
 
                     $diferenca = $dataInicial->diff($dataFinal);
-                    $duracao = "{$diferenca->m} mês(es) e {$diferenca->d} dia(s)";
+                    $duracao = "{$diferenca->y} ano(s), {$diferenca->m} mês(es) e {$diferenca->d} dia(s)";
                     $set('duracao', $duracao);
                 }),
 
             TextInput::make('duracao')
                 ->label('Duração da Atividade Registrada')
                 ->disabled()
-                ->dehydrated(false)
+                ->dehydrated(condition: false)
                 ->visible(fn ($get) => $get('duracao') !== null),
-            Textarea::make('observacao')
-            ->default('XXXXXX')
+           
+           
+                Textarea::make('observacao')
+            ->default('   ')
 
                 ->label('Observação'),
            
@@ -326,9 +332,9 @@ class NgCertificadosProgressaoResource extends Resource
 
                 Textarea::make('observacao_avaliador')
                 ->label('Observação do Avaliador')
-                ->default('.')
-                ->disabled()
-                ->required(),
+                ->default(' . ')
+                ->disabled(),
+                //->required()
 
                 TextInput::make('pontuacao_avaliador')
                 ->label('Pontuação Avaliador')

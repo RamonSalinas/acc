@@ -103,7 +103,10 @@
 
 <div style="border: px solid #ccc; padding: 20px; margin-bottom: 20px;">
     <h2>Horas ACC</h2>
-    <p><strong>Soma Total das Horas ACC:</strong> {{ $totalHorasACC }}</p>
+ 
+
+
+    <p><strong>Soma Total das Horas ACC Registradas:</strong> {{ $totalHorasACC }}</p>
     <p>{{ $necessarioACC }}</p>
 
     <!-- Resumo das Horas de Extensão -->
@@ -276,9 +279,9 @@ $totalHorasExtrapoladas += $horasPorAtividade[$idAtividade]['extrapoladas'];
 
 
 @php
-$certificadosPendentes = $certificados->where('type', 'Pendente')->count();
-$certificadosAprovados = $certificados->where('type', 'Aprovada')->count();
-$certificadosRejeitados = $certificados->where('type', 'Rejeitada')->count();
+$certificadosPendentes = $certificados->where('type', 'pendente')->count();
+$certificadosAprovados = $certificados->where('type', 'aprovada')->count();
+$certificadosRejeitados = $certificados->where('type', 'rejeitada')->count();
 @endphp
 
 <div style="border: px solid #ccc; padding: 20px; margin-bottom: 10px;">
@@ -306,6 +309,9 @@ $certificadosRejeitados = $certificados->where('type', 'Rejeitada')->count();
                                     <p style="text-align: center;"><strong>Certificados Rejeitados:</strong> {{ $certificadosRejeitados }}</p>
                               </div>
               </div>
+              <p style="font-size: 24px; color: blue; font-weight: bold; text-align: center;">
+    <strong>Soma Total das Horas ACC Aceitas Sistema:</strong> {{$totalHorasAceitas}}
+</p>
       </div>
   </div>
 </div>

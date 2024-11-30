@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
 use App\Models\User;
+use Psy\Readline\Hoa\Console;
 
 class PdfController extends Controller
 {
@@ -57,6 +58,7 @@ class PdfController extends Controller
 }
 public function generatePdf1()
     {
+        
         $user = Auth::user();
         $curso = AdCursos::find($user->id_curso);
 
@@ -93,7 +95,7 @@ public function generatePdf1()
         if ($certificados->isNotEmpty()) {
             $discente = $certificados->first()->user;
         } else {
-            $discente = null; // ou uma instância padrão de User, dependendo da sua lógica
+            $discente = 'null'; // ou uma instância padrão de User, dependendo da sua lógica
         }
            $atividadeCounts = $certificados->groupBy('id_tipo_atividade')
         ->map(function ($rows) use ($curso) {
@@ -172,105 +174,108 @@ public function generatePdf1()
     }
     
 
-
-
-public function generatePdfuser($id)
-{
-    $user = User::find($id);
-    $curso = AdCursos::find($user->id_curso);
-
-    if (!$curso) {
-        return Redirect::route('error');
-    }
-
-    $horaExtensão = $curso->carga_horaria_Extensao;
-
-    $query = NgCertificados::with(['ngAtividade', 'user']);
-
-    if (!$user->isSuperAdmin()) {
-        if ($user->isAdmin()) {
-            $query->whereHas('user', function ($q) use ($user) {
-                $q->where('id_professor', $user->id);
-            });
-        } else {
-            $query->where('id_usuario', $user->id);
+    public function generatePdfuser($id)
+    {
+        $user = User::find($id); // Encontrar o usuário pelo ID fornecido
+        $curso = AdCursos::find($user->id_curso);
+    
+        if (!$curso) {
+            return Redirect::route('error');
         }
-    }
-
-    $certificados = $query->get();
-
-    // Contar o número total de certificados
-    $totalCertificados = $certificados->count();
-
-    // Contar a ocorrência de cada tipo de atividade, somar horas ACC e calcular percentual máximo permitido
-    $atividadeCounts = $certificados->groupBy('id_tipo_atividade')
-        ->map(function ($rows, $id_tipo_atividade) use ($curso) {
-            $count = $rows->count();
-            $horas_acc_sum = $rows->sum('horas_ACC');
-            $atividade = NgAtividades::find($id_tipo_atividade);
-            $percentual_maximo = $atividade ? $atividade->percentual_maximo : 0;
-
-            if ($id_tipo_atividade === 10) {
-                $maxHorasPermitidas = ($percentual_maximo * $curso->carga_horaria_Extensao) / 100;
+    
+        $horaExtensão = $curso->carga_horaria_Extensao;
+    
+        $query = NgCertificados::with(['ngAtividade', 'user']);
+    
+        if (!$user->isSuperAdmin()) {
+            if ($user->isAdmin()) {
+                $query->whereHas('user', function ($q) use ($user) {
+                    $q->where('id_professor', $user->id);
+                });
             } else {
-                $maxHorasPermitidas = ($percentual_maximo * $curso->carga_horaria_ACC) / 100;
+                $query->where('id_usuario', $user->id);
             }
+        }
+    
+        $certificados = $query->get();
+    
+        // Contar o número total de certificados
+        $totalCertificados = $certificados->count();
+    
+        // Adicionar o discente, utilizando o nome do usuário
+        $discente = $user;
+    
+        // Contar a ocorrência de cada tipo de atividade, somar horas ACC e calcular percentual máximo permitido
+        $atividadeCounts = $certificados->groupBy('id_tipo_atividade')
+            ->map(function ($rows, $id_tipo_atividade) use ($curso) {
+                $count = $rows->count();
+                $horas_acc_sum = $rows->sum('horas_ACC');
+                $atividade = NgAtividades::find($id_tipo_atividade);
+                $percentual_maximo = $atividade ? $atividade->percentual_maximo : 0;
+    
+                if ($id_tipo_atividade === 10) {
+                    $maxHorasPermitidas = ($percentual_maximo * $curso->carga_horaria_Extensao) / 100;
+                } else {
+                    $maxHorasPermitidas = ($percentual_maximo * $curso->carga_horaria_ACC) / 100;
+                }
+    
+                $horasRestantes = $maxHorasPermitidas - $horas_acc_sum;
+                $horasExcedentes = $horas_acc_sum > $maxHorasPermitidas ? $horas_acc_sum - $maxHorasPermitidas : 0;
+                $horasValidas = $horas_acc_sum > $maxHorasPermitidas ? $maxHorasPermitidas : $horas_acc_sum;
+    
+                $comparacao = $horas_acc_sum > $maxHorasPermitidas
+                    ? "Alcançou o máximo de horas permitidas para integralizar. Horas não consideradas: {$horasExcedentes}"
+                    : "Faltam {$horasRestantes} horas para alcançar o máximo permitido :)";
+    
+                return [
+                    'count' => $count,
+                    'horas_acc_sum' => $horasValidas,
+                    'horasExcedentes' => $horasExcedentes,
+                    'percentual_maximo' => $percentual_maximo,
+                    'maxHorasPermitidas' => $maxHorasPermitidas,
+                    'comparacao' => $comparacao,
+                    'atividade' => $atividade
+                ];
+            })
+            ->sortDesc();
+    
+        // Calcular a soma total das horas ACC e das horas de extensão
+        $totalHorasACC = $certificados->where('id_tipo_atividade', '!=', 10)->sum('horas_ACC');
+    
+        $totalHorasExtensao = $certificados->where('id_tipo_atividade', 10)->sum(function ($certificado) use ($atividadeCounts) {
+            return $atividadeCounts[$certificado->id_tipo_atividade]['horas_acc_sum'];
+        });
+    
+        // Comparar a soma total das horas ACC com as horas máximas permitidas
+        $maxHorasACC = $curso->carga_horaria_ACC;
+        $maxHorasExtensao = $curso->carga_horaria_Extensao;
+    
+        $necessarioACC = $totalHorasACC >= $maxHorasACC
+            ? 'Alcançou o máximo de horas ACC permitidas para integralizar'
+            : 'Faltam ' . ($maxHorasACC - $totalHorasACC) . ' horas para alcançar o máximo permitido de horas ACC';
+    
+        $necessarioExtensao = $totalHorasExtensao >= $maxHorasExtensao
+            ? 'Alcançou o máximo de horas de Extensão permitidas para integralizar'
+            : 'Faltam ' . ($maxHorasExtensao - $totalHorasExtensao) . ' horas para alcançar o máximo permitido de horas de Extensão';
+    
+        $pdf = Pdf::loadView('pdf.reporte', compact(
+            'certificados',
+            'totalCertificados',
+            'atividadeCounts',
+            'curso',
+            'discente', // Passando o nome do discente para a view
+            'totalHorasACC',
+            'totalHorasExtensao',
+            'necessarioACC',
+            'necessarioExtensao'
+        ))
+        ->setPaper('a4', 'landscape');
+    
+        return $pdf->download('reportes.pdf');
+    }
+    
 
-            $horasRestantes = $maxHorasPermitidas - $horas_acc_sum;
-            $horasExcedentes = $horas_acc_sum > $maxHorasPermitidas ? $horas_acc_sum - $maxHorasPermitidas : 0;
-            $horasValidas = $horas_acc_sum > $maxHorasPermitidas ? $maxHorasPermitidas : $horas_acc_sum;
-
-            $comparacao = $horas_acc_sum > $maxHorasPermitidas
-                ? "Alcançou o máximo de horas permitidas para integralizar. Horas não consideradas: {$horasExcedentes}"
-                : "Faltam {$horasRestantes} horas para alcançar o máximo permitido :)";
-
-            return [
-                'count' => $count,
-                'horas_acc_sum' => $horasValidas,
-                'horasExcedentes' => $horasExcedentes,
-                'percentual_maximo' => $percentual_maximo,
-                'maxHorasPermitidas' => $maxHorasPermitidas,
-                'comparacao' => $comparacao,
-                'atividade' => $atividade
-            ];
-        })
-        ->sortDesc();
-
-    // Calcular a soma total das horas ACC e das horas de extensão
-    $totalHorasACC = $certificados->where('id_tipo_atividade', '!=', 10)->sum(function ($certificado) use ($atividadeCounts) {
-        return $atividadeCounts[$certificado->id_tipo_atividade]['horas_acc_sum'];
-    });
-
-    $totalHorasExtensao = $certificados->where('id_tipo_atividade', 10)->sum(function ($certificado) use ($atividadeCounts) {
-        return $atividadeCounts[$certificado->id_tipo_atividade]['horas_acc_sum'];
-    });
-
-    // Comparar a soma total das horas ACC com as horas máximas permitidas
-    $maxHorasACC = $curso->carga_horaria_ACC;
-    $maxHorasExtensao = $curso->carga_horaria_Extensao;
-
-    $necessarioACC = $totalHorasACC >= $maxHorasACC
-        ? 'Alcançou o máximo de horas ACC permitidas para integralizar'
-        : 'Faltam ' . ($maxHorasACC - $totalHorasACC) . ' horas para alcançar o máximo permitido de horas ACC';
-
-    $necessarioExtensao = $totalHorasExtensao >= $maxHorasExtensao
-        ? 'Alcançou o máximo de horas de Extensão permitidas para integralizar'
-        : 'Faltam ' . ($maxHorasExtensao - $totalHorasExtensao) . ' horas para alcançar o máximo permitido de horas de Extensão';
-
-    $pdf = Pdf::loadView('pdf.reporte', compact(
-        'certificados',
-        'totalCertificados',
-        'atividadeCounts',
-        'curso',
-        'totalHorasACC',
-        'totalHorasExtensao',
-        'necessarioACC',
-        'necessarioExtensao'
-    ))
-    ->setPaper('a4', 'landscape');
-
-    return $pdf->download('reportes.pdf');
-}
+   
 
 private function calcularComparacao($horas_acc_sum, $percentual_maximo, $carga_horaria_ACC)
 {

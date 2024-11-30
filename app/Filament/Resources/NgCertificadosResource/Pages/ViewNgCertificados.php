@@ -23,10 +23,14 @@ class ViewNgCertificados extends ViewRecord
 
         return [
             Action::make('Aprovar')
-                ->label('Aprovar')
+                ->label('Aprovar ')
                 ->action(function () {
+                    $horasACC_Back = $this->record->horas_ACC_Back;
+
                     $this->record->update([
                         'type' => 'Aprovada',
+                        'horas_ACC' => $horasACC_Back, // Use o valor real do campo horas_ACC_Back
+
                     ]);
                     
                     
@@ -55,8 +59,9 @@ class ViewNgCertificados extends ViewRecord
                         
                 ])
                 ->action(function (array $data) {
-                    $this->record->update([
+                    $this->record->update(attributes: [
                         'type' => 'Rejeitada',
+                        'horas_ACC' => 0, // Defina como 0 ao rejeitar
                         'observacao' => $data['observacao'], // Salva a observação no modelo
                     ]);
                     

@@ -52,6 +52,8 @@ class NgCertificadosResource extends Resource
                         $set('valor_unitario', null);
                         $set('percentual_maximo', null);
                         $set('horas_ACC', null);
+                        $set('horas_ACC_Back', null);
+
                         $set('carga_horaria', null);
                     }),
 
@@ -73,6 +75,7 @@ class NgCertificadosResource extends Resource
             })
             ->afterStateUpdated(function (callable $set, callable $get, $state) {
                 $set('horas_ACC', null);
+                $set('horas_ACC_Back', null);
                 $set('carga_horaria', null);
                 
 
@@ -183,6 +186,9 @@ class NgCertificadosResource extends Resource
                                 ->send();
                         }
                         $set('horas_ACC', $horasACC);
+                        $set('horas_ACC_Back', $horasACC);
+
+
                     } else {
                         // Cálculo das horas para outros casos
                         $horasACC = $cargaHoraria / $valorUnitario;
@@ -195,6 +201,7 @@ class NgCertificadosResource extends Resource
                                 ->send();
                         }
                         $set('horas_ACC', $horasACC);
+                        $set('horas_ACC_Back', $horasACC);
                     }
                 }),
     
@@ -230,7 +237,17 @@ class NgCertificadosResource extends Resource
                 ->default(0)
                 ->disabled()
                 ->extraAttributes(['hidden' => 'hidden']),
+         
             Forms\Components\Hidden::make('horas_ACC')
+                ->default(0),
+
+            Forms\Components\TextInput::make('horas_ACC_Back') // This hidden field ensures the value is sent to the database
+            ->label('Horas ACC Back')
+            ->default(0)
+            ->disabled()
+            ->extraAttributes(['hidden' => 'hidden']),
+
+            Forms\Components\Hidden::make('horas_ACC_Back')
                 ->default(0),
     
             Forms\Components\TextInput::make('type')
@@ -277,9 +294,9 @@ class NgCertificadosResource extends Resource
                  Tables\Columns\TextColumn::make('type')
                  ->badge()
                  ->color(fn ($state) => match($state) {
-                     'Aprovada' => 'success',
-                     'Pendente' => 'warning',
-                     'Rejeitada' => 'danger',
+                     'aprovada' => 'success',
+                     'pendente' => 'warning',
+                     'rejeitada' => 'danger',
                      default => null,  // Ou você pode escolher uma cor padrão como 'secondary'
                  })
                  ->tooltip(fn ($state) => $state === 'Rejeitada' ? 'Veja a observação do orientador e Envie de novo o certificado, atendendo o solicitado em caso de ser necesário' : null),

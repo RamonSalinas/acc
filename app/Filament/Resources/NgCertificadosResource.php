@@ -113,8 +113,9 @@ class NgCertificadosResource extends Resource
     
                 Forms\Components\TextInput::make('nome_certificado')
                     ->required()
-                   ->default('NOME TESTE')
-                    ->maxLength(255),
+                   ->default('')
+                    ->maxLength(255)
+                    ->placeholder('Digite o nome do certificado'),
     
                 Forms\Components\TextInput::make('carga_horaria')
                 ->label('Carga Horária ou Número de Atividades')
@@ -206,12 +207,14 @@ class NgCertificadosResource extends Resource
                 }),
     
             Forms\Components\Textarea::make('descricao')
-                ->default('TESTE DE FUEGO'),
+                ->default('')
+                ->placeholder('Digite o nome a descrição do certificado'),
     
             Forms\Components\TextInput::make('local')
                 ->required()
-                ->default('Truijillo')
-                ->maxLength(255),
+                ->default('')
+                ->maxLength(255)
+                ->placeholder('Digite o local'),
     
             Forms\Components\DatePicker::make('data_inicio')
                 ->default(Carbon::now())
@@ -241,11 +244,6 @@ class NgCertificadosResource extends Resource
             Forms\Components\Hidden::make('horas_ACC')
                 ->default(0),
 
-            Forms\Components\TextInput::make('horas_ACC_Back') // This hidden field ensures the value is sent to the database
-            ->label('Horas ACC Back')
-            ->default(0)
-            ->disabled()
-            ->extraAttributes(['hidden' => 'hidden']),
 
             Forms\Components\Hidden::make('horas_ACC_Back')
                 ->default(0),

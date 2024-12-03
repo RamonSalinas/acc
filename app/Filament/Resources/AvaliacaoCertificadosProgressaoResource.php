@@ -274,7 +274,7 @@ class AvaliacaoCertificadosProgressaoResource extends Resource
                         return;
                     }
 
-                    $pontuacao = $valorUnitario * $idTipoAtividade * $quantidade;
+                    $pontuacao = $valorUnitario * $quantidade;
                     $set('pontuacao_avaliador', $pontuacao);
 
                     $user = Auth::user();

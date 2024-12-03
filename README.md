@@ -265,4 +265,4 @@ php artisan storage:link
 
 docker build -t acc_progressao .
 
-docker run -it -p 8000:8000 -v $(pwd)/storage/app/public:/app/storage/app/public acc_progressao
+docker run -it -d -p 8000:8000 -v $(pwd)/storage/app/public:/app/storage/app/public acc_progressao

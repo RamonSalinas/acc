@@ -35,25 +35,27 @@
         th {
             background-color: #f4f4f4;
         }
+        .page-break {
+            page-break-after: always;
+        }
+        .image-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .image-container img {
+            max-width: 100%;
+            height: auto;
+        }
     </style>
 </head>
-<body>
-    <div class="container">
-        <h1>Lista de Certificados</h1>
-
-        <div class="header-info">
-            <h2>{{ $user->name }}</h2>
-            <h3>Curso: {{ $curso->nome_curso }}</h3>
-            <p>PPC: {{ $curso->ppc }}</p>
-            <p>Horas Totais: {{ $curso->carga_horaria_total }}</p>
-            <p>Horas ACC: {{ $curso->carga_horaria_ACC }}</p>
-            <p>Horas de Extensão: {{ $curso->carga_horaria_Extensao }}</p>
-        </div>
-
+<p style="text-align: center; font-size: 16px; font-weight: bold; margin-bottom: 20px;">
+    <a href="http://127.0.0.1:8000/storage/unificado.pdf" target="_blank" style="color: blue; text-decoration: underline;">
+        BAIXAR PDF DOCUMENTOS SALVOS
+    </a>
+</p>
         <table>
             <thead>
                 <tr>
-                    {{-- <th>ID</th> --}}
                     <th>Nome Certificado</th>
                     <th>Carga Horária</th>
                     <th>Tipo</th>
@@ -62,14 +64,12 @@
                     <th>Data Início</th>
                     <th>Data Final</th>
                     <th>Atividade</th>
-                    {{-- <th>Usuário</th> --}}
                     <th>Horas ACC</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($certificados as $certificado)
                     <tr>
-                        {{-- <td>{{ $certificado->id }}</td> --}}
                         <td>{{ $certificado->nome_certificado }}</td>
                         <td>{{ $certificado->carga_horaria }}</td>
                         <td>{{ $certificado->type }}</td>
@@ -78,12 +78,67 @@
                         <td>{{ $certificado->data_inicio }}</td>
                         <td>{{ $certificado->data_final }}</td>
                         <td>{{ $certificado->ngAtividade->nome_atividade ?? 'N/A' }}</td>
-                        {{-- <td>{{ $certificado->user->name ?? 'N/A' }}</td> --}}
                         <td>{{ $certificado->horas_ACC }}</td>
                     </tr>
                 @endforeach
             </tbody>
         </table>
+        
+
+      
+@foreach($certificados as $certificado)
+    <div class="certificate-container" style="page-break-inside: avoid; margin-bottom: 20px;">
+        <div class="image-container" style="text-align: center; margin-bottom: 10px;">
+            @if($certificado->arquivo)
+                @php
+                    $filePath = public_path('storage/' . $certificado->arquivo);
+                    $fileExtension = pathinfo($filePath, PATHINFO_EXTENSION);
+                @endphp
+
+                @if(in_array($fileExtension, ['jpg', 'jpeg', 'png', 'gif']))
+                    @if(file_exists($filePath))
+                        <img src="{{ asset('storage/' . $certificado->arquivo) }}" alt="Certificado" style="max-width: 60%; height: auto;">
+                    @else
+                        <p style="font-size: 12px; color: red;">Imagem não encontrada ou indisponível.</p>
+                    @endif
+                @elseif($fileExtension === 'pdf')
+                    <div style="text-align: center; margin-bottom: 10px;">
+                        <embed src="{{ asset('storage/' . $certificado->arquivo) }}" type="application/pdf" width="80%" height="500px" />
+                        <p style="font-size: 12px; margin-top: 10px;">Se o PDF não carregar, clique no link abaixo para visualizá-lo ou baixá-lo:</p>
+                        <a href="{{ asset('storage/' . $certificado->arquivo) }}" target="_blank" style="font-size: 14px; color: blue; text-decoration: underline;">
+                            Visualizar ou Baixar PDF
+                        </a>
+                    </div>
+                @else
+                    <p style="font-size: 12px;">Formato de arquivo não suportado: {{ $fileExtension }}</p>
+                @endif
+            @else
+                <p style="font-size: 12px;">Arquivo não disponível</p>
+            @endif
+        </div>
+
+        <div class="info-container" style="font-size: 12px;">
+            <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                <tr>
+                    <td style="border: 1px solid #ddd; padding: 6px;">Carga Horária</td>
+                    <td style="border: 1px solid #ddd; padding: 6px;">{{ $certificado->carga_horaria }}</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #ddd; padding: 6px;">Grupo Atividade</td>
+                    <td style="border: 1px solid #ddd; padding: 6px;">{{ $certificado->grupo_atividades }}</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #ddd; padding: 6px;">Atividade</td>
+                    <td style="border: 1px solid #ddd; padding: 6px;">{{ $certificado->ngAtividade->nome_atividade ?? 'N/A' }}</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #ddd; padding: 6px;">Horas ACC</td>
+                    <td style="border: 1px solid #ddd; padding: 6px;">{{ $certificado->horas_ACC }}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+@endforeach
     </div>
 </body>
 </html>

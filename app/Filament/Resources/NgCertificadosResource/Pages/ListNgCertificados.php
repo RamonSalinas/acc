@@ -21,7 +21,7 @@ class ListNgCertificados extends ListRecords
             return [
                 Actions\CreateAction::make(),
                 Actions\Action::make('downloadPdf')
-                    ->label('Download PDF')
+                    ->label('Downloadmmm PDF')
                     ->url(route('ng-certificados.pdf'))
                     ->color('warning')
                     ->icon('academicon-sci-hub-square'),
@@ -34,7 +34,7 @@ class ListNgCertificados extends ListRecords
             // Se for um administrador, retorna apenas o botão de download do PDF
             return [
                 Actions\Action::make('downloadPdf')
-                    ->label('Download PDF')
+                    ->label('Certificados consolidados PDF')
                     ->url(route('ng-certificados.pdf'))
                     ->color('warning')
                     ->icon('academicon-sci-hub-square'),
@@ -45,7 +45,7 @@ class ListNgCertificados extends ListRecords
         return [
             Actions\CreateAction::make(),
             Actions\Action::make('downloadPdf')
-                ->label('Download PDF')
+                ->label('Certificados consolidados PDF')
                 ->url(route('ng-certificados.pdf'))
                 ->color('warning')
                 ->icon('academicon-sci-hub-square'),

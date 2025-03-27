@@ -6,6 +6,11 @@ COPY . .
 RUN composer install
 RUN composer require laravel/octane
 
+# Instalar FPDI e FPDF para manipulação de PDFs
+RUN composer require setasign/fpdi
+RUN composer require setasign/fpdf
+
+
 # Instalar Node.js usando n
 RUN apk add --no-cache curl && \
     curl -L https://raw.githubusercontent.com/tj/n/master/bin/n -o /usr/local/bin/n && \

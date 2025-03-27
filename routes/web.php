@@ -34,7 +34,7 @@ Route::get('/test-professor', function () {
 */
 
 // routes/web.php
-
+Route::get('/ng-certificados/unificar', [PdfController::class, 'unificarCertificados'])->name('ng-certificados.unificar');
 
 Route::get('/ng-certificados/pdf', [PdfController::class, 'generatePdf'])->name('ng-certificados.pdf');
 Route::get('/reports/pdf', [PdfController::class, 'generatePdf1'])->name('reports.pdf');

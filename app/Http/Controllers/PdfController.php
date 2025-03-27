@@ -12,18 +12,32 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
 use App\Models\User;
 use Psy\Readline\Hoa\Console;
+use setasign\Fpdi\Fpdi;
+use setasign\Fpdf\Fpdf;
 
 class PdfController extends Controller
 {
     public function generatePdf()
 {
     $user = Auth::user();
+    // dd($user, $user->id); // Exibe o objeto $user e o ID do usuário
+
     $curso = AdCursos::find($user->id_curso);
 
     // Verificar se o usuário tem o curso registrado
     if (!$curso) {
         return Redirect::route('error');
     }
+
+
+     // Chamar a função para unificar os PDFs
+     $unificadoPath = $this->unificarCertificadosInterno();
+
+     // Verificar se o arquivo unificado foi gerado
+     if (!file_exists($unificadoPath)) {
+         abort(500, 'Erro ao gerar o arquivo PDF unificado.');
+     }
+ 
 
     // Verificar se o usuário é super administrador
     if ($user->isSuperAdmin()) {
@@ -50,12 +64,170 @@ class PdfController extends Controller
                                           ->get();
         }
     }
+    
 
     $pdf = Pdf::loadView('pdf.certificados', compact('certificados', 'user', 'curso'))
               ->setPaper('a4', 'landscape');  // Set the orientation to landscape
 
     return $pdf->download('certificados.pdf');
 }
+
+
+
+private function unificarCertificadosInterno()
+{
+    $certificados = $this->getCertificados();
+    $outputPath = public_path('storage/unificado.pdf'); // Caminho do PDF final unificado
+
+    // Crie um novo PDF com FPDI
+    $pdf = new Fpdi();
+
+    // Adicione o PDF recém-criado
+    $pdfRecemCriado = public_path('storage/certificados_recem_criado.pdf'); // Substitua pelo caminho do PDF gerado
+    if (file_exists($pdfRecemCriado)) {
+        $pageCount = $pdf->setSourceFile($pdfRecemCriado);
+        for ($i = 1; $i <= $pageCount; $i++) {
+            $tplIdx = $pdf->importPage($i);
+            $size = $pdf->getTemplateSize($tplIdx);
+
+            // Ajustar a orientação com base no tamanho da página
+            $orientation = ($size['width'] > $size['height']) ? 'L' : 'P';
+            $pdf->AddPage($orientation);
+            $pdf->useTemplate($tplIdx);
+        }
+    }
+
+    // Adicione os PDFs e imagens de $certificado->arquivo
+    foreach ($certificados as $certificado) {
+        if ($certificado->arquivo) {
+            $filePath = public_path('storage/' . $certificado->arquivo);
+            $fileExtension = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
+
+            if (file_exists($filePath)) {
+                if ($fileExtension === 'pdf') {
+                    // Adicionar páginas de PDF
+                    $pageCount = $pdf->setSourceFile($filePath);
+                    for ($i = 1; $i <= $pageCount; $i++) {
+                        $tplIdx = $pdf->importPage($i);
+                        $size = $pdf->getTemplateSize($tplIdx);
+
+                        // Ajustar a orientação com base no tamanho da página
+                        $orientation = ($size['width'] > $size['height']) ? 'L' : 'P';
+                        $pdf->AddPage($orientation);
+                        $pdf->useTemplate($tplIdx);
+                    }
+                } elseif (in_array($fileExtension, ['jpg', 'jpeg', 'png'])) {
+                    // Adicionar imagens
+                    list($width, $height) = getimagesize($filePath);
+
+                    // Converter dimensões para milímetros (FPDF usa mm)
+                    $widthMm = $width * 0.264583; // 1 pixel = 0.264583 mm
+                    $heightMm = $height * 0.264583;
+
+                    // Ajustar a orientação com base no tamanho da imagem
+                    $orientation = ($widthMm > $heightMm) ? 'L' : 'P';
+                    $pdf->AddPage($orientation);
+
+                    // Adicionar a imagem ao PDF
+                    $pdf->Image($filePath, 10, 10, $widthMm > 190 ? 190 : $widthMm); // Limitar largura a 190mm
+                }
+            }
+        }
+    }
+
+    // Salve o PDF unificado
+    $pdf->Output($outputPath, 'F'); // Salva o arquivo no servidor
+
+    return $outputPath; // Retorna o caminho do arquivo unificado
+}
+
+private function getCertificados($user = null)
+{
+
+    $user = $user ?? Auth::user();
+
+    if (!$user) {
+        abort(403, 'Usuário não autenticado.');
+    }
+
+
+    // Verificar se o usuário é super administrador
+    if ($user->isSuperAdmin()) {
+        // Retornar todos os certificados
+        return NgCertificados::with(['ngAtividade', 'user'])->get();
+    }
+
+    // Verificar se o usuário é administrador
+    if ($user->isAdmin()) {
+        // Retornar certificados do próprio administrador ou de usuários associados a ele
+        return NgCertificados::with(['ngAtividade', 'user'])
+            ->where(function ($query) use ($user) {
+                $query->where('id_usuario', $user->id)
+                    ->orWhereHas('user', function ($query) use ($user) {
+                        $query->where('id_professor', $user->id);
+                    });
+            })
+            ->get();
+    }
+
+    // Caso contrário, retornar apenas os certificados do próprio usuário
+    return NgCertificados::with(['ngAtividade', 'user'])
+        ->where('id_usuario', $user->id)
+        ->get();
+}
+
+
+
+public function unificarCertificados()
+{
+    $certificados = $this->getCertificados();
+    $outputPath = public_path('storage/unificado.pdf'); // Caminho do PDF final unificado
+
+    // Crie um novo PDF com FPDI
+    $pdf = new Fpdi();
+
+    // Adicione o PDF recém-criado
+    $pdfRecemCriado = public_path('storage/certificados_recem_criado.pdf'); // Substitua pelo caminho do PDF gerado
+    if (file_exists($pdfRecemCriado)) {
+        $pageCount = $pdf->setSourceFile($pdfRecemCriado);
+        for ($i = 1; $i <= $pageCount; $i++) {
+            $tplIdx = $pdf->importPage($i);
+            $pdf->AddPage();
+            $pdf->useTemplate($tplIdx);
+        }
+    }
+
+    // Adicione os PDFs de $certificado->arquivo
+    foreach ($certificados as $certificado) {
+        if ($certificado->arquivo) {
+            $filePath = public_path('storage/' . $certificado->arquivo);
+            $fileExtension = pathinfo($filePath, PATHINFO_EXTENSION);
+
+            // Verifique se o arquivo é um PDF
+            if (file_exists($filePath) && $fileExtension === 'pdf') {
+                $pageCount = $pdf->setSourceFile($filePath);
+                for ($i = 1; $i <= $pageCount; $i++) {
+                    $tplIdx = $pdf->importPage($i);
+                    $pdf->AddPage();
+                    $pdf->useTemplate($tplIdx);
+                }
+            }
+        }
+    }
+
+    // Salve o PDF unificado
+    $pdf->Output($outputPath, 'F'); // Salva o arquivo no servidor
+
+    // Retorne o PDF unificado para download
+    return response()->download($outputPath);
+}
+
+
+
+
+
+
+
 public function generatePdf1()
     {
         

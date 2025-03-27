@@ -16,7 +16,7 @@ class ListReports extends ListRecords
     {
         return [
             Actions\Action::make('downloadPdf')
-                ->label('Download PDF')
+                ->label('Download xxPDF')
                 ->url(route('reports.pdf'))
                 ->color('warning')
                 ->icon('academicon-openedition'),
@@ -27,7 +27,7 @@ class ListReports extends ListRecords
     {
         return [
             Actions\Action::make('downloadPdfFooter')
-                ->label('Download PDF')
+                ->label('Download PxxDF')
                 ->url(route('reports.pdf'))
                 ->color('warning')
                 ->icon('academicon-openedition'),

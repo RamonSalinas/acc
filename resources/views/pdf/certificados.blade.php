@@ -49,8 +49,8 @@
     </style>
 </head>
 <p style="text-align: center; font-size: 16px; font-weight: bold; margin-bottom: 20px;">
-    <a href="http://127.0.0.1:8000/storage/unificado.pdf" target="_blank" style="color: blue; text-decoration: underline;">
-        BAIXAR PDF DOCUMENTOS SALVOS
+    <a href="{{ asset('storage/unificado.pdf') }}" target="_blank" style="color: blue; text-decoration: underline;">
+        BAIXAR PDF CONSOLIDADO
     </a>
 </p>
         <table>

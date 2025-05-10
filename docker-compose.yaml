@@ -12,9 +12,12 @@ services:
       dockerfile: Dockerfile
     # descomente a linha abaixo se precisar instalar as dependências do Composer no contêiner
     # command: bash -c "composer install"
-    command: php artisan octane:start --server="swoole" --host="0.0.0.0"
+    command: php artisan octane:start --server="swoole" --host="0.0.0.0" --watch
     volumes:
       - ./:/app
+      - /app/vendor
+      - /app/node_modules
+    #  - ./storage/app/public:/app/storage/app/public # Persistência de arquivos
     restart: always
     env_file:
       - .env

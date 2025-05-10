@@ -208,7 +208,8 @@ class NgCertificadosResource extends Resource
     
             Forms\Components\Textarea::make('descricao')
                 ->default('')
-                ->placeholder('Digite o nome a descrição do certificado'),
+                ->placeholder('Digite o nome a descrição do certificado')
+                ->required(), // Torna o campo obrigatório no formulário
     
             Forms\Components\TextInput::make('local')
                 ->required()
@@ -230,7 +231,58 @@ class NgCertificadosResource extends Resource
                     ->directory('certificados')
                     ->acceptedFileTypes(['image/*', 'application/pdf'])
                     ->maxSize(10240) // Limite de tamanho de 10 MB
-                    ->required(),
+                    ->afterStateUpdated(function ($state, callable $set) {
+                        $path = $state?->storePublicly('certificados', ['disk' => 'public']);
+                        
+                        if (!$path) {
+                            return;
+                        }
+                    
+                        $filePath = storage_path('app/public/' . $path);
+                    
+                        if (pathinfo($filePath, PATHINFO_EXTENSION) === 'pdf') {
+                            try {
+                                $pdf = new \setasign\Fpdi\Fpdi();
+                                $pdf->setSourceFile($filePath);
+                    
+                                Notification::make()
+                                    ->title('Upload concluído')
+                                    ->body('O arquivo PDF foi enviado e validado com sucesso.')
+                                    ->success()
+                                    ->send();
+                    
+                            } catch (\setasign\Fpdi\PdfParser\CrossReference\CrossReferenceException $e) {
+                                if (str_contains($e->getMessage(), 'compression technique')) {
+                                    $outputPath = storage_path('app/public/certificados/reprocessed_' . basename($filePath));
+                                    $command = "gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/prepress -dNOPAUSE -dQUIET -dBATCH -sOutputFile={$outputPath} {$filePath}";
+                                    exec($command, $output, $returnVar);
+                    
+                                    if ($returnVar === 0 && file_exists($outputPath)) {
+                                        rename($outputPath, $filePath);
+                                        Notification::make()
+                                            ->title('Upload corrigido')
+                                            ->body('O PDF foi reprocessado com sucesso e está pronto para uso.')
+                                            ->success()
+                                            ->send();
+                                    } else {
+                                        unlink($filePath);
+                                        $set(null); // limpa o campo
+                                        Notification::make()
+                                            ->title('Erro ao corrigir PDF')
+                                            ->body('O PDF possui compressão incompatível e não pôde ser corrigido.')
+                                            ->danger()
+                                            ->send();
+                                    }
+                                } else {
+                                    Notification::make()
+                                        ->title('Erro inesperado')
+                                        ->body('Erro ao abrir o PDF: ' . $e->getMessage())
+                                        ->danger()
+                                        ->send();
+                                }
+                            }
+                        }
+                    }),
     
             Forms\Components\Hidden::make('id_usuario')
                 ->default(fn () => Auth::id()),
@@ -256,7 +308,7 @@ class NgCertificadosResource extends Resource
 
             // Dentro da função form()
             Forms\Components\Textarea::make('observacao')
-            ->label('Observação Orientador')
+            ->label('Observação Orientador:')
             ->readOnly()
             ->maxLength(500), // Limite de caracteres para a observação    
         ]);

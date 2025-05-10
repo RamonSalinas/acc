@@ -126,8 +126,7 @@ class AvaliacaoCertificadosProgressaoResource extends Resource
                     $idTipoAtividade = $get('ad_grupo_progressao_id');
                     $valorUnitario = $get('referencia');
                     $quantidade = $get('quantidade');
-
-                    $pontuacao = $valorUnitario * $idTipoAtividade * $quantidade;
+                    $pontuacao = $valorUnitario * $idTipoAtividade * $quantidade;#Imagino que era um problema da versão anterior
                     $set('pontuacao', $pontuacao);
 
                     $user = Auth::user();

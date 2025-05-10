@@ -308,7 +308,7 @@ class NgCertificadosResource extends Resource
 
             // Dentro da função form()
             Forms\Components\Textarea::make('observacao')
-            ->label('Observação Orientador:')
+            ->label('Observação Orientador :')
             ->readOnly()
             ->maxLength(500), // Limite de caracteres para a observação    
         ]);

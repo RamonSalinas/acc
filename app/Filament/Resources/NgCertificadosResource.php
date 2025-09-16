@@ -53,8 +53,10 @@ class NgCertificadosResource extends Resource
                         $set('percentual_maximo', null);
                         $set('horas_ACC', null);
                         $set('horas_ACC_Back', null);
-
                         $set('carga_horaria', null);
+                        $set('descricao_atividade', null); // Limpa a descrição
+
+                        
                     }),
 
             Forms\Components\Select::make('id_tipo_atividade')
@@ -77,6 +79,8 @@ class NgCertificadosResource extends Resource
                 $set('horas_ACC', null);
                 $set('horas_ACC_Back', null);
                 $set('carga_horaria', null);
+                $set('descricao_atividade', null); // Limpa o campo de descrição
+
                 
 
                 if ($state) {
@@ -84,6 +88,8 @@ class NgCertificadosResource extends Resource
                     if ($atividade) {
                         $set('valor_unitario', $atividade->valor_unitario);
                         $set('percentual_maximo', $atividade->percentual_maximo);
+                        $set('descricao_atividade', $atividade->explicacao); // Define a descrição da atividade
+
 
                         if (in_array($state, [7, 9, 15,80,82,83,13,14,15,16,17,18,19,20,21,23,25,26,27,28,29,32,33,34,35,36,37,39,40,41,43,44,45,50,53,54,55,56,57,58,59,60,61,62,65,66,67,68,69,70,71,72,73,74])) {
 
@@ -96,6 +102,22 @@ class NgCertificadosResource extends Resource
                     }
                 }
             }),
+
+// Exibe a descrição da atividade com base na seleção Codigo Novo aqui
+                Forms\Components\Textarea::make('descricao_atividade')
+                ->label('Equivalência da Atividade (horas ou quantidade conforme tabela do Barema do CCET)')
+                ->disabled() // O campo será apenas para exibição
+                ->reactive() // Atualiza dinamicamente
+                ->dehydrated(false) // Não envia o valor para o banco de dados
+                ->extraAttributes(['class' => 'bg-yellow-100 border-yellow-500 text-yellow-900 font-bold p-4 rounded-lg'])
+                ->afterStateUpdated(function (callable $set, $state) {
+                    if ($state) {
+                        $atividade = NgAtividades::find($state);
+                        if ($atividade) {
+                            $set('descricao_atividade', $atividade->explicacao); // Define o valor da descrição
+                        }
+                    }
+                }),
     
                 Forms\Components\TextInput::make('valor_unitario')
                     ->label('Valor Unitário')
@@ -124,6 +146,8 @@ class NgCertificadosResource extends Resource
                     ->reactive()
                     ->numeric() // Ensure only numeric values
                     ->rule('min:1') // Ensure the value is   maior que 0
+                    ->helperText('Atenção: Preencha este campo com o valor indicado na tabela. Use “horas” quando for atividade em horas e “quantidade” quando for por atividade. Não confunda!') // Mensagem fixa
+
     ->afterStateUpdated(function (callable $set, callable $get) {
     $idTipoAtividade = $get('id_tipo_atividade');
     $valorUnitario = $get('valor_unitario');

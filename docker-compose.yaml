@@ -15,6 +15,7 @@ services:
     command: php artisan octane:start --server="swoole" --host="0.0.0.0" --watch
     volumes:
       - ./:/app
+      - ./storage/app/public:/app/storage/app/public  # ← ADICIONE ESTA LINHA Para Backup
       - /app/vendor
       - /app/node_modules
     #  - ./storage/app/public:/app/storage/app/public # Persistência de arquivos

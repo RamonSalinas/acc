@@ -16,6 +16,7 @@ class NgAtividades extends Model
         'nome_atividade',
         'valor_unitario',
         'percentual_maximo',
+        'explicacao',
     ];
 
     public function ngCertificados()

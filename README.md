@@ -258,6 +258,13 @@ Sistema para Calcular ACC dos alunos da UFOB Cursos da UFOB.   Usando um sistema
 >>>>>>> 30f95fe8ff603d1c7bf29634c89afee288262e6d
 
 Traits are reusable code components that enhance code organization. To create a new trait, simply run:
+
+Para executar no servidor
+
+
+ssh root@
+
+
 docker build . -t accclear
 docker run -it -p 8000:8000 accclear
 php artisan storage:link
@@ -266,3 +273,31 @@ php artisan storage:link
 docker build -t acc_progressao .
 
 docker run -it -d -p 8000:8000 -v $(pwd)/storage/app/public:/app/storage/app/public acc_progressao
+
+docker run -it -d -p 8000:8000 -v $(pwd)/storage/app/public:/app/storage/app/public acc_progressao:latest
+
+Passos para executar o container usando docker
+docker ps -a
+  392  docker stop 
+  393  docker rm 26c
+  394  sudo docker build -t acc_progressao .
+  395  docker ps -a
+  396
+  Passos para executar no xamp
+  instlar xamp
+  agregar banco de dados
+  modificar .env
+sftp://root@181.215.135.250/opt/lampp/htdocs/progressao/storage/app/public/certificados/01JTXKM6TYMR4Y41W9ETD7HWY6.png
+
+a8d86ae5df44
+
+
+pasos para atualizar 
+
+  731  git add .
+  732  git commit "atualizando"
+  733  git commit -m "Início do projeto 2"
+  734  git push -u origin main
+  735  ssh root@181.215.135.250
+  736  ssh root:181.215.135.250
+  737  ssh root@181.215.135.250

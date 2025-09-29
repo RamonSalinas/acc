@@ -18,6 +18,8 @@ class ViewNgCertificados extends ViewRecord
 
     public $observacao; // Adiciona a propriedade observacao
 
+
+
     protected function getActions(): array
     {
 

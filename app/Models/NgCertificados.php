@@ -24,6 +24,8 @@ class NgCertificados extends Model
         'grupo_atividades', // Certifique-se de que o campo grupo_atividades está presente
         'arquivo', // Novo campo adicionado
         'observacao', // Novo campo adicionado
+        'explicacao_atividade', // Adicionado aqui
+
 
 
     ];
@@ -36,6 +38,8 @@ class NgCertificados extends Model
     public function ngAtividade()
     {
         return $this->belongsTo(NgAtividades::class, 'id_tipo_atividade');
+
+        
     }
 
     public function grupoAtividades()
@@ -43,4 +47,11 @@ class NgCertificados extends Model
         return $this->belongsTo(AdGrupo::class, 'id');
 
     }
+
+    public function getDescricaoAtividadeAttribute()
+    {
+        return $this->ngAtividade->explicacao ?? 'Equivalência não disponível';
+    }
+   
+
 }

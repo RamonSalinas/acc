@@ -21,6 +21,9 @@ class CreateNgCertificados extends CreateRecord
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $recipient = Auth::user();
+
+        \Log::info('Dados enviados para criação de certificado:', $data);
+
         \Log::info('Enviando notificação para o usuário', ['user' => Auth::user()]);
 
         $notification = FilamentNotification::make()
@@ -36,7 +39,7 @@ class CreateNgCertificados extends CreateRecord
         Notification::make()
         ->title('Certificado registrado para aprovação')
         ->sendToDatabase($recipient);
-            \Log::info('Notificação enviada com sucesso');
+            \Log::info('Notificação enviada com sucesso perrito');
         } catch (\Exception $e) {
             \Log::error('Erro ao enviar notificação', ['exception' => $e]);
         }

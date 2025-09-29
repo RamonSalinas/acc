@@ -23,6 +23,7 @@ class EditNgCertificados extends EditRecord
     {
         // Pegue o usuário autenticado
         $user = Auth::user();
+        \Log::error('Estoy editantdo ? .', ['data' => $data]);
 
         // Verifique se a chave 'id_aluno' existe no array de dados
         if (array_key_exists('id_usuario', $data)) {
